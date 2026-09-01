@@ -1,0 +1,1 @@
+import{j as t}from"./framer-motion-DforBNzQ.js";import{c as o}from"./utils-C5h7FuRP.js";function d({children:a,className:s,variant:e="default",onClick:r}){return t.jsx("div",{onClick:r,className:o("glass-card rounded-2xl p-5",r&&"cursor-pointer",s),children:a})}export{d as P};
