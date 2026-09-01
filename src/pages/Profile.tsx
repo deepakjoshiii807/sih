@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 import { skillGaps, opportunities } from "@/lib/mockData";
 import { Link } from "react-router";
 
-const profile = { name: "Shubham Kumar", email: "shubham@example.com", education: "BCA — 3rd Year, Delhi University", goal: "ML Engineer", interests: ["AI & ML", "Data Science", "Cloud Computing"], reputation: 245 };
+const profile = { name: "Shubham", email: "shubham@example.com", education: "BCA — 3rd Year, Delhi University", goal: "ML Engineer", interests: ["AI & ML", "Data Science", "Cloud Computing"], reputation: 245 };
 
 export default function Profile() {
   return (
