@@ -1,41 +1,33 @@
 import { Link } from "react-router";
+import { Zap } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#E8E4DA] border-t border-[#D4CFC4]">
+    <footer className="bg-[#08080C] border-t border-white/[0.05]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 bg-[#1A1A1A] flex items-center justify-center">
-                <span className="text-[#FAF8F2] font-bold text-[10px] editorial">O</span>
-              </div>
-              <span className="text-[13px] font-bold tracking-tight editorial text-[#1A1A1A]">OPPORTUNE</span>
+              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#7C6BF0] to-[#5B8DEF] flex items-center justify-center"><Zap className="w-3.5 h-3.5 text-white" /></div>
+              <span className="text-[13px] font-semibold text-white tracking-tight">Opportune</span>
             </div>
-            <p className="text-[11px] text-[#7A7570] leading-relaxed sans-ui">
-              AI-powered opportunity discovery for India's students and young professionals.
-            </p>
+            <p className="text-[11px] text-white/25 leading-relaxed sans">AI-powered opportunity discovery for India's students.</p>
           </div>
           {[
-            { title: "Explore", links: [{ label: "Courses", href: "/explore?type=course" }, { label: "Scholarships", href: "/explore?type=scholarship" }, { label: "Internships", href: "/explore?type=internship" }, { label: "Jobs", href: "/explore?type=job" }] },
-            { title: "Community", links: [{ label: "Discussions", href: "/community" }, { label: "AI & ML", href: "/community" }, { label: "Web Dev", href: "/community" }, { label: "Scholarships", href: "/community" }] },
-            { title: "Company", links: [{ label: "About", href: "#" }, { label: "Privacy", href: "#" }, { label: "Terms", href: "#" }, { label: "Contact", href: "#" }] },
-          ].map((col) => (
-            <div key={col.title}>
-              <h4 className="text-[10px] font-bold text-[#1A1A1A] uppercase tracking-[0.15em] mb-3 sans-ui">{col.title}</h4>
-              <ul className="space-y-1.5">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <Link to={link.href} className="text-[11px] text-[#7A7570] hover:text-[#1A1A1A] transition-colors sans-ui">{link.label}</Link>
-                  </li>
-                ))}
-              </ul>
+            { title: "Explore", links: [{ l: "Courses", h: "/explore?type=course" }, { l: "Scholarships", h: "/explore?type=scholarship" }, { l: "Internships", h: "/explore?type=internship" }, { l: "Jobs", h: "/explore?type=job" }] },
+            { title: "Community", links: [{ l: "Discussions", h: "/community" }, { l: "AI & ML", h: "/community" }, { l: "Web Dev", h: "/community" }, { l: "Scholarships", h: "/community" }] },
+            { title: "Company", links: [{ l: "About", h: "#" }, { l: "Privacy", h: "#" }, { l: "Terms", h: "#" }, { l: "Contact", h: "#" }] },
+          ].map((c) => (
+            <div key={c.title}>
+              <h4 className="text-[10px] font-semibold text-white/40 uppercase tracking-wider mb-3 sans">{c.title}</h4>
+              <ul className="space-y-1.5">{c.links.map((lk) => <li key={lk.l}><Link to={lk.h} className="text-[11px] text-white/25 hover:text-white/60 transition-colors sans">{lk.l}</Link></li>)}</ul>
             </div>
           ))}
         </div>
-        <div className="rule mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-[10px] text-[#8A8580] sans-ui">© 2026 Opportune. Built with care for India's students.</p>
-          <p className="text-[10px] text-[#8A8580] italic editorial">"Your next opportunity is one search away."</p>
+        <div className="divider my-8" />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-[10px] text-white/15 sans">© 2026 Opportune. Built with precision.</p>
+          <p className="text-[10px] text-white/15 italic serif">Your next opportunity is one search away.</p>
         </div>
       </div>
     </footer>

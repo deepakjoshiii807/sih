@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Target, Shield, Users, Lightbulb, ArrowRight } from "lucide-react";
+import { Target, Shield, Users, Lightbulb, ArrowRight, Zap, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SearchBar from "@/components/SearchBar";
 import MatchScore from "@/components/MatchScore";
@@ -9,247 +9,208 @@ import ThreadCard from "@/components/ThreadCard";
 import Footer from "@/components/Footer";
 import { opportunities, threadPreviews, trustedSources, quickSearchTags } from "@/lib/mockData";
 
-const fadeUp = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true } as const,
-  transition: { duration: 0.6 },
-};
-
-const typeTag: Record<string, string> = {
-  course: "tag-navy",
-  scholarship: "tag-sage",
-  internship: "tag-terracotta",
-  job: "tag-indigo",
-};
-const typeLabel: Record<string, string> = {
-  course: "Course",
-  scholarship: "Scholarship",
-  internship: "Internship",
-  job: "Job",
-};
+const fade = { initial: { opacity: 0, y: 20 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true } as const, transition: { duration: 0.6 } };
+const typeBadge: Record<string, string> = { course: "badge-blue", scholarship: "badge-teal", internship: "badge-orange", job: "badge-purple" };
+const typeLabel: Record<string, string> = { course: "Course", scholarship: "Scholarship", internship: "Internship", job: "Job" };
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-[#F0EEE6]">
+    <div className="min-h-screen bg-[#0B0B11] relative overflow-hidden">
+      <div className="ambient" />
       <Navbar />
 
-      {/* ═══════ HERO ═══════ */}
-      <section className="relative paper-grain">
+      {/* ═══ HERO ═══ */}
+      <section className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-            {/* Left */}
-            <motion.div {...fadeUp} className="lg:col-span-7 order-2 lg:order-1">
-              <h1 className="heading-xl text-4xl sm:text-5xl lg:text-[3.8rem] text-[#1A1A1A] mb-6">
-                Find the opportunity
-                <br />
-                worth your{" "}
-                <span className="relative inline-block">
-                  <span className="highlight">next step</span>
-                  <svg className="absolute -bottom-1 left-0 w-full h-3 text-[#B87654]" viewBox="0 0 200 12" fill="none">
-                    <path d="M2 8 C40 2, 80 10, 120 4 S170 9, 198 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                  </svg>
-                </span>
-                .
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            <motion.div {...fade} className="lg:col-span-7 order-2 lg:order-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1 glass rounded-full text-[11px] text-white/35 font-medium mb-6 sans">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00D2D3] animate-pulse" /> AI-Powered Discovery
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.8rem] font-bold text-white leading-[1.08] tracking-tight mb-6">
+                Find the opportunity <br className="hidden sm:block" /> worth your <span className="gradient-text">next step</span>.
               </h1>
-
-              <p className="body-lg text-base sm:text-lg text-[#7A7570] mb-8 max-w-xl">
+              <p className="text-[15px] text-white/35 leading-relaxed mb-8 max-w-xl sans">
                 Discover courses, scholarships, internships and jobs tailored to your goals, skills and interests.
               </p>
-
-              <div className="mb-5">
-                <SearchBar size="large" />
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {quickSearchTags.map((tag) => (
-                  <a
-                    key={tag}
-                    href={`/explore?q=${encodeURIComponent(tag)}`}
-                    className="px-3 py-1 text-[11px] font-semibold text-[#3D4F6F] bg-[#FAF8F2] ink-border-subtle hover:border-[#3D4F6F]/30 transition-colors sans-ui"
-                  >
-                    {tag}
-                  </a>
+              <SearchBar size="large" />
+              <div className="flex flex-wrap gap-2 mt-4 mb-6">
+                {quickSearchTags.map((t) => (
+                  <a key={t} href={`/explore?q=${encodeURIComponent(t)}`} className="px-3 py-1 text-[11px] font-medium text-white/30 glass rounded-full hover:text-white/60 hover:bg-white/[0.06] transition-all sans">{t}</a>
                 ))}
               </div>
-
-              {/* Handwritten annotation */}
-              <span className="handwritten text-sm text-[#B87654] mt-4 block">
-                ← Try natural language. We'll do the heavy lifting.
-              </span>
+              <div className="flex items-center gap-3 text-[11px] text-white/20 sans">
+                <div className="flex -space-x-2">{["#7C6BF0","#5B8DEF","#00D2D3","#FDCB6E"].map((c,i) => <div key={i} className="w-6 h-6 rounded-full border-2 border-[#0B0B11] flex items-center justify-center text-[8px] font-bold text-white" style={{background:c}}>{["P","R","A","V"][i]}</div>)}</div>
+                <span>2,400+ students already exploring</span>
+              </div>
             </motion.div>
 
-            {/* Right — Paper Collage */}
-            <motion.div
-              initial={{ opacity: 0, x: 24 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="lg:col-span-5 order-1 lg:order-2 relative"
-            >
-              <span className="handwritten text-sm text-[#7A8B6F] absolute -top-2 right-0 z-10 hidden lg:block">
-                Personalized for you →
-              </span>
-
-              <div className="relative grid grid-cols-2 gap-3 sm:gap-4">
-                {opportunities.slice(0, 4).map((opp, i) => {
-                  const rotations = [-1.5, 1, 0.8, -0.5];
-                  const tapes = ["tape", "tape tape-right", "tape", "tape tape-left"];
-                  return (
-                    <div
-                      key={opp.id}
-                      className="bg-[#FAF8F2] ink-border-subtle paper-shadow-lg p-4 relative"
-                      style={{ transform: `rotate(${rotations[i]}deg)`, marginTop: i % 2 === 1 ? "24px" : "0" }}
-                    >
-                      <div className={tapes[i]} />
-                      <span className={`tag ${typeTag[opp.type]} text-[8px] mb-2`}>
-                        {typeLabel[opp.type]}
-                      </span>
-                      <h4 className="font-semibold text-[12px] text-[#1A1A1A] leading-snug mb-1.5 editorial">
-                        {opp.title}
-                      </h4>
-                      <p className="text-[10px] text-[#8A8580] mb-2 sans-ui">{opp.provider}</p>
-                      <div className="text-[10px] text-[#8A8580] mb-2 sans-ui">
-                        <p>{opp.duration} · {opp.mode}</p>
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <MatchScore score={opp.matchPercentage} size="sm" />
+            {/* Right floating cards */}
+            <div className="lg:col-span-5 order-1 lg:order-2 relative h-[400px] hidden lg:block">
+              {opportunities.slice(0, 4).map((opp, i) => (
+                <motion.div key={opp.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 1 + i * 0.2 }} className="absolute" style={{ left: `${(i % 2) * 50 + 5}%`, top: `${Math.floor(i / 2) * 50 + 5}%` }}>
+                  <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 3 + i, repeat: Infinity, ease: "easeInOut" }}>
+                    <div className="glass-card rounded-2xl p-4 w-52 cursor-default">
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <span className={`badge ${typeBadge[opp.type]} rounded-full text-[8px]`}>{typeLabel[opp.type]}</span>
                         {opp.verified && <VerifiedBadge variant="compact" />}
                       </div>
+                      <h4 className="font-semibold text-[11px] text-white/85 leading-snug mb-1">{opp.title}</h4>
+                      <p className="text-[9px] text-white/25 mb-2 sans">{opp.duration} · {opp.mode}</p>
+                      <MatchScore score={opp.matchPercentage} size="sm" />
                     </div>
-                  );
-                })}
-              </div>
-
-              <span className="handwritten text-xs text-[#8A8580] mt-4 block text-center lg:text-right">
-                Your next step →
-              </span>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════ FEATURES ═══════ */}
-      <section className="bg-[#FAF8F2] paper-grain py-20 relative torn-top torn-bottom">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div {...fadeUp} className="text-center mb-14">
-            <span className="text-[10px] font-bold text-[#8A8580] uppercase tracking-[0.2em] mb-3 block sans-ui">Why Opportune</span>
-            <h2 className="heading-lg text-3xl sm:text-4xl text-[#1A1A1A]">
-              Built for how you <span className="highlight">actually</span> search
-            </h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              { icon: Target, title: "Personalized", desc: "AI recommendations based on profile and goals.", color: "#3D4F6F" },
-              { icon: Shield, title: "Trusted", desc: "Verified opportunities from reliable sources.", color: "#7A8B6F" },
-              { icon: Lightbulb, title: "Relevant", desc: "Recommendations based on actual skills and eligibility.", color: "#B87654" },
-              { icon: Users, title: "Community", desc: "Discuss opportunities and connect with people on the same journey.", color: "#5B6B8A" },
-            ].map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="bg-[#FAF8F2] ink-border-subtle paper-shadow p-6 text-center"
-              >
-                <div className="w-11 h-11 mx-auto mb-4 flex items-center justify-center ink-border" style={{ borderColor: f.color + "30" }}>
-                  <f.icon className="w-5 h-5" style={{ color: f.color }} />
-                </div>
-                <h3 className="text-[12px] font-bold text-[#1A1A1A] mb-2 uppercase tracking-[0.1em] sans-ui">{f.title}</h3>
-                <p className="text-[13px] text-[#7A7570] leading-relaxed body-lg">{f.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Sticky note overlapping */}
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 z-20 hidden lg:block">
-          <StickyNote color="yellow" rotation={-1.5} className="w-60">
-            <p className="text-[11px] font-bold text-[#1A1A1A] mb-1.5 uppercase tracking-wider sans-ui">
-              <span className="text-[#B87654]">Opportune</span> Tip
-            </p>
-            <p className="text-[11px] text-[#7A7570] mb-3 leading-relaxed body-sm">
-              Complete your profile to get better matches. The more you tell us, the smarter we get.
-            </p>
-            <a href="/onboarding" className="inline-flex items-center gap-1 text-[11px] font-bold text-[#3D4F6F] hover:text-[#1A1A1A] transition-colors sans-ui">
-              Complete Now <ArrowRight className="w-3 h-3" />
-            </a>
-          </StickyNote>
-        </div>
-      </section>
-
-      <div className="h-14 bg-[#F0EEE6]" />
-
-      {/* ═══════ TRUSTED SOURCES ═══════ */}
-      <section className="py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div {...fadeUp} className="text-center mb-8">
-            <h2 className="heading-md text-xl text-[#1A1A1A]">Trusted sources & partners</h2>
-          </motion.div>
-          <motion.div {...fadeUp} transition={{ duration: 0.5, delay: 0.1 }} className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-            {trustedSources.map((s) => (
-              <span key={s} className="text-lg font-bold text-[#1A1A1A]/[0.12] hover:text-[#1A1A1A]/[0.25] transition-colors cursor-default editorial tracking-tight">{s}</span>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══════ COMMUNITY ═══════ */}
-      <section className="bg-[#FAF8F2] paper-grain py-20 border-t border-[#D4CFC4]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-            <motion.div {...fadeUp} className="lg:col-span-2">
-              <span className="text-[10px] font-bold text-[#8A8580] uppercase tracking-[0.2em] mb-3 block sans-ui">Community</span>
-              <h2 className="heading-lg text-3xl sm:text-4xl text-[#1A1A1A] mb-4">
-                Don't explore alone.
-              </h2>
-              <p className="text-[13px] text-[#7A7570] leading-relaxed mb-6 max-w-sm body-lg">
-                Join thousands of students navigating their careers together. Ask questions, share experiences, and grow.
-              </p>
-              <a href="/community" className="btn-paper btn-ink">
-                Explore Community <ArrowRight className="w-4 h-4" />
-              </a>
-            </motion.div>
-            <div className="lg:col-span-3 space-y-3">
-              {threadPreviews.map((t, i) => (
-                <ThreadCard
-                  key={i}
-                  id={String(i + 1)}
-                  title={t.title}
-                  author={t.author}
-                  upvotes={t.upvotes}
-                  comments={t.comments}
-                  tags={t.tags}
-                  index={i}
-                  pinned={i === 0}
-                />
+                  </motion.div>
+                </motion.div>
               ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════ CTA ═══════ */}
-      <section className="bg-[#1A1A1A] py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div {...fadeUp}>
-            <h2 className="heading-lg text-3xl sm:text-4xl text-[#FAF8F2] mb-4">
-              Your next opportunity is waiting.
-            </h2>
-            <p className="body-lg text-base text-[#FAF8F2]/50 mb-8 max-w-lg mx-auto">
-              Join thousands of students who've found their path through Opportune.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a href="/onboarding" className="btn-paper bg-[#FAF8F2] text-[#1A1A1A] hover:bg-white">
-                Get Started Free <ArrowRight className="w-4 h-4" />
+      {/* ═══ HOW IT WORKS ═══ */}
+      <section className="relative z-10 py-20 border-t border-white/[0.05]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div {...fade} className="text-center mb-14">
+            <span className="text-[10px] font-semibold text-white/25 uppercase tracking-[3px] mb-3 block sans">How it works</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Three steps. Zero noise.</h2>
+          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              { icon: Users, title: "Tell us about yourself", desc: "Your skills, goals, and what matters to you. One profile unlocks everything.", color: "#7C6BF0" },
+              { icon: Zap, title: "We find the matches", desc: "Our AI scans 12,000+ opportunities and ranks the ones that actually fit you.", color: "#5B8DEF" },
+              { icon: Sparkles, title: "Apply with confidence", desc: "Get the 'why this matches' breakdown, deadlines, and direct links — no guesswork.", color: "#00D2D3" },
+            ].map((f, i) => (
+              <motion.div key={f.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.1 }} className="glass-card rounded-2xl p-6 text-center relative group">
+                <div className="w-11 h-11 mx-auto mb-4 rounded-xl flex items-center justify-center" style={{ background: f.color + "12", border: `1px solid ${f.color}25` }}>
+                  <f.icon className="w-5 h-5" style={{ color: f.color }} />
+                </div>
+                <h3 className="font-semibold text-[13px] text-white/80 mb-2 uppercase tracking-wider sans">{f.title}</h3>
+                <p className="text-[12px] text-white/30 leading-relaxed sans">{f.desc}</p>
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-b-2xl opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: `linear-gradient(90deg, transparent, ${f.color}30, transparent)` }} />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ WHY OPPORTUNE ═══ */}
+      <section className="relative z-10 py-20 border-t border-white/[0.05]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <motion.div {...fade}>
+              <span className="text-[10px] font-semibold text-white/25 uppercase tracking-[3px] mb-3 block sans">Why Opportune</span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-5">Not another job board. <br /><span className="gradient-text">An opportunity engine.</span></h2>
+              <p className="text-[13px] text-white/30 leading-relaxed mb-8 max-w-md sans">Most platforms dump a list of links on you. Opportune understands your profile, filters the noise, and shows you only what fits.</p>
+              <div className="space-y-4">
+                {[
+                  { icon: Sparkles, text: "Natural language search — ask in plain English", color: "#7C6BF0" },
+                  { icon: Target, text: "Match scores based on your actual skills", color: "#FDCB6E" },
+                  { icon: Shield, text: "Every opportunity verified by our team", color: "#00D2D3" },
+                ].map((f, i) => (
+                  <motion.div key={f.text} initial={{ opacity: 0, x: -12 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: f.color + "12", border: `1px solid ${f.color}20` }}><f.icon className="w-4 h-4" style={{ color: f.color }} /></div>
+                    <span className="text-[13px] text-white/45 sans">{f.text}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }} className="hidden lg:block">
+              <div className="glass rounded-3xl p-8 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#7C6BF0]/[0.04] to-[#5B8DEF]/[0.02]" />
+                <div className="relative z-10 space-y-3">
+                  {opportunities.slice(0, 3).map((opp, i) => (
+                    <div key={opp.id} className="glass-card rounded-xl p-4 flex items-center gap-3" style={{ transform: `rotate(${i % 2 === 0 ? -0.3 : 0.3}deg)` }}>
+                      <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center shrink-0">
+                        {opp.type === "course" ? <Target className="w-4 h-4 text-[#5B8DEF]" /> : opp.type === "scholarship" ? <Shield className="w-4 h-4 text-[#00D2D3]" /> : <Zap className="w-4 h-4 text-[#FDCB6E]" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] font-semibold text-white/75 truncate">{opp.title}</p>
+                        <p className="text-[10px] text-white/25 sans">{opp.provider}</p>
+                      </div>
+                      <MatchScore score={opp.matchPercentage} size="sm" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ FEATURES ═══ */}
+      <section className="relative z-10 py-20 border-t border-white/[0.05]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div {...fade} className="text-center mb-12">
+            <span className="text-[10px] font-semibold text-white/25 uppercase tracking-[3px] mb-3 block sans">Built for India</span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Everything you need, nothing you don't.</h2>
+          </motion.div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { icon: Target, title: "Personalized", desc: "AI recs based on your goals", color: "#7C6BF0" },
+              { icon: Shield, title: "Trusted", desc: "Verified from reliable sources", color: "#00D2D3" },
+              { icon: Lightbulb, title: "Relevant", desc: "Based on skills & eligibility", color: "#FDCB6E" },
+              { icon: Users, title: "Community", desc: "Discuss & connect with peers", color: "#5B8DEF" },
+            ].map((f, i) => (
+              <motion.div key={f.title} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35, delay: i * 0.08 }} className="glass-card rounded-2xl p-5 text-center">
+                <div className="w-9 h-9 mx-auto mb-3 rounded-xl flex items-center justify-center" style={{ background: f.color + "10", border: `1px solid ${f.color}20` }}><f.icon className="w-4 h-4" style={{ color: f.color }} /></div>
+                <h3 className="font-semibold text-[12px] text-white/70 mb-1 uppercase tracking-wider sans">{f.title}</h3>
+                <p className="text-[11px] text-white/25 sans">{f.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ COMMUNITY ═══ */}
+      <section className="relative z-10 py-20 border-t border-white/[0.05]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+            <motion.div {...fade} className="lg:col-span-2">
+              <span className="text-[10px] font-semibold text-white/25 uppercase tracking-[3px] mb-3 block sans">Community</span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">Don't explore alone.</h2>
+              <p className="text-[13px] text-white/30 leading-relaxed mb-6 max-w-sm sans">8,500+ students sharing tips, asking questions, and helping each other land opportunities.</p>
+              <a href="/community" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#7C6BF0] to-[#5B8DEF] text-white text-[13px] font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/20 transition-all sans">
+                Explore Community <ArrowRight className="w-4 h-4" />
               </a>
-              <a href="/explore" className="btn-paper border border-[#FAF8F2]/30 text-[#FAF8F2] hover:bg-[#FAF8F2]/10">
-                Browse Opportunities
-              </a>
+            </motion.div>
+            <div className="lg:col-span-3 space-y-3">
+              {threadPreviews.map((t, i) => (
+                <ThreadCard key={i} id={String(i + 1)} title={t.title} author={t.author} upvotes={t.upvotes} comments={t.comments} tags={t.tags} index={i} pinned={i === 0} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ CTA ═══ */}
+      <section className="relative z-10 py-24 border-t border-white/[0.05]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div {...fade}>
+            <div className="glass rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-b from-[#7C6BF0]/[0.06] via-transparent to-[#5B8DEF]/[0.03] pointer-events-none" />
+              <div className="relative z-10">
+                <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7C6BF0] to-[#5B8DEF] flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/20">
+                  <Zap className="w-7 h-7 text-white" />
+                </motion.div>
+                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">Stop searching. Start finding.</h2>
+                <p className="text-[13px] text-white/30 mb-8 max-w-md mx-auto sans">Your profile is free. Your matches are instant. Your next opportunity is one search away.</p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <a href="/onboarding" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#7C6BF0] to-[#5B8DEF] text-white font-semibold text-[13px] rounded-xl hover:shadow-lg hover:shadow-purple-500/20 transition-all sans">Get Started — It's Free <ArrowRight className="w-4 h-4" /></a>
+                  <a href="/explore" className="inline-flex items-center gap-2 px-6 py-3 glass text-white/50 font-medium text-[13px] rounded-xl hover:text-white hover:bg-white/[0.06] transition-all sans">Browse first</a>
+                </div>
+              </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ═══ PARTNERS ═══ */}
+      <section className="relative z-10 pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="divider mb-8" />
+          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
+            {trustedSources.map((s) => <span key={s} className="text-base font-bold text-white/[0.06] hover:text-white/[0.12] transition-colors cursor-default sans">{s}</span>)}
+          </div>
         </div>
       </section>
 

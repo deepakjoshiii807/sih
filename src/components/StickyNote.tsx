@@ -8,20 +8,17 @@ interface StickyNoteProps {
   rotation?: number;
 }
 
-const colorClasses = {
-  yellow: "sticky-yellow",
-  blue: "sticky-blue",
-  green: "sticky-green",
-  pink: "sticky-pink",
+const colorMap = {
+  yellow: { bg: "rgba(253,203,110,0.06)", border: "rgba(253,203,110,0.15)" },
+  blue: { bg: "rgba(91,141,239,0.06)", border: "rgba(91,141,239,0.15)" },
+  green: { bg: "rgba(0,210,211,0.06)", border: "rgba(0,210,211,0.15)" },
+  pink: { bg: "rgba(255,107,107,0.06)", border: "rgba(255,107,107,0.15)" },
 };
 
 export default function StickyNote({ children, color = "yellow", className, rotation = -1 }: StickyNoteProps) {
+  const c = colorMap[color];
   return (
-    <div
-      className={cn("p-5 paper-shadow-md relative", colorClasses[color], className)}
-      style={{ transform: `rotate(${rotation}deg)` }}
-    >
-      <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 h-3.5 bg-[rgba(255,248,220,0.6)] border border-[rgba(200,190,160,0.3)]" style={{ transform: "rotate(-1.5deg)" }} />
+    <div className={cn("rounded-2xl p-5 backdrop-blur-xl", className)} style={{ transform: `rotate(${rotation}deg)`, background: c.bg, border: `1px solid ${c.border}`, boxShadow: `0 8px 32px ${c.bg}` }}>
       {children}
     </div>
   );
