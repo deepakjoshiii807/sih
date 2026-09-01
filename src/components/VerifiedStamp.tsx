@@ -6,13 +6,11 @@ interface VerifiedStampProps {
 
 export default function VerifiedStamp({ className }: VerifiedStampProps) {
   return (
-    <span
-      className={cn(
-        "inline-block px-2 py-0.5 border-2 border-[#2C6B4F] text-[#2C6B4F] font-serif text-[10px] font-bold tracking-[3px] uppercase transform -rotate-3 opacity-80",
-        className
-      )}
-    >
-      VERIFIED
+    <span className={cn("stamp-glass rounded-full", className)}>
+      <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none">
+        <path d="M13.5 4.5L6.5 11.5L2.5 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      Verified
     </span>
   );
 }

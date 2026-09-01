@@ -6,21 +6,15 @@ interface MatchBadgeProps {
 }
 
 export default function MatchBadge({ percentage, className }: MatchBadgeProps) {
-  const color =
+  const variant =
     percentage >= 90
-      ? "text-[#2C6B4F] border-[#2C6B4F]/30"
+      ? "badge-teal"
       : percentage >= 80
-        ? "text-[#3D4F6F] border-[#3D4F6F]/30"
-        : "text-[#B87654] border-[#B87654]/30";
+        ? "badge-blue"
+        : "badge-orange";
 
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold tracking-wide border",
-        color,
-        className
-      )}
-    >
+    <span className={cn("badge-glass rounded-full", variant, className)}>
       {percentage}% Match
     </span>
   );

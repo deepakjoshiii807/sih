@@ -23,10 +23,10 @@ export default function FilterBar({ filters, activeFilters, onFilterChange }: Fi
             <button
               onClick={() => setExpandedFilter(isExpanded ? null : filter.id)}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border transition-colors",
+                "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-xl transition-all duration-200",
                 activeValue !== "All"
-                  ? "bg-[#2C2C2C] text-[#FAF8F2] border-[#2C2C2C]"
-                  : "bg-[#FAF8F2] text-[#3D3D3D] border-[#D4CFC4] hover:border-[#8A8580]"
+                  ? "bg-gradient-to-r from-[#6C5CE7] to-[#5B8DEF] text-white border border-purple-500/30 shadow-lg shadow-purple-500/10"
+                  : "glass text-white/50 hover:text-white hover:bg-white/[0.08]"
               )}
             >
               {filter.label}
@@ -45,9 +45,10 @@ export default function FilterBar({ filters, activeFilters, onFilterChange }: Fi
                   onClick={() => setExpandedFilter(null)}
                 />
                 <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute top-full left-0 mt-1 z-50 bg-[#FAF8F2] border border-[#D4CFC4] paper-shadow min-w-[160px] py-1"
+                  initial={{ opacity: 0, y: -4, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute top-full left-0 mt-2 z-50 glass-strong rounded-xl overflow-hidden min-w-[160px] py-1"
                 >
                   {filter.options.map((option) => (
                     <button
@@ -57,10 +58,10 @@ export default function FilterBar({ filters, activeFilters, onFilterChange }: Fi
                         setExpandedFilter(null);
                       }}
                       className={cn(
-                        "w-full text-left px-3 py-1.5 text-xs hover:bg-[#E8E4DA] transition-colors",
+                        "w-full text-left px-3 py-1.5 text-xs transition-all",
                         activeValue === option
-                          ? "font-semibold text-[#1a1a1a] bg-[#E8E4DA]/50"
-                          : "text-[#6B6560]"
+                          ? "font-semibold text-white bg-white/[0.08]"
+                          : "text-white/40 hover:text-white hover:bg-white/[0.05]"
                       )}
                     >
                       {option}
