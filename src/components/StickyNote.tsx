@@ -6,53 +6,22 @@ interface StickyNoteProps {
   color?: "yellow" | "blue" | "green" | "pink";
   className?: string;
   rotation?: number;
-  hasTape?: boolean;
 }
 
-const colorMap = {
-  yellow: {
-    bg: "rgba(253, 203, 110, 0.08)",
-    border: "rgba(253, 203, 110, 0.2)",
-    glow: "rgba(253, 203, 110, 0.06)",
-  },
-  blue: {
-    bg: "rgba(91, 141, 239, 0.08)",
-    border: "rgba(91, 141, 239, 0.2)",
-    glow: "rgba(91, 141, 239, 0.06)",
-  },
-  green: {
-    bg: "rgba(0, 210, 211, 0.08)",
-    border: "rgba(0, 210, 211, 0.2)",
-    glow: "rgba(0, 210, 211, 0.06)",
-  },
-  pink: {
-    bg: "rgba(255, 107, 107, 0.08)",
-    border: "rgba(255, 107, 107, 0.2)",
-    glow: "rgba(255, 107, 107, 0.06)",
-  },
+const colorClasses = {
+  yellow: "sticky-yellow",
+  blue: "sticky-blue",
+  green: "sticky-green",
+  pink: "sticky-pink",
 };
 
-export default function StickyNote({
-  children,
-  color = "yellow",
-  className,
-  rotation = -1,
-}: StickyNoteProps) {
-  const c = colorMap[color];
-
+export default function StickyNote({ children, color = "yellow", className, rotation = -1 }: StickyNoteProps) {
   return (
     <div
-      className={cn(
-        "relative p-5 backdrop-blur-xl rounded-2xl transition-all duration-300",
-        className
-      )}
-      style={{
-        transform: `rotate(${rotation}deg)`,
-        background: c.bg,
-        border: `1px solid ${c.border}`,
-        boxShadow: `0 8px 32px ${c.glow}`,
-      }}
+      className={cn("p-5 paper-shadow-md relative", colorClasses[color], className)}
+      style={{ transform: `rotate(${rotation}deg)` }}
     >
+      <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 h-3.5 bg-[rgba(255,248,220,0.6)] border border-[rgba(200,190,160,0.3)]" style={{ transform: "rotate(-1.5deg)" }} />
       {children}
     </div>
   );

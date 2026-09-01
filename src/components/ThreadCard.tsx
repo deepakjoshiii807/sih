@@ -15,57 +15,40 @@ interface ThreadCardProps {
   pinned?: boolean;
 }
 
-export default function ThreadCard({
-  id,
-  title,
-  author,
-  upvotes,
-  comments,
-  tags,
-  preview,
-  index = 0,
-  pinned = false,
-}: ThreadCardProps) {
+export default function ThreadCard({ id, title, author, upvotes, comments, tags, preview, index = 0, pinned }: ThreadCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.35, delay: index * 0.06 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
     >
       <Link to={`/community/thread/${id}`} className="block group">
-        <div
-          className={cn(
-            "glass-card rounded-2xl p-4",
-            pinned && "border-l-2 border-l-[#FDCB6E]"
-          )}
-        >
+        <div className={cn(
+          "bg-[#FAF8F2] ink-border-subtle paper-shadow p-4 transition-all duration-200 group-hover:paper-shadow-hover",
+          pinned && "border-l-[3px] border-l-[#B87654]"
+        )}>
           <div className="flex gap-3">
-            {/* Vote column */}
-            <div className="flex flex-col items-center gap-0.5 pt-1">
-              <ArrowBigUp className="w-5 h-5 text-white/25 group-hover:text-[#6C5CE7] transition-colors" />
-              <span className="text-xs font-semibold text-white/50">{upvotes}</span>
+            {/* Vote */}
+            <div className="flex flex-col items-center gap-0.5 pt-0.5">
+              <ArrowBigUp className="w-5 h-5 text-[#D4CFC4] group-hover:text-[#B87654] transition-colors" />
+              <span className="text-[11px] font-bold text-[#7A7570] sans-ui">{upvotes}</span>
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
-                <h3 className="font-semibold text-sm text-white/90 leading-snug group-hover:text-white transition-colors">
+                <h3 className="font-semibold text-[14px] text-[#1A1A1A] leading-snug group-hover:text-[#3D4F6F] transition-colors editorial">
                   {title}
                 </h3>
                 {pinned && (
-                  <span className="text-[9px] font-semibold text-[#FDCB6E] uppercase tracking-wider shrink-0">
-                    Pinned
-                  </span>
+                  <span className="text-[9px] font-bold text-[#B87654] uppercase tracking-wider sans-ui shrink-0">Pinned</span>
                 )}
               </div>
+              {preview && <p className="text-[11px] text-[#8A8580] line-clamp-1 mt-0.5 sans-ui">{preview}</p>}
 
-              {preview && (
-                <p className="text-[11px] text-white/30 line-clamp-1 mt-0.5">{preview}</p>
-              )}
-
-              <div className="flex items-center gap-3 text-[11px] text-white/30 mt-2">
-                <span className="font-medium text-white/50">u/{author}</span>
+              <div className="flex items-center gap-3 text-[11px] text-[#8A8580] mt-2 sans-ui">
+                <span className="font-medium text-[#7A7570]">u/{author}</span>
                 <span className="flex items-center gap-1">
                   <MessageSquare className="w-3 h-3" />
                   {comments}
@@ -74,12 +57,7 @@ export default function ThreadCard({
 
               <div className="flex flex-wrap gap-1.5 mt-2.5">
                 {tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-0.5 bg-white/[0.06] border border-white/[0.08] rounded-full text-[9px] text-white/40 font-medium"
-                  >
-                    {tag}
-                  </span>
+                  <span key={tag} className="tag tag-navy text-[8px] py-0">{tag}</span>
                 ))}
               </div>
             </div>

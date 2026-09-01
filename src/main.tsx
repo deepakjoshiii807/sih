@@ -9,70 +9,49 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./index.css";
 
-// Lazy load route components for better code splitting
+// Lazy load route components
 const Landing = lazy(() => import("./pages/Landing.tsx"));
-const Explore = lazy(() => import("./pages/Explore.tsx"));
-const AuthPage = lazy(() => import("./pages/Auth.tsx"));
+const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
+const Explore = lazy(() => import("./pages/Explore.tsx"));
+const OpportunityDetail = lazy(() => import("./pages/OpportunityDetail.tsx"));
+const Roadmap = lazy(() => import("./pages/Roadmap.tsx"));
+const Community = lazy(() => import("./pages/Community.tsx"));
+const ThreadDetail = lazy(() => import("./pages/ThreadDetail.tsx"));
+const Profile = lazy(() => import("./pages/Profile.tsx"));
+const AuthPage = lazy(() => import("./pages/Auth.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
-// Simple loading fallback for route transitions
 function RouteLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-pulse text-muted-foreground">Loading...</div>
+    <div className="min-h-screen flex items-center justify-center bg-[#F0EEE6]">
+      <div className="text-[#8A8580] editorial animate-pulse">Loading...</div>
     </div>
   );
 }
 
-/** Silent error boundary — if VlyToolbar crashes it renders nothing instead of
- *  crashing the whole app (e.g. hook errors in WebContainer environment). */
 class ToolbarErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean }
+  { children: React.ReactNode }, { hasError: boolean }
 > {
   state = { hasError: false };
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-  componentDidCatch(err: Error) {
-    console.warn("[VlyToolbar] Caught error, toolbar disabled:", err.message);
-  }
-  render() {
-    return this.state.hasError ? null : this.props.children;
-  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() { return this.state.hasError ? null : this.props.children; }
 }
 
-/** Hard guard so runtime errors never leave the preview as a blank page. */
 class RootErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean; message: string; stack: string }
+  { children: React.ReactNode }, { hasError: boolean; message: string; stack: string }
 > {
   state = { hasError: false, message: "", stack: "" };
   static getDerivedStateFromError(error: Error) {
-    return {
-      hasError: true,
-      message: error.message || "Unknown runtime error",
-      stack: error.stack || "",
-    };
-  }
-  componentDidCatch(err: Error) {
-    console.error("[WebContainer preview] Root crash:", err);
+    return { hasError: true, message: error.message || "Unknown error", stack: error.stack || "" };
   }
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-6">
-          <div className="max-w-lg text-center">
-            <p className="text-sm font-semibold">Preview runtime error</p>
-            <p className="mt-2 text-xs text-muted-foreground break-words">
-              {this.state.message}
-            </p>
-            {this.state.stack && (
-              <pre className="mt-3 text-left text-[10px] leading-4 text-muted-foreground/80 max-h-40 overflow-auto rounded border border-border/60 p-2">
-                {this.state.stack}
-              </pre>
-            )}
+        <div className="min-h-screen flex items-center justify-center bg-[#F0EEE6] p-6">
+          <div className="max-w-lg text-center bg-[#FAF8F2] ink-border paper-shadow p-8">
+            <p className="heading-md text-lg text-[#1A1A1A] mb-2">Something went wrong</p>
+            <p className="text-[12px] text-[#8A8580] sans-ui break-words">{this.state.message}</p>
           </div>
         </div>
       );
@@ -83,17 +62,11 @@ class RootErrorBoundary extends React.Component<
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
-
-
 function RouteSyncer() {
   const location = useLocation();
   useEffect(() => {
-    window.parent.postMessage(
-      { type: "iframe-route-change", path: location.pathname },
-      "*",
-    );
+    window.parent.postMessage({ type: "iframe-route-change", path: location.pathname }, "*");
   }, [location.pathname]);
-
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       if (event.data?.type === "navigate") {
@@ -104,10 +77,8 @@ function RouteSyncer() {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
-
   return null;
 }
-
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -121,11 +92,14 @@ createRoot(document.getElementById("root")!).render(
           <Suspense fallback={<RouteLoading />}>
             <Routes>
               <Route path="/" element={<Landing />} />
+              <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/explore" element={<Explore />} />
-              <Route
-                path="/auth"
-                element={<AuthPage redirectAfterAuth="/dashboard" />}
-              />
+              <Route path="/opportunity/:id" element={<OpportunityDetail />} />
+              <Route path="/roadmap" element={<Roadmap />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/community/thread/:id" element={<ThreadDetail />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/auth" element={<AuthPage />} />
               <Route
                 path="/dashboard"
                 element={

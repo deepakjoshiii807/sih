@@ -1,304 +1,129 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Mail, Lock, User, ArrowLeft } from "lucide-react";
+import Navbar from "@/components/Navbar";
 
-import { useAuth } from "@/hooks/use-auth";
-import logo from "@/assets/logo.svg";
-import { ArrowRight, Loader2, Mail, UserX } from "lucide-react";
-import { Suspense, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+type AuthMode = "login" | "signup" | "forgot";
 
-interface AuthProps {
-  redirectAfterAuth?: string;
-}
-
-function resolveRedirectAfterAuth(
-  returnTo: string | null,
-  fallback = "/dashboard",
-) {
-  if (returnTo?.startsWith("/") && !returnTo.startsWith("//")) {
-    return returnTo;
-  }
-  return fallback;
-}
-
-function Auth({ redirectAfterAuth }: AuthProps = {}) {
-  const { isLoading: authLoading, isAuthenticated, signIn } = useAuth();
+export default function Auth() {
+  const [mode, setMode] = useState<AuthMode>("login");
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const redirect = resolveRedirectAfterAuth(
-    searchParams.get("returnTo"),
-    redirectAfterAuth,
-  );
-  const [step, setStep] = useState<"signIn" | { email: string }>("signIn");
-  const [otp, setOtp] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      navigate(redirect);
-    }
-  }, [authLoading, isAuthenticated, navigate, redirect]);
-  const handleEmailSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsLoading(true);
-    setError(null);
-    try {
-      const formData = new FormData(event.currentTarget);
-      await signIn("email-otp", formData);
-      setStep({ email: formData.get("email") as string });
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Email sign-in error:", error);
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to send verification code. Please try again.",
-      );
-      setIsLoading(false);
-    }
-  };
-
-  const handleOtpSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsLoading(true);
-    setError(null);
-    try {
-      const formData = new FormData(event.currentTarget);
-      await signIn("email-otp", formData);
-
-      console.log("signed in");
-
-      navigate(redirect);
-    } catch (error) {
-      console.error("OTP verification error:", error);
-
-      setError("The verification code you entered is incorrect.");
-      setIsLoading(false);
-
-      setOtp("");
-    }
-  };
-
-  const handleGuestLogin = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      console.log("Attempting anonymous sign in...");
-      await signIn("anonymous");
-      console.log("Anonymous sign in successful");
-      navigate(redirect);
-    } catch (error) {
-      console.error("Guest login error:", error);
-      console.error("Error details:", JSON.stringify(error, null, 2));
-      setError(`Failed to sign in as guest: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      setIsLoading(false);
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate("/dashboard");
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-
-      
-      {/* Auth Content */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="flex items-center justify-center h-full flex-col">
-        <Card className="min-w-[350px] pb-0 border shadow-md">
-          {step === "signIn" ? (
-            <>
-              <CardHeader className="text-center">
-              <div className="flex justify-center">
-                    <img
-                      src={logo}
-                      alt="Lock Icon"
-                      width={64}
-                      height={64}
-                      className="rounded-lg mb-4 mt-4 cursor-pointer"
-                      onClick={() => navigate("/")}
-                    />
-                  </div>
-                <CardTitle className="text-xl">Get Started</CardTitle>
-                <CardDescription>
-                  Enter your email to log in or sign up
-                </CardDescription>
-              </CardHeader>
-              <form onSubmit={handleEmailSubmit}>
-                <CardContent>
-                  
-                  <div className="relative flex items-center gap-2">
-                    <div className="relative flex-1">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        name="email"
-                        placeholder="name@example.com"
-                        type="email"
-                        className="pl-9"
-                        disabled={isLoading}
-                        required
-                      />
-                    </div>
-                    <Button
-                      type="submit"
-                      variant="outline"
-                      size="icon"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <ArrowRight className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                  {error && (
-                    <p className="mt-2 text-sm text-red-500">{error}</p>
-                  )}
-                  
-                  <div className="mt-4">
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">
-                          Or
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full mt-4"
-                      onClick={handleGuestLogin}
-                      disabled={isLoading}
-                    >
-                      <UserX className="mr-2 h-4 w-4" />
-                      Continue as Guest
-                    </Button>
-                  </div>
-                </CardContent>
-              </form>
-            </>
-          ) : (
-            <>
-              <CardHeader className="text-center mt-4">
-                <CardTitle>Check your email</CardTitle>
-                <CardDescription>
-                  We've sent a code to {step.email}
-                </CardDescription>
-              </CardHeader>
-              <form onSubmit={handleOtpSubmit}>
-                <CardContent className="pb-4">
-                  <input type="hidden" name="email" value={step.email} />
-                  <input type="hidden" name="code" value={otp} />
-
-                  <div className="flex justify-center">
-                    <InputOTP
-                      value={otp}
-                      onChange={setOtp}
-                      maxLength={6}
-                      disabled={isLoading}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && otp.length === 6 && !isLoading) {
-                          // Find the closest form and submit it
-                          const form = (e.target as HTMLElement).closest("form");
-                          if (form) {
-                            form.requestSubmit();
-                          }
-                        }
-                      }}
-                    >
-                      <InputOTPGroup>
-                        {Array.from({ length: 6 }).map((_, index) => (
-                          <InputOTPSlot key={index} index={index} />
-                        ))}
-                      </InputOTPGroup>
-                    </InputOTP>
-                  </div>
-                  {error && (
-                    <p className="mt-2 text-sm text-red-500 text-center">
-                      {error}
-                    </p>
-                  )}
-                  <p className="text-sm text-muted-foreground text-center mt-4">
-                    Didn't receive a code?{" "}
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto"
-                      onClick={() => setStep("signIn")}
-                    >
-                      Try again
-                    </Button>
-                  </p>
-                </CardContent>
-                <CardFooter className="flex-col gap-2">
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isLoading || otp.length !== 6}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Verifying...
-                      </>
-                    ) : (
-                      <>
-                        Verify code
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setStep("signIn")}
-                    disabled={isLoading}
-                    className="w-full"
-                  >
-                    Use different email
-                  </Button>
-                </CardFooter>
-              </form>
-            </>
-          )}
-
-          <div className="py-4 px-6 text-xs text-center text-muted-foreground bg-muted border-t rounded-b-lg">
-            Secured by{" "}
-            <a
-              href="https://freebuff.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-primary transition-colors"
+    <div className="min-h-screen bg-[#F0EEE6]">
+      <Navbar />
+      <div className="flex-1 flex items-center justify-center py-16 px-4">
+        <div className="w-full max-w-md">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={mode}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
             >
-              freebuff.com
-            </a>
-          </div>
-        </Card>
+              <div className="bg-[#FAF8F2] ink-border paper-shadow-lg p-8 relative">
+                <div className="tape" />
+
+                {mode === "forgot" && (
+                  <button onClick={() => setMode("login")} className="flex items-center gap-1 text-[12px] text-[#7A7570] hover:text-[#1A1A1A] mb-6 sans-ui">
+                    <ArrowLeft className="w-3.5 h-3.5" /> Back to login
+                  </button>
+                )}
+
+                {/* Logo */}
+                <div className="text-center mb-6 mt-2">
+                  <div className="w-10 h-10 bg-[#1A1A1A] flex items-center justify-center mx-auto mb-3">
+                    <span className="text-[#FAF8F2] font-bold text-sm editorial">O</span>
+                  </div>
+                  <h1 className="heading-lg text-xl text-[#1A1A1A]">
+                    {mode === "login" && "Welcome back"}
+                    {mode === "signup" && "Create your account"}
+                    {mode === "forgot" && "Reset password"}
+                  </h1>
+                  <p className="text-[12px] text-[#8A8580] mt-1 sans-ui">
+                    {mode === "login" && "Sign in to continue your journey"}
+                    {mode === "signup" && "Start discovering opportunities"}
+                    {mode === "forgot" && "Enter your email to receive a reset link"}
+                  </p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {mode === "signup" && (
+                    <div>
+                      <label className="text-[10px] font-bold text-[#8A8580] uppercase tracking-[0.15em] mb-1.5 block sans-ui">Full Name</label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 w-4 h-4 text-[#8A8580]" />
+                        <input type="text" placeholder="Your name" className="w-full pl-10 pr-4 py-2.5 bg-[#FAF8F2] ink-border text-[13px] editorial placeholder:text-[#D4CFC4] focus:outline-none focus:border-[#3D4F6F]" required />
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-[10px] font-bold text-[#8A8580] uppercase tracking-[0.15em] mb-1.5 block sans-ui">Email</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 w-4 h-4 text-[#8A8580]" />
+                      <input type="email" placeholder="name@example.com" className="w-full pl-10 pr-4 py-2.5 bg-[#FAF8F2] ink-border text-[13px] editorial placeholder:text-[#D4CFC4] focus:outline-none focus:border-[#3D4F6F]" required />
+                    </div>
+                  </div>
+
+                  {mode !== "forgot" && (
+                    <div>
+                      <label className="text-[10px] font-bold text-[#8A8580] uppercase tracking-[0.15em] mb-1.5 block sans-ui">Password</label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 w-4 h-4 text-[#8A8580]" />
+                        <input type="password" placeholder="••••••••" className="w-full pl-10 pr-4 py-2.5 bg-[#FAF8F2] ink-border text-[13px] editorial placeholder:text-[#D4CFC4] focus:outline-none focus:border-[#3D4F6F]" required />
+                      </div>
+                    </div>
+                  )}
+
+                  {mode === "login" && (
+                    <div className="flex items-center justify-between">
+                      <label className="flex items-center gap-2 text-[12px] text-[#7A7570] sans-ui">
+                        <input type="checkbox" className="accent-[#1A1A1A]" /> Remember me
+                      </label>
+                      <button type="button" onClick={() => setMode("forgot")} className="text-[12px] text-[#3D4F6F] hover:text-[#1A1A1A] sans-ui">
+                        Forgot password?
+                      </button>
+                    </div>
+                  )}
+
+                  <button type="submit" className="btn-paper btn-ink w-full justify-center text-[13px]">
+                    {mode === "login" && "Log In"}
+                    {mode === "signup" && "Create Account"}
+                    {mode === "forgot" && "Send Reset Link"}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </form>
+
+                <div className="rule my-6" />
+
+                <p className="text-center text-[12px] text-[#7A7570] sans-ui">
+                  {mode === "login" && (
+                    <>Don't have an account? <button onClick={() => setMode("signup")} className="font-semibold text-[#1A1A1A] hover:text-[#3D4F6F]">Sign up</button></>
+                  )}
+                  {mode === "signup" && (
+                    <>Already have an account? <button onClick={() => setMode("login")} className="font-semibold text-[#1A1A1A] hover:text-[#3D4F6F]">Log in</button></>
+                  )}
+                  {mode === "forgot" && (
+                    <>Remember your password? <button onClick={() => setMode("login")} className="font-semibold text-[#1A1A1A] hover:text-[#3D4F6F]">Log in</button></>
+                  )}
+                </p>
+              </div>
+
+              <p className="text-center text-[10px] text-[#8A8580] mt-4 sans-ui">
+                Secured by Opportune · <span className="underline">Privacy Policy</span>
+              </p>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function AuthPage(props: AuthProps) {
-  return (
-    <Suspense>
-      <Auth {...props} />
-    </Suspense>
   );
 }

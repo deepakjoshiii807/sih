@@ -1,67 +1,41 @@
 import { Link } from "react-router";
-import { Zap } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#08080C] border-t border-white/[0.06]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="bg-[#E8E4DA] border-t border-[#D4CFC4]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand */}
           <div>
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#6C5CE7] to-[#5B8DEF] flex items-center justify-center">
-                <Zap className="w-3.5 h-3.5 text-white" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-6 h-6 bg-[#1A1A1A] flex items-center justify-center">
+                <span className="text-[#FAF8F2] font-bold text-[10px] editorial">O</span>
               </div>
-              <span className="text-sm font-semibold text-white tracking-tight">Opportune</span>
+              <span className="text-[13px] font-bold tracking-tight editorial text-[#1A1A1A]">OPPORTUNE</span>
             </div>
-            <p className="text-xs text-white/30 leading-relaxed">
-              AI-powered opportunity discovery for students and young professionals in India.
+            <p className="text-[11px] text-[#7A7570] leading-relaxed sans-ui">
+              AI-powered opportunity discovery for India's students and young professionals.
             </p>
           </div>
-
-          {/* Explore */}
-          <div>
-            <h4 className="text-[11px] font-semibold text-white/50 uppercase tracking-wider mb-3">Explore</h4>
-            <ul className="space-y-2">
-              <li><Link to="/explore?type=course" className="text-xs text-white/30 hover:text-white/70 transition-colors">Courses</Link></li>
-              <li><Link to="/explore?type=scholarship" className="text-xs text-white/30 hover:text-white/70 transition-colors">Scholarships</Link></li>
-              <li><Link to="/explore?type=internship" className="text-xs text-white/30 hover:text-white/70 transition-colors">Internships</Link></li>
-              <li><Link to="/explore?type=job" className="text-xs text-white/30 hover:text-white/70 transition-colors">Jobs</Link></li>
-            </ul>
-          </div>
-
-          {/* Community */}
-          <div>
-            <h4 className="text-[11px] font-semibold text-white/50 uppercase tracking-wider mb-3">Community</h4>
-            <ul className="space-y-2">
-              <li><Link to="/community" className="text-xs text-white/30 hover:text-white/70 transition-colors">Discussions</Link></li>
-              <li><Link to="/community" className="text-xs text-white/30 hover:text-white/70 transition-colors">AI & ML</Link></li>
-              <li><Link to="/community" className="text-xs text-white/30 hover:text-white/70 transition-colors">Web Dev</Link></li>
-              <li><Link to="/community" className="text-xs text-white/30 hover:text-white/70 transition-colors">Scholarships</Link></li>
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="text-[11px] font-semibold text-white/50 uppercase tracking-wider mb-3">Company</h4>
-            <ul className="space-y-2">
-              <li><span className="text-xs text-white/30">About</span></li>
-              <li><span className="text-xs text-white/30">Privacy</span></li>
-              <li><span className="text-xs text-white/30">Terms</span></li>
-              <li><span className="text-xs text-white/30">Contact</span></li>
-            </ul>
-          </div>
+          {[
+            { title: "Explore", links: [{ label: "Courses", href: "/explore?type=course" }, { label: "Scholarships", href: "/explore?type=scholarship" }, { label: "Internships", href: "/explore?type=internship" }, { label: "Jobs", href: "/explore?type=job" }] },
+            { title: "Community", links: [{ label: "Discussions", href: "/community" }, { label: "AI & ML", href: "/community" }, { label: "Web Dev", href: "/community" }, { label: "Scholarships", href: "/community" }] },
+            { title: "Company", links: [{ label: "About", href: "#" }, { label: "Privacy", href: "#" }, { label: "Terms", href: "#" }, { label: "Contact", href: "#" }] },
+          ].map((col) => (
+            <div key={col.title}>
+              <h4 className="text-[10px] font-bold text-[#1A1A1A] uppercase tracking-[0.15em] mb-3 sans-ui">{col.title}</h4>
+              <ul className="space-y-1.5">
+                {col.links.map((link) => (
+                  <li key={link.label}>
+                    <Link to={link.href} className="text-[11px] text-[#7A7570] hover:text-[#1A1A1A] transition-colors sans-ui">{link.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-
-        <div className="divider-glass my-8" />
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-[11px] text-white/20">
-            © 2026 Opportune. Built with precision.
-          </p>
-          <p className="text-[11px] text-white/20 italic">
-            Your next opportunity is one search away.
-          </p>
+        <div className="rule mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-[10px] text-[#8A8580] sans-ui">© 2026 Opportune. Built with care for India's students.</p>
+          <p className="text-[10px] text-[#8A8580] italic editorial">"Your next opportunity is one search away."</p>
         </div>
       </div>
     </footer>
