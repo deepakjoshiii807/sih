@@ -1,162 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
-const INJECTED_STYLES = `
-  .gsap-reveal { visibility: hidden; }
-
-  .film-grain {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 50; opacity: 0.05; mix-blend-mode: overlay;
-      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%%" height="100%%" filter="url(%23noiseFilter)"/></svg>');
-  }
-
-  .bg-grid-theme {
-      background-size: 60px 60px;
-      background-image: 
-          linear-gradient(to right, color-mix(in srgb, var(--color-foreground) 5%%, transparent) 1px, transparent 1px),
-          linear-gradient(to bottom, color-mix(in srgb, var(--color-foreground) 5%%, transparent) 1px, transparent 1px);
-      mask-image: radial-gradient(ellipse at center, black 0%%, transparent 70%%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 0%%, transparent 70%%);
-  }
-
-  .text-3d-matte {
-      color: var(--color-foreground);
-      text-shadow: 
-          0 10px 30px color-mix(in srgb, var(--color-foreground) 20%%, transparent), 
-          0 2px 4px color-mix(in srgb, var(--color-foreground) 10%%, transparent);
-  }
-
-  .text-silver-matte {
-      background: linear-gradient(180deg, var(--color-foreground) 0%%, color-mix(in srgb, var(--color-foreground) 40%%, transparent) 100%%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      transform: translateZ(0);
-      filter: 
-          drop-shadow(0px 10px 20px color-mix(in srgb, var(--color-foreground) 15%%, transparent)) 
-          drop-shadow(0px 2px 4px color-mix(in srgb, var(--color-foreground) 10%%, transparent));
-  }
-
-  .text-card-silver-matte {
-      background: linear-gradient(180deg, #FFFFFF 0%%, #A1A1AA 100%%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      transform: translateZ(0);
-      filter: 
-          drop-shadow(0px 12px 24px rgba(0,0,0,0.8)) 
-          drop-shadow(0px 4px 8px rgba(0,0,0,0.6));
-  }
-
-  .premium-depth-card {
-      background: linear-gradient(145deg, #162C6D 0%%, #0A101D 100%%);
-      box-shadow: 
-          0 40px 100px -20px rgba(0, 0, 0, 0.9),
-          0 20px 40px -20px rgba(0, 0, 0, 0.8),
-          inset 0 1px 2px rgba(255, 255, 255, 0.2),
-          inset 0 -2px 4px rgba(0, 0, 0, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      position: relative;
-  }
-
-  .card-sheen {
-      position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 50;
-      background: radial-gradient(800px circle at var(--mouse-x, 50%%) var(--mouse-y, 50%%), rgba(255,255,255,0.06) 0%%, transparent 40%%);
-      mix-blend-mode: screen; transition: opacity 0.3s ease;
-  }
-
-  .iphone-bezel {
-      background-color: #111;
-      box-shadow: 
-          inset 0 0 0 2px #52525B, 
-          inset 0 0 0 7px #000, 
-          0 40px 80px -15px rgba(0,0,0,0.9),
-          0 15px 25px -5px rgba(0,0,0,0.7);
-      transform-style: preserve-3d;
-  }
-
-  .hardware-btn {
-      background: linear-gradient(90deg, #404040 0%%, #171717 100%%);
-      box-shadow: 
-          -2px 0 5px rgba(0,0,0,0.8),
-          inset -1px 0 1px rgba(255,255,255,0.15),
-          inset 1px 0 2px rgba(0,0,0,0.8);
-      border-left: 1px solid rgba(255,255,255,0.05);
-  }
-  
-  .screen-glare {
-      background: linear-gradient(110deg, rgba(255,255,255,0.08) 0%%, rgba(255,255,255,0) 45%%);
-  }
-
-  .widget-depth {
-      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%%, rgba(255,255,255,0.01) 100%%);
-      box-shadow: 
-          0 10px 20px rgba(0,0,0,0.3),
-          inset 0 1px 1px rgba(255,255,255,0.05),
-          inset 0 -1px 1px rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,255,255,0.03);
-  }
-
-  .floating-ui-badge {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%%, rgba(255, 255, 255, 0.01) 100%%);
-      backdrop-filter: blur(24px); 
-      -webkit-backdrop-filter: blur(24px);
-      box-shadow: 
-          0 0 0 1px rgba(255, 255, 255, 0.1),
-          0 25px 50px -12px rgba(0, 0, 0, 0.8),
-          inset 0 1px 1px rgba(255,255,255,0.2),
-          inset 0 -1px 1px rgba(0,0,0,0.5);
-  }
-
-  .btn-modern-light, .btn-modern-dark {
-      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-  }
-  .btn-modern-light {
-      background: linear-gradient(180deg, #FFFFFF 0%%, #F1F5F9 100%%);
-      color: #0F172A;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.1), 0 12px 24px -4px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,1), inset 0 -3px 6px rgba(0,0,0,0.06);
-  }
-  .btn-modern-light:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 6px 12px -2px rgba(0,0,0,0.15), 0 20px 32px -6px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,1), inset 0 -3px 6px rgba(0,0,0,0.06);
-  }
-  .btn-modern-light:active {
-      transform: translateY(1px);
-      background: linear-gradient(180deg, #F1F5F9 0%%, #E2E8F0 100%%);
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.1), inset 0 3px 6px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.02);
-  }
-  .btn-modern-dark {
-      background: linear-gradient(180deg, #27272A 0%%, #18181B 100%%);
-      color: #FFFFFF;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.6), 0 12px 24px -4px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -3px 6px rgba(0,0,0,0.8);
-  }
-  .btn-modern-dark:hover {
-      transform: translateY(-3px);
-      background: linear-gradient(180deg, #3F3F46 0%%, #27272A 100%%);
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 6px 12px -2px rgba(0,0,0,0.7), 0 20px 32px -6px rgba(0,0,0,1), inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -3px 6px rgba(0,0,0,0.8);
-  }
-  .btn-modern-dark:active {
-      transform: translateY(1px);
-      background: #18181B;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.05), inset 0 3px 8px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(0,0,0,0.5);
-  }
-
-  .progress-ring {
-      transform: rotate(-90deg);
-      transform-origin: center;
-      stroke-dasharray: 402;
-      stroke-dashoffset: 402;
-      stroke-linecap: round;
-  }
-`;
 
 export interface CinematicHeroProps extends React.HTMLAttributes<HTMLDivElement> {
   brandName?: string;
@@ -170,256 +15,235 @@ export interface CinematicHeroProps extends React.HTMLAttributes<HTMLDivElement>
   ctaDescription?: string;
 }
 
-export function CinematicHero({ 
+export function CinematicHero({
   brandName = "SkillBridge",
   tagline1 = "Build the skills,",
   tagline2 = "bridge the gap.",
   cardHeading = "Evidence-backed skill profiles.",
-  cardDescription = <><span className="text-white font-semibold">SkillBridge</span> connects students with industry through verified skills, semantic matching, and real opportunity discovery.</>,
+  cardDescription = (
+    <>
+      <span className="text-white font-semibold">SkillBridge</span> connects students with industry through verified skills, semantic matching, and real opportunity discovery.
+    </>
+  ),
   metricValue = 340,
   metricLabel = "Verified Skills",
   ctaHeading = "Start your journey.",
   ctaDescription = "Join thousands of students bridging the gap between academics and industry.",
-  className, 
-  ...props 
+  className,
+  ...props
 }: CinematicHeroProps) {
-  
   const containerRef = useRef<HTMLDivElement>(null);
   const mainCardRef = useRef<HTMLDivElement>(null);
   const mockupRef = useRef<HTMLDivElement>(null);
-  const requestRef = useRef<number>(0);
+  const [mounted, setMounted] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const [scrollPhase, setScrollPhase] = useState(0); // 0=intro, 1=card, 2=cta
+  const rafRef = useRef<number>(0);
 
+  // Mount flag
+  useEffect(() => { setMounted(true); }, []);
+
+  // Mouse tracking for card sheen + 3D tilt
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (window.scrollY > window.innerHeight * 2) return;
-
-      cancelAnimationFrame(requestRef.current);
-      
-      requestRef.current = requestAnimationFrame(() => {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
         if (mainCardRef.current && mockupRef.current) {
           const rect = mainCardRef.current.getBoundingClientRect();
-          const mouseX = e.clientX - rect.left;
-          const mouseY = e.clientY - rect.top;
-          
-          mainCardRef.current.style.setProperty("--mouse-x", `${mouseX}px`);
-          mainCardRef.current.style.setProperty("--mouse-y", `${mouseY}px`);
-
+          mainCardRef.current.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+          mainCardRef.current.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
           const xVal = (e.clientX / window.innerWidth - 0.5) * 2;
           const yVal = (e.clientY / window.innerHeight - 0.5) * 2;
-
-          gsap.to(mockupRef.current, {
-            rotationY: xVal * 12,
-            rotationX: -yVal * 12,
-            ease: "power3.out",
-            duration: 1.2,
-          });
+          mockupRef.current.style.transform = `rotateY(${xVal * 12}deg) rotateX(${-yVal * 12}deg)`;
         }
       });
     };
-
     window.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      cancelAnimationFrame(requestRef.current);
-    };
-  },[]);
+    return () => { window.removeEventListener("mousemove", handleMouseMove); cancelAnimationFrame(rafRef.current); };
+  }, []);
 
+  // Scroll-based phase transitions (pure CSS/JS, no GSAP)
   useEffect(() => {
-    const isMobile = window.innerWidth < 768;
+    const container = containerRef.current;
+    if (!container) return;
 
-    const ctx = gsap.context(() => {
-      gsap.set(".text-track", { autoAlpha: 0, y: 60, scale: 0.85, filter: "blur(20px)", rotationX: -20 });
-      gsap.set(".text-days", { autoAlpha: 1, clipPath: "inset(0 100% 0 0)" });
-      gsap.set(".main-card", { y: window.innerHeight + 200, autoAlpha: 1 });
-      gsap.set([".card-left-text", ".card-right-text", ".mockup-scroll-wrapper", ".floating-badge", ".phone-widget"], { autoAlpha: 0 });
-      gsap.set(".cta-wrapper", { autoAlpha: 0, scale: 0.8, filter: "blur(30px)" });
+    const handleScroll = () => {
+      const rect = container.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, -rect.top / (rect.height - window.innerHeight)));
+      if (progress < 0.15) setScrollPhase(0);
+      else if (progress < 0.75) setScrollPhase(1);
+      else setScrollPhase(2);
+    };
 
-      const introTl = gsap.timeline({ delay: 0.3 });
-      introTl
-        .to(".text-track", { duration: 1.8, autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)", rotationX: 0, ease: "expo.out" })
-        .to(".text-days", { duration: 1.4, clipPath: "inset(0 0% 0 0)", ease: "power4.inOut" }, "-=1.0");
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-      const scrollTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "+=7000",
-          pin: true,
-          scrub: 1,
-          anticipatePin: 1,
-        },
-      });
+  // Counter animation
+  const [counter, setCounter] = useState(0);
+  useEffect(() => {
+    if (scrollPhase < 1) return;
+    let start = 0;
+    const duration = 1500;
+    const step = (ts: number) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      setCounter(Math.floor(p * metricValue));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [scrollPhase, metricValue]);
 
-      scrollTl
-        .to([".hero-text-wrapper", ".bg-grid-theme"], { scale: 1.15, filter: "blur(20px)", opacity: 0.2, ease: "power2.inOut", duration: 2 }, 0)
-        .to(".main-card", { y: 0, ease: "power3.inOut", duration: 2 }, 0)
-        .to(".main-card", { width: "100%", height: "100%", borderRadius: "0px", ease: "power3.inOut", duration: 1.5 })
-        .fromTo(".mockup-scroll-wrapper",
-          { y: 300, z: -500, rotationX: 50, rotationY: -30, autoAlpha: 0, scale: 0.6 },
-          { y: 0, z: 0, rotationX: 0, rotationY: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 2.5 }, "-=0.8"
-        )
-        .fromTo(".phone-widget", { y: 40, autoAlpha: 0, scale: 0.95 }, { y: 0, autoAlpha: 1, scale: 1, stagger: 0.15, ease: "back.out(1.2)", duration: 1.5 }, "-=1.5")
-        .to(".progress-ring", { strokeDashoffset: 60, duration: 2, ease: "power3.inOut" }, "-=1.2")
-        .to(".counter-val", { innerHTML: metricValue, snap: { innerHTML: 1 }, duration: 2, ease: "expo.out" }, "-=2.0")
-        .fromTo(".floating-badge", { y: 100, autoAlpha: 0, scale: 0.7, rotationZ: -10 }, { y: 0, autoAlpha: 1, scale: 1, rotationZ: 0, ease: "back.out(1.5)", duration: 1.5, stagger: 0.2 }, "-=2.0")
-        .fromTo(".card-left-text", { x: -50, autoAlpha: 0 }, { x: 0, autoAlpha: 1, ease: "power4.out", duration: 1.5 }, "-=1.5")
-        .fromTo(".card-right-text", { x: 50, autoAlpha: 0, scale: 0.8 }, { x: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 1.5 }, "<")
-        .to({}, { duration: 2.5 })
-        .set(".hero-text-wrapper", { autoAlpha: 0 })
-        .set(".cta-wrapper", { autoAlpha: 1 }) 
-        .to({}, { duration: 1.5 })
-        .to([".mockup-scroll-wrapper", ".floating-badge", ".card-left-text", ".card-right-text"], {
-          scale: 0.9, y: -40, z: -200, autoAlpha: 0, ease: "power3.in", duration: 1.2, stagger: 0.05,
-        })
-        .to(".main-card", { 
-          width: isMobile ? "92vw" : "85vw", 
-          height: isMobile ? "92vh" : "85vh", 
-          borderRadius: isMobile ? "32px" : "40px", 
-          ease: "expo.inOut", 
-          duration: 1.8 
-        }, "pullback") 
-        .to(".cta-wrapper", { scale: 1, filter: "blur(0px)", ease: "expo.inOut", duration: 1.8 }, "pullback")
-        .to(".main-card", { y: -window.innerHeight - 300, ease: "power3.in", duration: 1.5 });
-
-    }, containerRef);
-
-    return () => ctx.revert();
-  },[metricValue]); 
+  // Progress ring offset
+  const ringOffset = scrollPhase >= 1 ? 60 : 402;
 
   return (
     <div
       ref={containerRef}
-      className={cn("relative w-screen h-screen overflow-hidden flex items-center justify-center bg-background text-foreground font-sans antialiased", className)}
-      style={{ perspective: "1500px" }}
+      className={cn("relative w-screen overflow-hidden bg-[#0A101D] text-white font-sans antialiased", className)}
+      style={{ height: mounted ? "400vh" : "100vh" }}
       {...props}
     >
-      <style dangerouslySetInnerHTML={{ __html: INJECTED_STYLES }} />
-      <div className="film-grain" aria-hidden="true" />
-      <div className="bg-grid-theme absolute inset-0 z-0 pointer-events-none opacity-50" aria-hidden="true" />
+      {/* Film grain overlay */}
+      <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.03] mix-blend-overlay" aria-hidden="true"
+        style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }}
+      />
 
-      <div className="hero-text-wrapper absolute z-10 flex flex-col items-center justify-center text-center w-screen px-4 will-change-transform" style={{ transformStyle: "preserve-3d" }}>
-        <h1 className="text-track gsap-reveal text-3d-matte text-5xl md:text-7xl lg:text-[6rem] font-bold tracking-tight mb-2">
+      {/* Background grid */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-30"
+        aria-hidden="true"
+        style={{
+          backgroundSize: "60px 60px",
+          backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
+          maskImage: "radial-gradient(ellipse at center, black 0%, transparent 70%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 0%, transparent 70%)",
+        }}
+      />
+
+      {/* PHASE 0: Hero text */}
+      <div
+        className="fixed inset-0 z-10 flex flex-col items-center justify-center text-center px-4 transition-all duration-700"
+        style={{
+          opacity: scrollPhase === 0 ? 1 : scrollPhase === 1 ? 0 : 0,
+          transform: scrollPhase === 0 ? "scale(1)" : "scale(1.15)",
+          filter: scrollPhase === 0 ? "blur(0px)" : "blur(20px)",
+          pointerEvents: scrollPhase === 0 ? "auto" : "none",
+        }}
+      >
+        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] font-bold tracking-tight mb-2"
+          style={{ color: "white", textShadow: "0 10px 30px rgba(255,255,255,0.1), 0 2px 4px rgba(255,255,255,0.05)" }}>
           {tagline1}
         </h1>
-        <h1 className="text-days gsap-reveal text-silver-matte text-5xl md:text-7xl lg:text-[6rem] font-extrabold tracking-tighter">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] font-extrabold tracking-tighter"
+          style={{ background: "linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.4) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", filter: "drop-shadow(0px 10px 20px rgba(255,255,255,0.1))" }}>
           {tagline2}
         </h1>
       </div>
 
-      <div className="cta-wrapper absolute z-10 flex flex-col items-center justify-center text-center w-screen px-4 gsap-reveal pointer-events-auto will-change-transform">
-        <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight text-silver-matte">
-          {ctaHeading}
-        </h2>
-        <p className="text-muted-foreground text-lg md:text-xl mb-12 max-w-xl mx-auto font-light leading-relaxed">
-          {ctaDescription}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-6">
-          <a href="/onboarding" className="btn-modern-light flex items-center justify-center gap-3 px-8 py-4 rounded-2xl group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-            <svg className="w-6 h-6 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            <div className="text-left">
-              <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase mb-[-2px]">Get started on</div>
-              <div className="text-xl font-bold leading-none tracking-tight">SkillBridge</div>
-            </div>
-          </a>
-          <a href="/explore" className="btn-modern-dark flex items-center justify-center gap-3 px-8 py-4 rounded-2xl group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-background">
-            <svg className="w-6 h-6 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            <div className="text-left">
-              <div className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase mb-[-2px]">Browse</div>
-              <div className="text-xl font-bold leading-none tracking-tight">Opportunities</div>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none" style={{ perspective: "1500px" }}>
+      {/* PHASE 1+2: Main card */}
+      <div
+        className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none"
+        style={{ perspective: "1500px" }}
+      >
         <div
           ref={mainCardRef}
-          className="main-card premium-depth-card relative overflow-hidden gsap-reveal flex items-center justify-center pointer-events-auto w-[92vw] md:w-[85vw] h-[92vh] md:h-[85vh] rounded-[32px] md:rounded-[40px]"
+          className="relative overflow-hidden flex items-center justify-center pointer-events-auto transition-all duration-[1800ms] ease-[cubic-bezier(0.25,1,0.5,1)]"
+          style={{
+            width: scrollPhase === 0 ? "85vw" : scrollPhase === 1 ? "85vw" : "85vw",
+            height: scrollPhase === 0 ? "85vh" : scrollPhase === 1 ? "100vh" : "85vh",
+            borderRadius: scrollPhase === 0 ? "40px" : scrollPhase === 1 ? "0px" : "40px",
+            transform: scrollPhase === 0 ? "translateY(calc(100vh + 200px))" : scrollPhase === 2 ? "translateY(-100vh)" : "translateY(0)",
+            opacity: scrollPhase === 2 ? 0 : 1,
+            background: "linear-gradient(145deg, #162C6D 0%, #0A101D 100%)",
+            boxShadow: "0 40px 100px -20px rgba(0,0,0,0.9), 0 20px 40px -20px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.8)",
+            border: "1px solid rgba(255,255,255,0.04)",
+          }}
         >
-          <div className="card-sheen" aria-hidden="true" />
+          {/* Card sheen (mouse follow) */}
+          <div className="absolute inset-0 pointer-events-none z-50" style={{ borderRadius: "inherit", background: "radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06) 0%, transparent 40%)", mixBlendMode: "screen" }} />
 
           <div className="relative w-full h-full max-w-7xl mx-auto px-4 lg:px-12 flex flex-col justify-evenly lg:grid lg:grid-cols-3 items-center lg:gap-8 z-10 py-6 lg:py-0">
-            
-            <div className="card-right-text gsap-reveal order-1 lg:order-3 flex justify-center lg:justify-end z-20 w-full">
-              <h2 className="text-6xl md:text-[6rem] lg:text-[8rem] font-black uppercase tracking-tighter text-card-silver-matte lg:mt-0">
+            {/* Right: Brand */}
+            <div className={cn("order-1 lg:order-3 flex justify-center lg:justify-end z-20 w-full transition-all duration-700", scrollPhase >= 1 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12")}>
+              <h2 className="text-5xl md:text-[6rem] lg:text-[8rem] font-black uppercase tracking-tighter" style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", filter: "drop-shadow(0px 12px 24px rgba(0,0,0,0.8)) drop-shadow(0px 4px 8px rgba(0,0,0,0.6))" }}>
                 {brandName}
               </h2>
             </div>
 
-            <div className="mockup-scroll-wrapper order-2 lg:order-2 relative w-full h-[380px] lg:h-[600px] flex items-center justify-center z-10" style={{ perspective: "1000px" }}>
-              
+            {/* Center: iPhone */}
+            <div className={cn("order-2 lg:order-2 relative w-full h-[380px] lg:h-[600px] flex items-center justify-center z-10 transition-all duration-1000", scrollPhase >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[300px]")} style={{ perspective: "1000px" }}>
               <div className="relative w-full h-full flex items-center justify-center" style={{ transform: "scale(0.65)" }}>
-                
-                <div
-                  ref={mockupRef}
-                  className="relative w-[280px] h-[580px] rounded-[3rem] iphone-bezel flex flex-col will-change-transform"
-                  style={{ transformStyle: "preserve-3d" }}
-                >
-                  <div className="absolute top-[120px] -left-[3px] w-[3px] h-[25px] hardware-btn rounded-l-md z-0" aria-hidden="true" />
-                  <div className="absolute top-[160px] -left-[3px] w-[3px] h-[45px] hardware-btn rounded-l-md z-0" aria-hidden="true" />
-                  <div className="absolute top-[220px] -left-[3px] w-[3px] h-[45px] hardware-btn rounded-l-md z-0" aria-hidden="true" />
-                  <div className="absolute top-[170px] -right-[3px] w-[3px] h-[70px] hardware-btn rounded-r-md z-0" style={{ transform: "scaleX(-1)" }} aria-hidden="true" />
+                {/* iPhone */}
+                <div ref={mockupRef} className="relative w-[280px] h-[580px] rounded-[3rem] flex flex-col will-change-transform" style={{ backgroundColor: "#111", boxShadow: "inset 0 0 0 2px #52525B, inset 0 0 0 7px #000, 0 40px 80px -15px rgba(0,0,0,0.9), 0 15px 25px -5px rgba(0,0,0,0.7)", transformStyle: "preserve-3d" }}>
+                  {/* Hardware buttons */}
+                  <div className="absolute top-[120px] -left-[3px] w-[3px] h-[25px] rounded-l-md z-0" style={{ background: "linear-gradient(90deg, #404040, #171717)", boxShadow: "-2px 0 5px rgba(0,0,0,0.8)" }} />
+                  <div className="absolute top-[160px] -left-[3px] w-[3px] h-[45px] rounded-l-md z-0" style={{ background: "linear-gradient(90deg, #404040, #171717)", boxShadow: "-2px 0 5px rgba(0,0,0,0.8)" }} />
+                  <div className="absolute top-[220px] -left-[3px] w-[3px] h-[45px] rounded-l-md z-0" style={{ background: "linear-gradient(90deg, #404040, #171717)", boxShadow: "-2px 0 5px rgba(0,0,0,0.8)" }} />
+                  <div className="absolute top-[170px] -right-[3px] w-[3px] h-[70px] rounded-r-md z-0" style={{ background: "linear-gradient(270deg, #404040, #171717)", boxShadow: "2px 0 5px rgba(0,0,0,0.8)" }} />
 
-                  <div className="absolute inset-[7px] bg-[#050914] rounded-[2.5rem] overflow-hidden shadow-[inset_0_0_15px_rgba(0,0,0,1)] text-white z-10">
-                    <div className="absolute inset-0 screen-glare z-40 pointer-events-none" aria-hidden="true" />
+                  {/* Screen */}
+                  <div className="absolute inset-[7px] rounded-[2.5rem] overflow-hidden text-white z-10" style={{ backgroundColor: "#050914", boxShadow: "inset 0 0 15px rgba(0,0,0,1)" }}>
+                    <div className="absolute inset-0 z-40 pointer-events-none" style={{ background: "linear-gradient(110deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 45%)" }} />
 
-                    <div className="absolute top-[5px] left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-black rounded-full z-50 flex items-center justify-end px-3 shadow-[inset_0_-1px_2px_rgba(255,255,255,0.1)]">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" />
+                    {/* Dynamic Island */}
+                    <div className="absolute top-[5px] left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-black rounded-full z-50 flex items-center justify-end px-3" style={{ boxShadow: "inset 0 -1px 2px rgba(255,255,255,0.1)" }}>
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" style={{ boxShadow: "0 0 8px rgba(34,197,94,0.8)" }} />
                     </div>
 
+                    {/* App content */}
                     <div className="relative w-full h-full pt-12 px-5 pb-8 flex flex-col">
-                      <div className="phone-widget flex justify-between items-center mb-8">
+                      <div className="flex justify-between items-center mb-8">
                         <div className="flex flex-col">
                           <span className="text-[10px] text-neutral-400 uppercase tracking-widest font-bold mb-1">Dashboard</span>
-                          <span className="text-xl font-bold tracking-tight text-white drop-shadow-md">SkillBridge</span>
+                          <span className="text-xl font-bold tracking-tight text-white">SkillBridge</span>
                         </div>
-                        <div className="w-9 h-9 rounded-full bg-white/5 text-neutral-200 flex items-center justify-center font-bold text-sm border border-white/10 shadow-lg shadow-black/50">SB</div>
+                        <div className="w-9 h-9 rounded-full bg-white/5 text-neutral-200 flex items-center justify-center font-bold text-sm border border-white/10">SB</div>
                       </div>
 
-                      <div className="phone-widget relative w-44 h-44 mx-auto flex items-center justify-center mb-8 drop-shadow-[0_15px_25px_rgba(0,0,0,0.8)]">
-                        <svg className="absolute inset-0 w-full h-full" aria-hidden="true">
+                      {/* Progress ring */}
+                      <div className="relative w-44 h-44 mx-auto flex items-center justify-center mb-8">
+                        <svg className="absolute inset-0 w-full h-full" style={{ transform: "rotate(-90deg)", transformOrigin: "center" }} aria-hidden="true">
                           <circle cx="88" cy="88" r="64" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="12" />
-                          <circle className="progress-ring" cx="88" cy="88" r="64" fill="none" stroke="#22C55E" strokeWidth="12" />
+                          <circle cx="88" cy="88" r="64" fill="none" stroke="#22C55E" strokeWidth="12" strokeLinecap="round" style={{ strokeDasharray: 402, strokeDashoffset: ringOffset, transition: "stroke-dashoffset 2s ease" }} />
                         </svg>
                         <div className="text-center z-10 flex flex-col items-center">
-                          <span className="counter-val text-4xl font-extrabold tracking-tighter text-white">0</span>
+                          <span className="text-4xl font-extrabold tracking-tighter text-white">{counter}</span>
                           <span className="text-[8px] text-green-200/50 uppercase tracking-[0.1em] font-bold mt-0.5">{metricLabel}</span>
                         </div>
                       </div>
 
+                      {/* Widget items */}
                       <div className="space-y-3">
-                        <div className="phone-widget widget-depth rounded-2xl p-3 flex items-center">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-green-600/5 flex items-center justify-center mr-3 border border-green-400/20 shadow-inner">
-                            <svg className="w-4 h-4 text-green-400 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                        <div className="rounded-2xl p-3 flex items-center" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))", boxShadow: "0 10px 20px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05), inset 0 -1px 1px rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.03)" }}>
+                          <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center mr-3 border border-green-400/20">
+                            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                           </div>
                           <div className="flex-1">
-                            <div className="h-2 w-20 bg-neutral-300 rounded-full mb-2 shadow-inner" />
-                            <div className="h-1.5 w-12 bg-neutral-600 rounded-full shadow-inner" />
+                            <div className="h-2 w-20 bg-neutral-300 rounded-full mb-2" />
+                            <div className="h-1.5 w-12 bg-neutral-600 rounded-full" />
                           </div>
                         </div>
-                        <div className="phone-widget widget-depth rounded-2xl p-3 flex items-center">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/5 flex items-center justify-center mr-3 border border-emerald-400/20 shadow-inner">
-                            <svg className="w-4 h-4 text-emerald-400 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                            </svg>
+                        <div className="rounded-2xl p-3 flex items-center" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))", boxShadow: "0 10px 20px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05), inset 0 -1px 1px rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.03)" }}>
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center mr-3 border border-emerald-400/20">
+                            <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                           </div>
                           <div className="flex-1">
-                            <div className="h-2 w-16 bg-neutral-300 rounded-full mb-2 shadow-inner" />
-                            <div className="h-1.5 w-24 bg-neutral-600 rounded-full shadow-inner" />
+                            <div className="h-2 w-16 bg-neutral-300 rounded-full mb-2" />
+                            <div className="h-1.5 w-24 bg-neutral-600 rounded-full" />
                           </div>
                         </div>
                       </div>
 
-                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[4px] bg-white/20 rounded-full shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[4px] bg-white/20 rounded-full" />
                     </div>
                   </div>
                 </div>
 
-                <div className="floating-badge absolute flex top-6 lg:top-12 left-[-15px] lg:left-[-80px] floating-ui-badge rounded-xl lg:rounded-2xl p-3 lg:p-4 items-center gap-3 lg:gap-4 z-30">
-                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-b from-green-500/20 to-green-900/10 flex items-center justify-center border border-green-400/30 shadow-inner">
-                    <span className="text-base lg:text-xl drop-shadow-lg" aria-hidden="true">🎯</span>
+                {/* Floating badges */}
+                <div className={cn("absolute flex top-6 lg:top-12 left-[-15px] lg:left-[-80px] rounded-xl lg:rounded-2xl p-3 lg:p-4 items-center gap-3 lg:gap-4 z-30 transition-all duration-700 delay-300", scrollPhase >= 1 ? "opacity-100 translate-y-0 rotate-0" : "opacity-0 translate-y-[100px] rotate-[-10deg]")}
+                  style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01))", backdropFilter: "blur(24px)", boxShadow: "0 0 0 1px rgba(255,255,255,0.1), 0 25px 50px -12px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -1px 1px rgba(0,0,0,0.5)" }}>
+                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-green-500/10 flex items-center justify-center border border-green-400/30">
+                    <span className="text-base lg:text-xl" aria-hidden="true">🎯</span>
                   </div>
                   <div>
                     <p className="text-white text-xs lg:text-sm font-bold tracking-tight">91% Match</p>
@@ -427,20 +251,21 @@ export function CinematicHero({
                   </div>
                 </div>
 
-                <div className="floating-badge absolute flex bottom-12 lg:bottom-20 right-[-15px] lg:right-[-80px] floating-ui-badge rounded-xl lg:rounded-2xl p-3 lg:p-4 items-center gap-3 lg:gap-4 z-30">
-                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-b from-blue-500/20 to-blue-900/10 flex items-center justify-center border border-blue-400/30 shadow-inner">
-                    <span className="text-base lg:text-lg drop-shadow-lg" aria-hidden="true">📈</span>
+                <div className={cn("absolute flex bottom-12 lg:bottom-20 right-[-15px] lg:right-[-80px] rounded-xl lg:rounded-2xl p-3 lg:p-4 items-center gap-3 lg:gap-4 z-30 transition-all duration-700 delay-500", scrollPhase >= 1 ? "opacity-100 translate-y-0 rotate-0" : "opacity-0 translate-y-[100px] rotate-[-10deg]")}
+                  style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01))", backdropFilter: "blur(24px)", boxShadow: "0 0 0 1px rgba(255,255,255,0.1), 0 25px 50px -12px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -1px 1px rgba(0,0,0,0.5)" }}>
+                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-400/30">
+                    <span className="text-base lg:text-lg" aria-hidden="true">📈</span>
                   </div>
                   <div>
                     <p className="text-white text-xs lg:text-sm font-bold tracking-tight">Skill Verified</p>
                     <p className="text-blue-200/50 text-[10px] lg:text-xs font-medium">Evidence-backed</p>
                   </div>
                 </div>
-
               </div>
             </div>
 
-            <div className="card-left-text gsap-reveal order-3 lg:order-1 flex flex-col justify-center text-center lg:text-left z-20 w-full lg:max-w-none px-4 lg:px-0">
+            {/* Left: Card text */}
+            <div className={cn("order-3 lg:order-1 flex flex-col justify-center text-center lg:text-left z-20 w-full px-4 lg:px-0 transition-all duration-700", scrollPhase >= 1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-12")}>
               <h3 className="text-white text-2xl md:text-3xl lg:text-4xl font-bold mb-0 lg:mb-5 tracking-tight">
                 {cardHeading}
               </h3>
@@ -448,8 +273,44 @@ export function CinematicHero({
                 {cardDescription}
               </p>
             </div>
-
           </div>
+        </div>
+      </div>
+
+      {/* PHASE 2: CTA */}
+      <div
+        className="fixed inset-0 z-30 flex flex-col items-center justify-center text-center px-4 transition-all duration-700"
+        style={{
+          opacity: scrollPhase === 2 ? 1 : 0,
+          transform: scrollPhase === 2 ? "scale(1)" : "scale(0.8)",
+          filter: scrollPhase === 2 ? "blur(0px)" : "blur(30px)",
+          pointerEvents: scrollPhase === 2 ? "auto" : "none",
+        }}
+      >
+        <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight"
+          style={{ background: "linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.4) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", filter: "drop-shadow(0px 10px 20px rgba(255,255,255,0.1))" }}>
+          {ctaHeading}
+        </h2>
+        <p className="text-white/40 text-lg md:text-xl mb-12 max-w-xl mx-auto font-light leading-relaxed">
+          {ctaDescription}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-6">
+          <a href="/onboarding" className="flex items-center justify-center gap-3 px-8 py-4 rounded-2xl group transition-all duration-300 hover:-translate-y-1"
+            style={{ background: "linear-gradient(180deg, #FFFFFF, #F1F5F9)", color: "#0F172A", boxShadow: "0 0 0 1px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.1), 0 12px 24px -4px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,1), inset 0 -3px 6px rgba(0,0,0,0.06)" }}>
+            <svg className="w-6 h-6 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            <div className="text-left">
+              <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase mb-[-2px]">Get started on</div>
+              <div className="text-xl font-bold leading-none tracking-tight">SkillBridge</div>
+            </div>
+          </a>
+          <a href="/explore" className="flex items-center justify-center gap-3 px-8 py-4 rounded-2xl group transition-all duration-300 hover:-translate-y-1"
+            style={{ background: "linear-gradient(180deg, #27272A, #18181B)", color: "#FFFFFF", boxShadow: "0 0 0 1px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.6), 0 12px 24px -4px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -3px 6px rgba(0,0,0,0.8)" }}>
+            <svg className="w-6 h-6 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <div className="text-left">
+              <div className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase mb-[-2px]">Browse</div>
+              <div className="text-xl font-bold leading-none tracking-tight">Opportunities</div>
+            </div>
+          </a>
         </div>
       </div>
     </div>
