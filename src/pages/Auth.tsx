@@ -60,15 +60,12 @@ export default function Auth() {
       <AboutBento />
 
       {/* Magic scroll text section */}
-      <section className="relative bg-white py-32 px-6">
+      <section className="bg-white py-32 px-6">
         <div className="max-w-4xl mx-auto">
           <MagicText
             text="Hi there! We're Lead2Learn, building the future of opportunity discovery for students across India. Thank you for all the support and love. We hope you enjoy using L2L as much as we enjoyed creating it."
           />
         </div>
-        <p className="absolute top-1/2 left-1/2 -translate-x-1/2 text-sm text-gray-400 select-none pointer-events-none">
-          Scroll Down 👇
-        </p>
       </section>
     </div>
   );
