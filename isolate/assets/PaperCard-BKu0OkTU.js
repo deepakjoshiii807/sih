@@ -1,1 +1,0 @@
-import{j as s}from"./framer-motion-DforBNzQ.js";import{c as e}from"./utils-C5h7FuRP.js";function c({children:a,className:t,variant:o="default",onClick:r}){return s.jsx("div",{onClick:r,className:e("pixel-card bg-card p-5",r&&"cursor-pointer",t),children:a})}export{c as P};
