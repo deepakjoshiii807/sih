@@ -1,4 +1,4 @@
-import CinematicHero from "@/components/ui/cinematic-hero";
+import { CinematicHero } from "@/components/ui/cinematic-hero";
 
 export default function Auth() {
   return (
