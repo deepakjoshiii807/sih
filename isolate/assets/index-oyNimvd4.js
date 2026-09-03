@@ -34,7 +34,7 @@ Error generating stack: `+u.message+`
             -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
         }
         .text-3d-matte { color: white; text-shadow: 0 10px 30px rgba(255,255,255,0.1), 0 2px 4px rgba(255,255,255,0.05); }
-        .text-silver-matte { background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.4) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transform: translateZ(0); filter: drop-shadow(0px 10px 20px rgba(255,255,255,0.1)) drop-shadow(0px 2px 4px rgba(255,255,255,0.05)); }
+        .text-silver-matte { color: rgba(255,255,255,0.55); text-shadow: 0 2px 8px rgba(255,255,255,0.06); }
         .text-card-silver-matte { background: linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transform: translateZ(0); filter: drop-shadow(0px 12px 24px rgba(0,0,0,0.8)) drop-shadow(0px 4px 8px rgba(0,0,0,0.6)); }
         .premium-depth-card { background: linear-gradient(145deg, #162C6D 0%, #0A101D 100%); box-shadow: 0 40px 100px -20px rgba(0,0,0,0.9), 0 20px 40px -20px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.04); position: relative; }
         .card-sheen { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 50; background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06) 0%, transparent 40%); mix-blend-mode: screen; transition: opacity 0.3s ease; }
