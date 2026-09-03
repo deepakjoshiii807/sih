@@ -9,155 +9,6 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const INJECTED_STYLES = `
-  .gsap-reveal { visibility: hidden; }
-
-  .film-grain {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 50; opacity: 0.04; mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-
-  .bg-grid-theme {
-      background-size: 60px 60px;
-      background-image: 
-          linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
-      mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
-  }
-
-  .text-3d-matte {
-      color: white;
-      text-shadow: 
-          0 10px 30px rgba(255,255,255,0.1), 
-          0 2px 4px rgba(255,255,255,0.05);
-  }
-
-  .text-silver-matte {
-      background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.4) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      transform: translateZ(0);
-      filter: 
-          drop-shadow(0px 10px 20px rgba(255,255,255,0.1)) 
-          drop-shadow(0px 2px 4px rgba(255,255,255,0.05));
-  }
-
-  .text-card-silver-matte {
-      background: linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      transform: translateZ(0);
-      filter: 
-          drop-shadow(0px 12px 24px rgba(0,0,0,0.8)) 
-          drop-shadow(0px 4px 8px rgba(0,0,0,0.6));
-  }
-
-  .premium-depth-card {
-      background: linear-gradient(145deg, #162C6D 0%, #0A101D 100%);
-      box-shadow: 
-          0 40px 100px -20px rgba(0, 0, 0, 0.9),
-          0 20px 40px -20px rgba(0, 0, 0, 0.8),
-          inset 0 1px 2px rgba(255, 255, 255, 0.2),
-          inset 0 -2px 4px rgba(0, 0, 0, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      position: relative;
-  }
-
-  .card-sheen {
-      position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 50;
-      background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06) 0%, transparent 40%);
-      mix-blend-mode: screen; transition: opacity 0.3s ease;
-  }
-
-  .iphone-bezel {
-      background-color: #111;
-      box-shadow: 
-          inset 0 0 0 2px #52525B, 
-          inset 0 0 0 7px #000, 
-          0 40px 80px -15px rgba(0,0,0,0.9),
-          0 15px 25px -5px rgba(0,0,0,0.7);
-      transform-style: preserve-3d;
-  }
-
-  .hardware-btn {
-      background: linear-gradient(90deg, #404040 0%, #171717 100%);
-      box-shadow: 
-          -2px 0 5px rgba(0,0,0,0.8),
-          inset -1px 0 1px rgba(255,255,255,0.15),
-          inset 1px 0 2px rgba(0,0,0,0.8);
-      border-left: 1px solid rgba(255,255,255,0.05);
-  }
-  
-  .screen-glare {
-      background: linear-gradient(110deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 45%);
-  }
-
-  .widget-depth {
-      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
-      box-shadow: 
-          0 10px 20px rgba(0,0,0,0.3),
-          inset 0 1px 1px rgba(255,255,255,0.05),
-          inset 0 -1px 1px rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,255,255,0.03);
-  }
-
-  .floating-ui-badge {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%);
-      backdrop-filter: blur(24px); 
-      -webkit-backdrop-filter: blur(24px);
-      box-shadow: 
-          0 0 0 1px rgba(255, 255, 255, 0.1),
-          0 25px 50px -12px rgba(0, 0, 0, 0.8),
-          inset 0 1px 1px rgba(255,255,255,0.2),
-          inset 0 -1px 1px rgba(0,0,0,0.5);
-  }
-
-  .btn-modern-light, .btn-modern-dark {
-      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-  }
-  .btn-modern-light {
-      background: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
-      color: #0F172A;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.1), 0 12px 24px -4px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,1), inset 0 -3px 6px rgba(0,0,0,0.06);
-  }
-  .btn-modern-light:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 6px 12px -2px rgba(0,0,0,0.15), 0 20px 32px -6px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,1), inset 0 -3px 6px rgba(0,0,0,0.06);
-  }
-  .btn-modern-light:active {
-      transform: translateY(1px);
-      background: linear-gradient(180deg, #F1F5F9 0%, #E2E8F0 100%);
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.1), inset 0 3px 6px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.02);
-  }
-  .btn-modern-dark {
-      background: linear-gradient(180deg, #27272A 0%, #18181B 100%);
-      color: #FFFFFF;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.6), 0 12px 24px -4px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -3px 6px rgba(0,0,0,0.8);
-  }
-  .btn-modern-dark:hover {
-      transform: translateY(-3px);
-      background: linear-gradient(180deg, #3F3F46 0%, #27272A 100%);
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 6px 12px -2px rgba(0,0,0,0.7), 0 20px 32px -6px rgba(0,0,0,1), inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -3px 6px rgba(0,0,0,0.8);
-  }
-  .btn-modern-dark:active {
-      transform: translateY(1px);
-      background: #18181B;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.05), inset 0 3px 8px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(0,0,0,0.5);
-  }
-
-  .progress-ring {
-      transform: rotate(-90deg);
-      transform-origin: center;
-      stroke-dasharray: 402;
-      stroke-dashoffset: 402;
-      stroke-linecap: round;
-  }
-`;
-
 export interface CinematicHeroProps extends React.HTMLAttributes<HTMLDivElement> {
   brandName?: string;
   tagline1?: string;
@@ -170,7 +21,7 @@ export interface CinematicHeroProps extends React.HTMLAttributes<HTMLDivElement>
   ctaDescription?: string;
 }
 
-export function CinematicHero({ 
+export function CinematicHero({
   brandName = "SkillBridge",
   tagline1 = "Build the skills,",
   tagline2 = "bridge the gap.",
@@ -180,27 +31,28 @@ export function CinematicHero({
   metricLabel = "Verified Skills",
   ctaHeading = "Start your journey.",
   ctaDescription = "Join thousands of students bridging the gap between academics and industry.",
-  className, 
-  ...props 
+  className,
+  ...props
 }: CinematicHeroProps) {
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const mainCardRef = useRef<HTMLDivElement>(null);
   const mockupRef = useRef<HTMLDivElement>(null);
   const requestRef = useRef<number>(0);
 
+  // Mouse interaction
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (window.scrollY > window.innerHeight * 2) return;
 
       cancelAnimationFrame(requestRef.current);
-      
+
       requestRef.current = requestAnimationFrame(() => {
         if (mainCardRef.current && mockupRef.current) {
           const rect = mainCardRef.current.getBoundingClientRect();
           const mouseX = e.clientX - rect.left;
           const mouseY = e.clientY - rect.top;
-          
+
           mainCardRef.current.style.setProperty("--mouse-x", `${mouseX}px`);
           mainCardRef.current.style.setProperty("--mouse-y", `${mouseY}px`);
 
@@ -222,8 +74,9 @@ export function CinematicHero({
       window.removeEventListener("mousemove", handleMouseMove);
       cancelAnimationFrame(requestRef.current);
     };
-  },[]);
+  }, []);
 
+  // GSAP scroll timeline
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
 
@@ -266,25 +119,25 @@ export function CinematicHero({
         .fromTo(".card-right-text", { x: 50, autoAlpha: 0, scale: 0.8 }, { x: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 1.5 }, "<")
         .to({}, { duration: 2.5 })
         .set(".hero-text-wrapper", { autoAlpha: 0 })
-        .set(".cta-wrapper", { autoAlpha: 1 }) 
+        .set(".cta-wrapper", { autoAlpha: 1 })
         .to({}, { duration: 1.5 })
         .to([".mockup-scroll-wrapper", ".floating-badge", ".card-left-text", ".card-right-text"], {
           scale: 0.9, y: -40, z: -200, autoAlpha: 0, ease: "power3.in", duration: 1.2, stagger: 0.05,
         })
-        .to(".main-card", { 
-          width: isMobile ? "92vw" : "85vw", 
-          height: isMobile ? "92vh" : "85vh", 
-          borderRadius: isMobile ? "32px" : "40px", 
-          ease: "expo.inOut", 
-          duration: 1.8 
-        }, "pullback") 
+        .to(".main-card", {
+          width: isMobile ? "92vw" : "85vw",
+          height: isMobile ? "92vh" : "85vh",
+          borderRadius: isMobile ? "32px" : "40px",
+          ease: "expo.inOut",
+          duration: 1.8
+        }, "pullback")
         .to(".cta-wrapper", { scale: 1, filter: "blur(0px)", ease: "expo.inOut", duration: 1.8 }, "pullback")
         .to(".main-card", { y: -window.innerHeight - 300, ease: "power3.in", duration: 1.5 });
 
     }, containerRef);
 
     return () => ctx.revert();
-  },[metricValue]); 
+  }, [metricValue]);
 
   return (
     <div
@@ -293,7 +146,155 @@ export function CinematicHero({
       style={{ perspective: "1500px" }}
       {...props}
     >
-      <style dangerouslySetInnerHTML={{ __html: INJECTED_STYLES }} />
+      <style dangerouslySetInnerHTML={{ __html: `
+        .gsap-reveal { visibility: hidden; }
+
+        .film-grain {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 50; opacity: 0.04; mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .bg-grid-theme {
+            background-size: 60px 60px;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+            mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+        }
+
+        .text-3d-matte {
+            color: white;
+            text-shadow: 
+                0 10px 30px rgba(255,255,255,0.1), 
+                0 2px 4px rgba(255,255,255,0.05);
+        }
+
+        .text-silver-matte {
+            background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.4) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: translateZ(0);
+            filter: 
+                drop-shadow(0px 10px 20px rgba(255,255,255,0.1)) 
+                drop-shadow(0px 2px 4px rgba(255,255,255,0.05));
+        }
+
+        .text-card-silver-matte {
+            background: linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: translateZ(0);
+            filter: 
+                drop-shadow(0px 12px 24px rgba(0,0,0,0.8)) 
+                drop-shadow(0px 4px 8px rgba(0,0,0,0.6));
+        }
+
+        .premium-depth-card {
+            background: linear-gradient(145deg, #162C6D 0%, #0A101D 100%);
+            box-shadow: 
+                0 40px 100px -20px rgba(0, 0, 0, 0.9),
+                0 20px 40px -20px rgba(0, 0, 0, 0.8),
+                inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            position: relative;
+        }
+
+        .card-sheen {
+            position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 50;
+            background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06) 0%, transparent 40%);
+            mix-blend-mode: screen; transition: opacity 0.3s ease;
+        }
+
+        .iphone-bezel {
+            background-color: #111;
+            box-shadow: 
+                inset 0 0 0 2px #52525B, 
+                inset 0 0 0 7px #000, 
+                0 40px 80px -15px rgba(0,0,0,0.9),
+                0 15px 25px -5px rgba(0,0,0,0.7);
+            transform-style: preserve-3d;
+        }
+
+        .hardware-btn {
+            background: linear-gradient(90deg, #404040 0%, #171717 100%);
+            box-shadow: 
+                -2px 0 5px rgba(0,0,0,0.8),
+                inset -1px 0 1px rgba(255,255,255,0.15),
+                inset 1px 0 2px rgba(0,0,0,0.8);
+            border-left: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .screen-glare {
+            background: linear-gradient(110deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 45%);
+        }
+
+        .widget-depth {
+            background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+            box-shadow: 
+                0 10px 20px rgba(0,0,0,0.3),
+                inset 0 1px 1px rgba(255,255,255,0.05),
+                inset 0 -1px 1px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .floating-ui-badge {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(24px); 
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                0 25px 50px -12px rgba(0, 0, 0, 0.8),
+                inset 0 1px 1px rgba(255,255,255,0.2),
+                inset 0 -1px 1px rgba(0,0,0,0.5);
+        }
+
+        .btn-modern-light, .btn-modern-dark {
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .btn-modern-light {
+            background: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
+            color: #0F172A;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.1), 0 12px 24px -4px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,1), inset 0 -3px 6px rgba(0,0,0,0.06);
+        }
+        .btn-modern-light:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 6px 12px -2px rgba(0,0,0,0.15), 0 20px 32px -6px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,1), inset 0 -3px 6px rgba(0,0,0,0.06);
+        }
+        .btn-modern-light:active {
+            transform: translateY(1px);
+            background: linear-gradient(180deg, #F1F5F9 0%, #E2E8F0 100%);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.1), inset 0 3px 6px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.02);
+        }
+        .btn-modern-dark {
+            background: linear-gradient(180deg, #27272A 0%, #18181B 100%);
+            color: #FFFFFF;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.6), 0 12px 24px -4px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -3px 6px rgba(0,0,0,0.8);
+        }
+        .btn-modern-dark:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(180deg, #3F3F46 0%, #27272A 100%);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 6px 12px -2px rgba(0,0,0,0.7), 0 20px 32px -6px rgba(0,0,0,1), inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -3px 6px rgba(0,0,0,0.8);
+        }
+        .btn-modern-dark:active {
+            transform: translateY(1px);
+            background: #18181B;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.05), inset 0 3px 8px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(0,0,0,0.5);
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+            transform-origin: center;
+            stroke-dasharray: 402;
+            stroke-dashoffset: 402;
+            stroke-linecap: round;
+        }
+      ` }} />
+
       <div className="film-grain" aria-hidden="true" />
       <div className="bg-grid-theme absolute inset-0 z-0 pointer-events-none opacity-50" aria-hidden="true" />
 
@@ -314,14 +315,14 @@ export function CinematicHero({
           {ctaDescription}
         </p>
         <div className="flex flex-col sm:flex-row gap-6">
-          <a href="/onboarding" className="btn-modern-light flex items-center justify-center gap-3 px-8 py-4 rounded-[1.25rem] group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+          <a href="/" className="btn-modern-light flex items-center justify-center gap-3 px-8 py-4 rounded-[1.25rem] group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
             <svg className="w-7 h-7 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
             <div className="text-left">
               <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase mb-[-2px]">Get started on</div>
               <div className="text-xl font-bold leading-none tracking-tight">SkillBridge</div>
             </div>
           </a>
-          <a href="/explore" className="btn-modern-dark flex items-center justify-center gap-3 px-8 py-4 rounded-[1.25rem] group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0A0A0F]">
+          <a href="/" className="btn-modern-dark flex items-center justify-center gap-3 px-8 py-4 rounded-[1.25rem] group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0A0A0F]">
             <svg className="w-6 h-6 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             <div className="text-left">
               <div className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase mb-[-2px]">Browse</div>
