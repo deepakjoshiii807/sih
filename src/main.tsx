@@ -1,7 +1,7 @@
 import '@vly-ai/integrations';
 import { Toaster } from "@/components/ui/sonner";
 import { RequireAuth } from "@/components/RequireAuth";
-import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
+import { VlyToolbar } from '../vly-toolbar-readonly.tsx';
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
 import React, { StrictMode, useEffect, lazy, Suspense } from "react";
@@ -24,8 +24,13 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 function RouteLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F0EEE6]">
-      <div className="text-[#8A8580] editorial animate-pulse">Loading...</div>
+    <div className="min-h-screen flex items-center justify-center bg-cream">
+      <div className="text-center">
+        <div className="w-12 h-12 bg-forest border-[3px] border-[#2A4A35] shadow-[4px_4px_0px_#2A4A35] flex items-center justify-center mx-auto mb-3 animate-pixel-bounce">
+          <span className="text-cream pixel text-[10px]">SB</span>
+        </div>
+        <p className="pixel text-[8px] text-ink-muted animate-pixel-blink">LOADING...</p>
+      </div>
     </div>
   );
 }
@@ -48,10 +53,10 @@ class RootErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-[#F0EEE6] p-6">
-          <div className="max-w-lg text-center bg-[#FAF8F2] ink-border paper-shadow p-8">
-            <p className="heading-md text-lg text-[#1A1A1A] mb-2">Something went wrong</p>
-            <p className="text-[12px] text-[#8A8580] sans-ui break-words">{this.state.message}</p>
+        <div className="min-h-screen flex items-center justify-center bg-cream p-6">
+          <div className="max-w-lg text-center pixel-card bg-card p-8">
+            <p className="pixel text-[10px] text-ink mb-2">SOMETHING WENT WRONG</p>
+            <p className="text-[12px] text-ink-muted break-words sans">{this.state.message}</p>
           </div>
         </div>
       );

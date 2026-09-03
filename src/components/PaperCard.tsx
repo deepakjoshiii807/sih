@@ -10,7 +10,7 @@ interface PaperCardProps {
 
 export default function PaperCard({ children, className, variant = "default", onClick }: PaperCardProps) {
   return (
-    <div onClick={onClick} className={cn("glass-card rounded-2xl p-5", onClick && "cursor-pointer", className)}>
+    <div onClick={onClick} className={cn("pixel-card bg-card p-5", onClick && "cursor-pointer", className)}>
       {children}
     </div>
   );

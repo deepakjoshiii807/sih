@@ -5,11 +5,11 @@ interface ProgressBarProps { label: string; progress: number; completed?: boolea
 export default function ProgressBar({ label, progress, completed, className }: ProgressBarProps) {
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <span className="text-[12px] text-white/60 w-28 shrink-0 sans">{label}</span>
-      <div className="flex-1 h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
-        <div className={cn("h-full rounded-full transition-all duration-500", completed ? "bg-[#00D2D3]" : progress >= 50 ? "bg-[#5B8DEF]" : "bg-[#FDCB6E]")} style={{ width: `${progress}%` }} />
+      <span className="text-[12px] text-ink-light font-semibold w-28 shrink-0 sans">{label}</span>
+      <div className="flex-1 pixel-progress">
+        <div className={cn("pixel-progress-fill", completed ? "green" : progress >= 50 ? "blue" : "yellow")} style={{ width: `${progress}%` }} />
       </div>
-      <span className="text-[10px] text-white/30 w-8 text-right sans">{completed ? "✓" : `${progress}%`}</span>
+      <span className="text-[10px] text-ink-muted font-bold w-10 text-right pixel">{completed ? "✓ DONE" : `${progress}%`}</span>
     </div>
   );
 }

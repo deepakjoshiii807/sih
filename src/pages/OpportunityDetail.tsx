@@ -6,37 +6,39 @@ import MatchScore from "@/components/MatchScore";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import PaperCard from "@/components/PaperCard";
 import Footer from "@/components/Footer";
+import { PixelDocument, PixelGraduation, PixelBriefcase, PixelBuilding } from "@/components/PixelIcons";
 import { opportunities } from "@/lib/mockData";
 
 const typeLabel: Record<string, string> = { course: "Course", scholarship: "Scholarship", internship: "Internship", job: "Job" };
-const typeBadge: Record<string, string> = { course: "badge-blue", scholarship: "badge-teal", internship: "badge-orange", job: "badge-purple" };
+const typeBadge: Record<string, string> = { course: "badge-pixel-blue", scholarship: "badge-pixel-green", internship: "badge-pixel-peach", job: "badge-pixel-purple" };
+const typeIcon: Record<string, typeof PixelDocument> = { course: PixelDocument, scholarship: PixelGraduation, internship: PixelBriefcase, job: PixelBuilding };
 
 export default function OpportunityDetail() {
   const { id } = useParams();
   const opp = opportunities.find((o) => o.id === id) || opportunities[0];
+  const Icon = typeIcon[opp.type];
 
   return (
-    <div className="min-h-screen bg-[#0B0B11] relative">
-      <div className="ambient" />
+    <div className="min-h-screen bg-cream">
       <Navbar />
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/explore" className="inline-flex items-center gap-1.5 text-[12px] text-white/30 hover:text-white/60 transition-colors mb-6 sans"><ArrowLeft className="w-3.5 h-3.5" /> Back to Explore</Link>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Link to="/explore" className="inline-flex items-center gap-1.5 text-[12px] text-ink-muted hover:text-ink transition-colors mb-6 sans"><ArrowLeft className="w-3.5 h-3.5" /> Back to Explore</Link>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="glass rounded-2xl p-6 sm:p-8 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#7C6BF0]/[0.03] to-transparent pointer-events-none" />
+          <div className="pixel-card bg-card p-6 sm:p-8 relative overflow-hidden">
+            <div className="absolute inset-0 pixel-dots opacity-10 pointer-events-none" />
             <div className="relative z-10">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className={`badge ${typeBadge[opp.type]} rounded-full`}>{typeLabel[opp.type]}</span>
+                    <span className={`badge-pixel ${typeBadge[opp.type]}`}><Icon className="w-3 h-3" /> {typeLabel[opp.type]}</span>
                     {opp.verified && <VerifiedBadge />}
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 tracking-tight">{opp.title}</h1>
-                  <p className="text-[13px] text-white/35 sans">{opp.provider}</p>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-ink mb-1 tracking-tight">{opp.title}</h1>
+                  <p className="text-[13px] text-ink-muted sans">{opp.provider}</p>
                 </div>
                 <MatchScore score={opp.matchPercentage} size="lg" showBar />
               </div>
-              <div className="divider mb-6" />
+              <div className="pixel-divider mb-6" />
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
                 {[
                   { icon: Clock, label: "Duration", value: opp.duration },
@@ -46,28 +48,28 @@ export default function OpportunityDetail() {
                   { icon: Users, label: "Eligibility", value: opp.eligibility },
                   { icon: BookOpen, label: "Mode", value: opp.mode.charAt(0).toUpperCase() + opp.mode.slice(1) },
                 ].map((d) => (
-                  <div key={d.label} className="glass rounded-xl p-3">
-                    <p className="text-[9px] font-semibold text-white/25 uppercase tracking-wider mb-1 sans flex items-center gap-1"><d.icon className="w-3 h-3" /> {d.label}</p>
-                    <p className="text-[12px] text-white/70 font-medium sans">{d.value}</p>
+                  <div key={d.label} className="pixel-card-sm bg-cream p-3">
+                    <p className="pixel text-[7px] text-ink-muted mb-1 flex items-center gap-1"><d.icon className="w-3 h-3" /> {d.label}</p>
+                    <p className="text-[12px] text-ink font-semibold sans">{d.value}</p>
                   </div>
                 ))}
               </div>
               <div className="mb-6">
-                <h3 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-2 sans">About</h3>
-                <p className="text-[13px] text-white/50 leading-relaxed">{opp.description}</p>
+                <h3 className="section-pixel mb-2">About</h3>
+                <p className="text-[13px] text-ink-light leading-relaxed">{opp.description}</p>
               </div>
               <div className="mb-6">
-                <h3 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-2 sans">Skills Gained</h3>
-                <div className="flex flex-wrap gap-1.5">{opp.skills.map((s) => <span key={s} className="px-2.5 py-1 bg-white/[0.05] border border-white/[0.06] rounded-full text-[11px] text-white/50 sans">{s}</span>)}</div>
+                <h3 className="section-pixel mb-2">Skills Gained</h3>
+                <div className="flex flex-wrap gap-1.5">{opp.skills.map((s) => <span key={s} className="tag-pixel text-[10px]">{s}</span>)}</div>
               </div>
               <div className="mb-8">
-                <h3 className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-2 sans">Why This Matches You</h3>
-                <div className="glass rounded-xl p-4"><p className="text-[12px] text-white/45 italic">"{opp.whyRecommended}"</p></div>
+                <h3 className="section-pixel mb-2">Why This Matches You</h3>
+                <div className="pixel-sticky bg-cream p-4 shadow-[3px_3px_0px_var(--border)] border-2 border-border"><p className="text-[12px] text-ink-light italic">"{opp.whyRecommended}"</p></div>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
-                <button className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#7C6BF0] to-[#5B8DEF] text-white text-[13px] font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/20 transition-all sans">Apply Now <ArrowRight className="w-4 h-4" /></button>
-                <button className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 glass text-white/50 text-[13px] font-medium rounded-xl hover:text-white hover:bg-white/[0.06] transition-all sans">Save Opportunity</button>
-                <button className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 glass text-white/50 text-[13px] font-medium rounded-xl hover:text-white hover:bg-white/[0.06] transition-all sans">Discuss</button>
+                <button className="flex-1 pixel-btn pixel-btn-primary justify-center">Apply Now <ArrowRight className="w-3.5 h-3.5" /></button>
+                <button className="flex-1 pixel-btn pixel-btn-secondary justify-center">Save Opportunity</button>
+                <button className="flex-1 pixel-btn pixel-btn-secondary justify-center">Discuss</button>
               </div>
             </div>
           </div>
@@ -75,8 +77,11 @@ export default function OpportunityDetail() {
         <div className="mt-6">
           <PaperCard>
             <div className="flex items-center justify-between">
-              <div><p className="text-[13px] font-semibold text-white/80">23 people are discussing this opportunity</p><p className="text-[11px] text-white/25 sans mt-0.5">Get answers from students who've applied</p></div>
-              <a href="/community" className="inline-flex items-center gap-1.5 px-4 py-1.5 glass text-[11px] font-medium text-white/50 rounded-xl hover:text-white hover:bg-white/[0.06] transition-all sans">Join Discussion</a>
+              <div>
+                <p className="text-[13px] font-bold text-ink">23 people are discussing this opportunity</p>
+                <p className="text-[11px] text-ink-muted sans mt-0.5">Get answers from students who've applied</p>
+              </div>
+              <a href="/community" className="pixel-btn pixel-btn-accent text-[7px] py-1.5">Join Discussion</a>
             </div>
           </PaperCard>
         </div>

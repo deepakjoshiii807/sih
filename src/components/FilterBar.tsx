@@ -15,7 +15,7 @@ export default function FilterBar({ filters, activeFilters, onFilterChange }: Fi
         const isOpen = open === f.id;
         return (
           <div key={f.id} className="relative">
-            <button onClick={() => setOpen(isOpen ? null : f.id)} className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider rounded-xl transition-all sans", active !== "All" ? "bg-gradient-to-r from-[#7C6BF0] to-[#5B8DEF] text-white shadow-lg shadow-purple-500/10" : "glass text-white/40 hover:text-white/60")}>
+            <button onClick={() => setOpen(isOpen ? null : f.id)} className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 text-[8px] font-bold uppercase tracking-wider pixel transition-all", active !== "All" ? "bg-forest text-white border-2 border-[#2A4A35] shadow-[2px_2px_0px_#2A4A35]" : "pixel-card-sm bg-card text-ink-muted hover:text-ink-light border-2 border-border")}>
               {f.label}{active !== "All" && <span className="opacity-60">: {active}</span>}
               <svg className={cn("w-3 h-3 transition-transform", isOpen && "rotate-180")} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
             </button>
@@ -23,9 +23,9 @@ export default function FilterBar({ filters, activeFilters, onFilterChange }: Fi
               {isOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setOpen(null)} />
-                  <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="absolute top-full left-0 mt-2 z-50 glass-strong rounded-xl min-w-[150px] py-1 overflow-hidden">
+                  <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="absolute top-full left-0 mt-2 z-50 pixel-card bg-card min-w-[150px] py-1 overflow-hidden">
                     {f.options.map((o) => (
-                      <button key={o} onClick={() => { onFilterChange(f.id, o); setOpen(null); }} className={cn("w-full text-left px-3 py-1.5 text-[11px] transition-all sans", active === o ? "font-semibold text-white bg-white/[0.06]" : "text-white/35 hover:text-white hover:bg-white/[0.04]")}>{o}</button>
+                      <button key={o} onClick={() => { onFilterChange(f.id, o); setOpen(null); }} className={cn("w-full text-left px-3 py-1.5 text-[11px] transition-all sans", active === o ? "font-bold text-ink bg-cream-dark" : "text-ink-muted hover:text-ink hover:bg-cream")}>{o}</button>
                     ))}
                   </motion.div>
                 </>
