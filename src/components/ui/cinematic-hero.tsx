@@ -40,7 +40,6 @@ export function CinematicHero({
   const mockupRef = useRef<HTMLDivElement>(null);
   const requestRef = useRef<number>(0);
 
-  // Mouse interaction
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (window.scrollY > window.innerHeight * 2) return;
@@ -60,7 +59,6 @@ export function CinematicHero({
     return () => { window.removeEventListener("mousemove", handleMouseMove); cancelAnimationFrame(requestRef.current); };
   }, []);
 
-  // GSAP scroll timeline — reduced to 2800px for smoother feel
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
 
@@ -71,13 +69,11 @@ export function CinematicHero({
       gsap.set([".card-left-text", ".card-right-text", ".mockup-scroll-wrapper", ".floating-badge", ".phone-widget"], { autoAlpha: 0 });
       gsap.set(".cta-wrapper", { autoAlpha: 0, scale: 0.8, filter: "blur(30px)" });
 
-      // Intro animation
       const introTl = gsap.timeline({ delay: 0.3 });
       introTl
         .to(".text-track", { duration: 1.4, autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)", rotationX: 0, ease: "expo.out" })
         .to(".text-days", { duration: 1.0, clipPath: "inset(0 0% 0 0)", ease: "power4.inOut" }, "-=0.8");
 
-      // Scroll timeline — 2800px total
       const scrollTl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
@@ -90,11 +86,9 @@ export function CinematicHero({
       });
 
       scrollTl
-        // Phase 1: Hero text fades, card slides up
         .to([".hero-text-wrapper", ".bg-grid-theme"], { scale: 1.1, filter: "blur(16px)", opacity: 0.15, ease: "power2.inOut", duration: 1.5 }, 0)
         .to(".main-card", { y: 0, ease: "power3.inOut", duration: 1.5 }, 0)
         .to(".main-card", { width: "100%", height: "100%", borderRadius: "0px", ease: "power3.inOut", duration: 1.2 })
-        // Phase 2: Card content reveals
         .fromTo(".mockup-scroll-wrapper",
           { y: 200, z: -300, rotationX: 40, rotationY: -20, autoAlpha: 0, scale: 0.6 },
           { y: 0, z: 0, rotationX: 0, rotationY: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 1.8 }, "-=0.6"
@@ -105,9 +99,7 @@ export function CinematicHero({
         .fromTo(".floating-badge", { y: 60, autoAlpha: 0, scale: 0.7, rotationZ: -8 }, { y: 0, autoAlpha: 1, scale: 1, rotationZ: 0, ease: "back.out(1.5)", duration: 1.0, stagger: 0.15 }, "-=1.0")
         .fromTo(".card-left-text", { x: -40, autoAlpha: 0 }, { x: 0, autoAlpha: 1, ease: "power4.out", duration: 1.0 }, "-=0.8")
         .fromTo(".card-right-text", { x: 40, autoAlpha: 0, scale: 0.8 }, { x: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 1.0 }, "<")
-        // Phase 3: Hold for a beat
         .to({}, { duration: 1.5 })
-        // Phase 4: Content fades, CTA appears
         .set(".hero-text-wrapper", { autoAlpha: 0 })
         .set(".cta-wrapper", { autoAlpha: 1 })
         .to({}, { duration: 0.8 })
@@ -150,7 +142,7 @@ export function CinematicHero({
             -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
         }
         .text-3d-matte { color: white; text-shadow: 0 10px 30px rgba(255,255,255,0.1), 0 2px 4px rgba(255,255,255,0.05); }
-        .text-silver-matte { background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.4) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transform: translateZ(0); filter: drop-shadow(0px 10px 20px rgba(255,255,255,0.1)) drop-shadow(0px 2px 4px rgba(255,255,255,0.05)); }
+        .text-silver-matte { color: rgba(255,255,255,0.55); text-shadow: 0 2px 8px rgba(255,255,255,0.06); }
         .text-card-silver-matte { background: linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transform: translateZ(0); filter: drop-shadow(0px 12px 24px rgba(0,0,0,0.8)) drop-shadow(0px 4px 8px rgba(0,0,0,0.6)); }
         .premium-depth-card { background: linear-gradient(145deg, #162C6D 0%, #0A101D 100%); box-shadow: 0 40px 100px -20px rgba(0,0,0,0.9), 0 20px 40px -20px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.04); position: relative; }
         .card-sheen { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 50; background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06) 0%, transparent 40%); mix-blend-mode: screen; transition: opacity 0.3s ease; }
@@ -227,7 +219,6 @@ export function CinematicHero({
                   <div className="absolute top-[160px] -left-[3px] w-[3px] h-[45px] hardware-btn rounded-l-md z-0" />
                   <div className="absolute top-[220px] -left-[3px] w-[3px] h-[45px] hardware-btn rounded-l-md z-0" />
                   <div className="absolute top-[170px] -right-[3px] w-[3px] h-[70px] hardware-btn rounded-r-md z-0 scale-x-[-1]" />
-
                   <div className="absolute inset-[7px] bg-[#050914] rounded-[2.5rem] overflow-hidden shadow-[inset_0_0_15px_rgba(0,0,0,1)] text-white z-10">
                     <div className="absolute inset-0 screen-glare z-40 pointer-events-none" />
                     <div className="absolute top-[5px] left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-black rounded-full z-50 flex items-center justify-end px-3 shadow-[inset_0_-1px_2px_rgba(255,255,255,0.1)]">
@@ -266,7 +257,6 @@ export function CinematicHero({
                     </div>
                   </div>
                 </div>
-
                 <div className="floating-badge absolute flex top-6 lg:top-12 left-[-15px] lg:left-[-80px] floating-ui-badge rounded-xl lg:rounded-2xl p-3 lg:p-4 items-center gap-3 lg:gap-4 z-30">
                   <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-green-500/10 flex items-center justify-center border border-green-400/30 shadow-inner"><span className="text-base lg:text-xl drop-shadow-lg">🎯</span></div>
                   <div><p className="text-white text-xs lg:text-sm font-bold tracking-tight">91% Match</p><p className="text-green-200/50 text-[10px] lg:text-xs font-medium">Data Analyst role</p></div>
