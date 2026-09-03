@@ -1,155 +1,153 @@
-import { motion } from "framer-motion";
-import { ArrowRight, Users, Zap, Sparkles, Target, Shield, Lightbulb } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { ArrowRight, Search } from "lucide-react";
+import { Link, useNavigate } from "react-router";
 import Navbar from "@/components/Navbar";
-import SearchBar from "@/components/SearchBar";
-import MatchScore from "@/components/MatchScore";
-import VerifiedBadge from "@/components/VerifiedBadge";
-import StickyNote from "@/components/StickyNote";
-import ThreadCard from "@/components/ThreadCard";
 import Footer from "@/components/Footer";
-import { PixelGraduation, PixelBriefcase, PixelDocument, PixelBuilding, PixelTarget, PixelRocket, PixelGraph, PixelStar, PixelChip } from "@/components/PixelIcons";
-import { opportunities, threadPreviews, trustedSources, quickSearchTags } from "@/lib/mockData";
+import { PixelGraduation, PixelBriefcase, PixelTarget, PixelRocket, PixelDocument, PixelGraph, PixelStar, PixelChip } from "@/components/PixelIcons";
 
-const fade = { initial: { opacity: 0, y: 20 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true } as const, transition: { duration: 0.5 } };
-const typeBadge: Record<string, string> = { course: "badge-pixel-blue", scholarship: "badge-pixel-green", internship: "badge-pixel-peach", job: "badge-pixel-purple" };
-const typeLabel: Record<string, string> = { course: "Course", scholarship: "Scholarship", internship: "Internship", job: "Job" };
-const typeIcon: Record<string, typeof PixelGraduation> = { course: PixelDocument, scholarship: PixelGraduation, internship: PixelBriefcase, job: PixelBuilding };
+/* ─── Animated counter ─── */
+function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true });
+  useEffect(() => {
+    if (!inView) return;
+    let start = 0;
+    const duration = 1200;
+    const step = (ts: number) => {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      setVal(Math.floor(progress * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [inView, target]);
+  return <span ref={ref}>{val.toLocaleString()}{suffix}</span>;
+}
+
+/* ─── Skill bar ─── */
+function SkillBar({ label, pct, delay }: { label: string; pct: number; delay: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true });
+  return (
+    <div ref={ref} className="flex items-center gap-4">
+      <span className="text-[12px] text-ink-light font-medium w-28 shrink-0 text-right">{label}</span>
+      <div className="flex-1 pixel-progress">
+        <div
+          className={`pixel-progress-fill ${pct >= 75 ? "green" : pct >= 50 ? "blue" : "yellow"}`}
+          style={{ width: inView ? `${pct}%` : "0%", transition: `width 0.8s ease ${delay}s` }}
+        />
+      </div>
+      <span className="pixel text-[8px] text-ink-muted w-10">{pct}%</span>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════ */
+/*                     LANDING PAGE                       */
+/* ═══════════════════════════════════════════════════════ */
 
 export default function Landing() {
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+
+  const handleSearch = () => {
+    if (query.trim()) navigate(`/explore?q=${encodeURIComponent(query.trim())}`);
+  };
+
   return (
     <div className="min-h-screen bg-cream">
       <Navbar />
 
-      {/* ═══ HERO ═══ */}
+      {/* ═══════ HERO ═══════ */}
       <section className="relative overflow-hidden">
-        {/* Pixel background decoration */}
-        <div className="absolute inset-0 pixel-dots opacity-30 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-sage-bg opacity-50 pointer-events-none" style={{ borderRadius: "0 0 0 100%" }} />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-lavender-bg opacity-40 pointer-events-none" style={{ borderRadius: "0 100% 0 0" }} />
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 pb-20 sm:pt-24 sm:pb-28">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-            <motion.div {...fade} className="lg:col-span-7 order-2 lg:order-1">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-sage-bg border-2 border-sage text-forest text-[7px] pixel mb-6 shadow-[2px_2px_0px_var(--sage)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-forest animate-pixel-blink" /> SIH26044 · ACADEMIA–INDUSTRY PORTAL
-              </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold text-ink leading-[1.08] tracking-tight mb-6">
-                Find the opportunity <br className="hidden sm:block" /> worth your{" "}
-                <span className="relative inline-block">
-                  next step
-                  <svg className="absolute -bottom-1 left-0 w-full" height="8" viewBox="0 0 200 8" fill="none">
-                    <path d="M2 6C30 2 70 2 100 4C130 6 170 3 198 2" stroke="#3B6B4A" strokeWidth="3" strokeLinecap="round" />
-                  </svg>
-                </span>.
-              </h1>
-              <p className="text-[15px] text-ink-light leading-relaxed mb-8 max-w-xl sans">
-                Discover courses, scholarships, internships and jobs tailored to your goals, skills and interests.
-              </p>
-              <SearchBar size="large" />
-              <div className="flex flex-wrap gap-2 mt-4 mb-6">
-                {quickSearchTags.map((t) => (
-                  <a key={t} href={`/explore?q=${encodeURIComponent(t)}`} className="tag-pixel hover:border-ink-muted hover:text-ink transition-all">{t}</a>
-                ))}
-              </div>
-              <div className="flex items-center gap-3 text-[11px] text-ink-muted sans">
-                <div className="flex -space-x-2">{["#3B6B4A","#6B5B8A","#4A7B8A","#D4A843"].map((c,i) => <div key={i} className="w-7 h-7 border-2 border-cream flex items-center justify-center text-[8px] font-bold text-white pixel" style={{background:c}}>{["S","R","A","V"][i]}</div>)}</div>
-                <span className="font-semibold">2,400+ students already exploring</span>
-              </div>
-            </motion.div>
+            {/* Left — text */}
+            <div className="lg:col-span-7 order-2 lg:order-1">
+              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                <div className="pixel text-[7px] text-ink-muted tracking-widest mb-6">
+                  SIH26044 · ACADEMIA–INDUSTRY PORTAL
+                </div>
 
-            {/* Right — pixel collage */}
-            <div className="lg:col-span-5 order-1 lg:order-2 relative h-[420px] hidden lg:block">
-              {opportunities.slice(0, 4).map((opp, i) => {
-                const Icon = typeIcon[opp.type];
-                return (
-                  <motion.div key={opp.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.8 + i * 0.15 }} className="absolute" style={{ left: `${(i % 2) * 55 + 2}%`, top: `${Math.floor(i / 2) * 52 + 3}%` }}>
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 3 + i, repeat: Infinity, ease: "easeInOut" }}>
-                      <div className="pixel-card bg-card p-4 w-56 cursor-default">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className={`badge-pixel ${typeBadge[opp.type]} text-[6px]`}><Icon className="w-3 h-3" /> {typeLabel[opp.type]}</span>
-                          {opp.verified && <VerifiedBadge variant="compact" />}
-                        </div>
-                        <h4 className="font-bold text-[11px] text-ink leading-snug mb-1">{opp.title}</h4>
-                        <p className="text-[9px] text-ink-muted mb-2 sans">{opp.duration} · {opp.mode}</p>
-                        <MatchScore score={opp.matchPercentage} size="sm" />
-                      </div>
-                    </motion.div>
-                  </motion.div>
-                );
-              })}
-              {/* Pixel decorations */}
-              <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} className="absolute -top-2 right-8">
-                <PixelStar className="text-yellow" size={20} />
+                <h1 className="text-[2.5rem] sm:text-[3.2rem] lg:text-[3.8rem] font-extrabold text-ink leading-[1.08] tracking-tight mb-6">
+                  Find the opportunity
+                  <br />
+                  worth your{" "}
+                  <span className="relative inline-block">
+                    next step
+                    <svg className="absolute -bottom-1 left-0 w-full" height="8" viewBox="0 0 200 8" fill="none" preserveAspectRatio="none">
+                      <path d="M2 5.5C40 2.5 100 2.5 198 5.5" stroke="#2D5016" strokeWidth="2.5" strokeLinecap="round" />
+                    </svg>
+                  </span>.
+                </h1>
+
+                <p className="text-[15px] text-ink-light leading-relaxed mb-8 max-w-lg">
+                  Discover courses, scholarships, internships and jobs matched to your skills, goals and interests.
+                </p>
               </motion.div>
-              <motion.div animate={{ rotate: [0, 5, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-8 -left-2">
-                <PixelRocket className="text-purple" size={20} />
+
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}>
+                <div className="pixel-card-border p-1.5 flex items-stretch gap-1.5 max-w-xl">
+                  <div className="flex-1 flex items-center gap-3 px-4 bg-cream-card">
+                    <Search className="w-4 h-4 text-ink-muted shrink-0" />
+                    <input
+                      type="text"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search opportunities..."
+                      className="w-full bg-transparent text-[13px] text-ink placeholder:text-ink-muted focus:outline-none py-2.5"
+                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    />
+                  </div>
+                  <button onClick={handleSearch} className="pixel-btn pixel-btn-green text-[7px] px-5 shrink-0">
+                    Explore <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-4 mt-4">
+                  {["Internships", "Jobs", "Courses", "Scholarships"].map((c) => (
+                    <Link key={c} to={`/explore?type=${c.toLowerCase()}`} className="text-[11px] text-ink-muted hover:text-ink font-medium transition-colors">
+                      {c}
+                    </Link>
+                  ))}
+                </div>
               </motion.div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ═══ HOW IT WORKS ═══ */}
-      <section className="py-20 border-t-[3px] border-ink bg-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div {...fade} className="text-center mb-14">
-            <span className="section-pixel mb-3 block">How it works</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-ink tracking-tight">Three steps. Zero noise.</h2>
-          </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { icon: Users, pixelIcon: PixelGraduation, title: "Tell us about yourself", desc: "Your skills, goals, and what matters to you. One profile unlocks everything.", color: "forest", num: "01" },
-              { icon: Zap, pixelIcon: PixelRocket, title: "We find the matches", desc: "Our AI scans 12,000+ opportunities and ranks the ones that actually fit you.", color: "blue", num: "02" },
-              { icon: Sparkles, pixelIcon: PixelTarget, title: "Apply with confidence", desc: "Get the 'why this matches' breakdown, deadlines, and direct links — no guesswork.", color: "purple", num: "03" },
-            ].map((f, i) => (
-              <motion.div key={f.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.1 }} className="pixel-card bg-card p-6 text-center relative group">
-                <div className="absolute top-3 right-3 pixel text-[8px] text-ink-muted">{f.num}</div>
-                <div className="w-12 h-12 mx-auto mb-4 bg-cream-dark border-2 border-ink shadow-[2px_2px_0px_var(--ink)] flex items-center justify-center">
-                  <f.pixelIcon className="text-ink" size={24} />
-                </div>
-                <h3 className="pixel text-[8px] text-ink mb-3 tracking-wider">{f.title}</h3>
-                <p className="text-[12px] text-ink-muted leading-relaxed sans">{f.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+            {/* Right — career roadmap visual */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="lg:col-span-5 order-1 lg:order-2 hidden lg:block"
+            >
+              <div className="pixel-card p-6 ml-4">
+                <div className="pixel text-[7px] text-ink-muted tracking-widest mb-5">YOUR CAREER PATH</div>
 
-      {/* ═══ WHY SKILLBRIDGE ═══ */}
-      <section className="py-20 border-t-[3px] border-ink bg-cream-dark">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div {...fade}>
-              <span className="section-pixel mb-3 block">Why SkillBridge</span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-ink tracking-tight mb-5">Not another job board. <br /><span className="text-forest">An opportunity engine.</span></h2>
-              <p className="text-[13px] text-ink-muted leading-relaxed mb-8 max-w-md sans">Most platforms dump a list of links on you. SkillBridge understands your profile, filters the noise, and shows you only what fits.</p>
-              <div className="space-y-4">
-                {[
-                  { pixelIcon: PixelMagnifier, text: "Natural language search — ask in plain English", color: "var(--forest)" },
-                  { pixelIcon: PixelTarget, text: "Match scores based on your actual skills", color: "var(--yellow)" },
-                  { pixelIcon: PixelStar, text: "Every opportunity verified by our team", color: "var(--blue)" },
-                ].map((f, i) => (
-                  <motion.div key={f.text} initial={{ opacity: 0, x: -12 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }} className="flex items-center gap-3">
-                    <div className="w-9 h-9 border-2 border-ink bg-card shadow-[2px_2px_0px_var(--ink)] flex items-center justify-center shrink-0"><f.pixelIcon className="text-ink" size={18} /></div>
-                    <span className="text-[13px] text-ink-light font-medium sans">{f.text}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }} className="hidden lg:block">
-              <div className="pixel-card bg-card p-8 relative overflow-hidden">
-                <div className="absolute inset-0 pixel-dots opacity-20 pointer-events-none" />
-                <div className="relative z-10 space-y-3">
-                  {opportunities.slice(0, 3).map((opp, i) => (
-                    <div key={opp.id} className="pixel-card-sm bg-cream p-4 flex items-center gap-3" style={{ transform: `rotate(${i % 2 === 0 ? -0.5 : 0.5}deg)` }}>
-                      <div className="w-10 h-10 border-2 border-ink bg-cream-dark flex items-center justify-center shrink-0 shadow-[2px_2px_0px_var(--ink)]">
-                        {opp.type === "course" ? <PixelDocument className="text-blue" size={18} /> : opp.type === "scholarship" ? <PixelGraduation className="text-forest" size={18} /> : <PixelBriefcase className="text-peach" size={18} />}
+                <div className="space-y-0">
+                  {[
+                    { icon: PixelDocument, label: "Student Profile", sub: "Education & background", color: "var(--green)" },
+                    { icon: PixelStar, label: "Skills", sub: "Evidence-backed skill map", color: "var(--yellow)" },
+                    { icon: PixelTarget, label: "Skill Gap", sub: "What you need to learn", color: "var(--peach)" },
+                    { icon: PixelBriefcase, label: "Opportunity", sub: "Matched to your profile", color: "var(--blue)" },
+                    { icon: PixelRocket, label: "Next Step", sub: "Your career launchpad", color: "var(--green)" },
+                  ].map((step, i) => (
+                    <div key={step.label}>
+                      <div className="flex items-center gap-3 py-2.5">
+                        <div className="w-9 h-9 border-[1.5px] border-ink bg-cream flex items-center justify-center shrink-0" style={{ boxShadow: `2px 2px 0 ${step.color}40` }}>
+                          <step.icon className="text-ink" size={16} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[12px] font-bold text-ink leading-tight">{step.label}</p>
+                          <p className="text-[10px] text-ink-muted">{step.sub}</p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-bold text-ink truncate">{opp.title}</p>
-                        <p className="text-[10px] text-ink-muted sans">{opp.provider}</p>
-                      </div>
-                      <MatchScore score={opp.matchPercentage} size="sm" />
+                      {i < 4 && (
+                        <div className="ml-[17px] border-l-[1.5px] border-dashed border-border h-2" />
+                      )}
                     </div>
                   ))}
                 </div>
@@ -159,96 +157,273 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ═══ FEATURES ═══ */}
-      <section className="py-20 border-t-[3px] border-ink bg-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div {...fade} className="text-center mb-12">
-            <span className="section-pixel mb-3 block">Built for India</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">Everything you need, nothing you don't.</h2>
-          </motion.div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+      {/* ═══════ STATS BAR ═══════ */}
+      <section className="border-y border-border bg-cream-card">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { pixelIcon: PixelTarget, title: "Personalized", desc: "AI recs based on your goals", color: "var(--forest)" },
-              { pixelIcon: PixelStar, title: "Trusted", desc: "Verified from reliable sources", color: "var(--blue)" },
-              { pixelIcon: PixelGraph, title: "Relevant", desc: "Based on skills & eligibility", color: "var(--yellow)" },
-              { pixelIcon: PixelRocket, title: "Community", desc: "Discuss & connect with peers", color: "var(--purple)" },
-            ].map((f, i) => (
-              <motion.div key={f.title} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35, delay: i * 0.08 }} className="pixel-card bg-card p-5 text-center">
-                <div className="w-10 h-10 mx-auto mb-3 bg-cream-dark border-2 border-ink shadow-[2px_2px_0px_var(--ink)] flex items-center justify-center">
-                  <f.pixelIcon className="text-ink" size={20} />
+              { value: 12000, suffix: "+", label: "Opportunities" },
+              { value: 8500, suffix: "+", label: "Students" },
+              { value: 340, suffix: "+", label: "Verified Skills" },
+              { value: 94, suffix: "%", label: "Match Accuracy" },
+            ].map((s) => (
+              <div key={s.label}>
+                <p className="pixel text-[14px] sm:text-[18px] text-ink leading-none mb-1.5">
+                  <CountUp target={s.value} suffix={s.suffix} />
+                </p>
+                <p className="text-[11px] text-ink-muted font-medium">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ HOW IT WORKS — 4 STEPS ═══════ */}
+      <section className="py-24 sm:py-32">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <div className="mb-16">
+            <p className="section-pixel mb-4">How SkillBridge works</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-ink tracking-tight max-w-lg leading-tight">
+              Everything you need for your next step.
+            </h2>
+          </div>
+
+          <div className="space-y-0">
+            {[
+              {
+                num: "01",
+                title: "Build Your Skill Profile",
+                desc: "Upload evidence — degrees, certificates, projects, internships. Our system extracts and verifies your skills from real documents.",
+                icon: PixelDocument,
+              },
+              {
+                num: "02",
+                title: "Understand Your Gap",
+                desc: "See how your current skills compare to your target role. Visualize the gap between where you are and where you want to be.",
+                icon: PixelTarget,
+              },
+              {
+                num: "03",
+                title: "Find the Right Opportunity",
+                desc: "Discover internships, jobs, courses and scholarships matched to your verified skills, not just keywords on a resume.",
+                icon: PixelBriefcase,
+              },
+              {
+                num: "04",
+                title: "Track Your Journey",
+                desc: "Application pipeline, skill verification status, outcomes and a growing portfolio — all in one place.",
+                icon: PixelGraph,
+              },
+            ].map((step, i) => (
+              <motion.div
+                key={step.num}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                className="grid grid-cols-1 sm:grid-cols-12 gap-4 sm:gap-8 py-8 border-b border-border last:border-0"
+              >
+                <div className="sm:col-span-1">
+                  <span className="section-number">{step.num}</span>
                 </div>
-                <h3 className="pixel text-[7px] text-ink mb-2 tracking-wider">{f.title}</h3>
-                <p className="text-[11px] text-ink-muted sans">{f.desc}</p>
+                <div className="sm:col-span-3 flex items-start gap-3">
+                  <div className="w-9 h-9 border-[1.5px] border-ink bg-cream flex items-center justify-center shrink-0" style={{ boxShadow: "2px 2px 0 var(--border)" }}>
+                    <step.icon className="text-ink" size={16} />
+                  </div>
+                  <h3 className="text-[15px] font-bold text-ink leading-tight pt-1">{step.title}</h3>
+                </div>
+                <div className="sm:col-span-8">
+                  <p className="text-[13px] text-ink-light leading-relaxed max-w-md">{step.desc}</p>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══ STICKY NOTE TIP ═══ */}
-      <section className="py-12 bg-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div {...fade} className="max-w-md mx-auto">
-            <StickyNote color="yellow" rotation={-1.5}>
-              <p className="pixel text-[8px] text-[#8A6A20] mb-2">💡 OPPORTUNE TIP</p>
-              <p className="text-[13px] text-ink leading-relaxed mb-3">Complete your profile to get better matches. Students with full profiles see 3x more relevant opportunities.</p>
-              <a href="/onboarding" className="pixel-btn pixel-btn-primary text-[7px] py-1.5">Complete Now →</a>
-            </StickyNote>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ═══ TRUSTED SOURCES ═══ */}
-      <section className="py-16 border-t-[3px] border-ink bg-cream-dark">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div {...fade} className="text-center mb-8">
-            <span className="section-pixel mb-2 block">Trusted Sources</span>
-            <p className="text-[12px] text-ink-muted sans">Opportunities from verified, reliable organizations</p>
-          </motion.div>
-          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
-            {trustedSources.map((s) => <span key={s} className="pixel text-[10px] text-ink-muted/40 hover:text-ink-muted/70 transition-colors cursor-default">{s}</span>)}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ COMMUNITY ═══ */}
-      <section className="py-20 border-t-[3px] border-ink bg-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-            <motion.div {...fade} className="lg:col-span-2">
-              <span className="section-pixel mb-3 block">Community</span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-ink tracking-tight mb-4">Don't explore alone.</h2>
-              <p className="text-[13px] text-ink-muted leading-relaxed mb-6 max-w-sm sans">8,500+ students sharing tips, asking questions, and helping each other land opportunities.</p>
-              <a href="/community" className="pixel-btn pixel-btn-primary">
-                Explore Community <ArrowRight className="w-3.5 h-3.5" />
-              </a>
+      {/* ═══════ SKILL MATCHING ═══════ */}
+      <section className="py-24 sm:py-32 bg-cream-card border-y border-border">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <p className="section-pixel mb-4">Skill Matching</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight mb-4 leading-tight">
+                Evidence-backed skills,<br />
+                not self-reported claims.
+              </h2>
+              <p className="text-[13px] text-ink-light leading-relaxed mb-6 max-w-md">
+                SkillBridge extracts and verifies your skills from uploaded documents — degrees, certificates, project repositories, and internship records. Your profile is backed by evidence, not guesswork.
+              </p>
+              <div className="pixel-badge pixel-badge-green">
+                <svg className="w-2.5 h-2.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M13.5 4.5L6.5 11.5L2.5 7.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                VERIFIED · EVIDENCE-BACKED
+              </div>
             </motion.div>
-            <div className="lg:col-span-3 space-y-3">
-              {threadPreviews.map((t, i) => (
-                <ThreadCard key={i} id={String(i + 1)} title={t.title} author={t.author} upvotes={t.upvotes} comments={t.comments} tags={t.tags} index={i} pinned={i === 0} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ═══ CTA ═══ */}
-      <section className="py-24 border-t-[3px] border-ink bg-ink">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div {...fade}>
-            <div className="bg-cream border-[3px] border-ink shadow-[6px_6px_0px_var(--ink)] p-10 sm:p-14 text-center relative overflow-hidden">
-              <div className="absolute inset-0 pixel-dots opacity-20 pointer-events-none" />
-              <div className="relative z-10">
-                <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="w-16 h-16 bg-forest border-[3px] border-[#2A4A35] shadow-[4px_4px_0px_#2A4A35] flex items-center justify-center mx-auto mb-6">
-                  <PixelChip className="text-cream" size={28} />
-                </motion.div>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-ink mb-3 tracking-tight">Stop searching.<br />Start finding.</h2>
-                <p className="text-[13px] text-ink-muted mb-8 max-w-md mx-auto sans">Your profile is free. Your matches are instant. Your next opportunity is one search away.</p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <a href="/onboarding" className="pixel-btn pixel-btn-primary text-[8px]">Get Started — It's Free <ArrowRight className="w-3.5 h-3.5" /></a>
-                  <a href="/explore" className="pixel-btn pixel-btn-secondary text-[8px]">Browse first</a>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <div className="pixel-card p-6">
+                <div className="flex items-center justify-between mb-5">
+                  <span className="pixel text-[7px] text-ink-muted tracking-widest">YOUR SKILLS</span>
+                  <span className="pixel-badge pixel-badge-green text-[6px]">91% MATCH</span>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <SkillBar label="Python" pct={86} delay={0} />
+                  <SkillBar label="Data Analysis" pct={72} delay={0.1} />
+                  <SkillBar label="SQL" pct={61} delay={0.2} />
+                  <SkillBar label="Statistics" pct={38} delay={0.3} />
+                  <SkillBar label="ML Basics" pct={24} delay={0.4} />
+                </div>
+
+                <div className="pixel-divider-light my-5" />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="pixel text-[7px] text-ink-muted tracking-widest mb-1">TARGET ROLE</p>
+                    <p className="text-[14px] font-bold text-ink">Data Analyst</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="pixel text-[7px] text-ink-muted tracking-widest mb-1">GAP TO CLOSE</p>
+                    <p className="text-[14px] font-bold text-ink">2 skills</p>
+                  </div>
                 </div>
               </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ OPPORTUNITIES ═══════ */}
+      <section className="py-24 sm:py-32">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <p className="section-pixel mb-4">Opportunities</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
+                Matched to your verified skills.
+              </h2>
+            </div>
+            <Link to="/explore" className="hidden sm:inline-flex pixel-btn pixel-btn-outline text-[7px]">
+              View All <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+
+          <div className="space-y-0">
+            {[
+              { type: "Internship", typeColor: "pixel-badge-peach", title: "AI / ML Research Internship", org: "Microsoft Research India", match: 90, skills: ["Python", "Machine Learning", "PyTorch"], deadline: "Feb 28, 2026" },
+              { type: "Course", typeColor: "pixel-badge-blue", title: "Google Data Analytics Certificate", org: "Google · Coursera", match: 95, skills: ["SQL", "R", "Tableau"], deadline: "Rolling" },
+              { type: "Job", typeColor: "pixel-badge-lavender", title: "Junior Data Analyst", org: "Infosys", match: 88, skills: ["Python", "Data Analysis", "SQL"], deadline: "May 15, 2026" },
+              { type: "Scholarship", typeColor: "pixel-badge-green", title: "Undergraduate Scholarship Programme", org: "Tata Trusts", match: 92, skills: ["Academic Excellence", "Leadership"], deadline: "Mar 15, 2026" },
+            ].map((opp, i) => (
+              <motion.div
+                key={opp.title}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: i * 0.06 }}
+              >
+                <Link to="/explore" className="group flex items-center gap-5 py-5 border-b border-border hover:bg-cream-card/60 transition-colors px-3 -mx-3">
+                  <div className="shrink-0 w-16 sm:w-20">
+                    <span className={`pixel-badge ${opp.typeColor} text-[6px]`}>{opp.type}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-bold text-ink group-hover:text-green transition-colors truncate">{opp.title}</p>
+                    <p className="text-[11px] text-ink-muted mt-0.5">{opp.org}</p>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-2 shrink-0">
+                    {opp.skills.slice(0, 2).map((s) => (
+                      <span key={s} className="text-[9px] text-ink-muted border border-border px-1.5 py-0.5">{s}</span>
+                    ))}
+                  </div>
+                  <div className="shrink-0 text-right w-20 hidden md:block">
+                    <p className="pixel text-[7px] text-ink-muted mb-0.5">DEADLINE</p>
+                    <p className="text-[10px] text-ink-light">{opp.deadline}</p>
+                  </div>
+                  <div className="shrink-0 w-16 text-right">
+                    <span className={`pixel-match ${opp.match >= 90 ? "pixel-match-high" : opp.match >= 75 ? "pixel-match-mid" : "pixel-match-low"}`}>
+                      {opp.match}%
+                    </span>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-8 sm:hidden">
+            <Link to="/explore" className="pixel-btn pixel-btn-outline text-[7px] w-full justify-center">View All Opportunities</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ FOUR USER TYPES ═══════ */}
+      <section className="py-24 sm:py-32 bg-ink text-cream">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <div className="mb-16">
+            <p className="pixel text-[7px] text-cream/40 tracking-widest mb-4">THE ECOSYSTEM</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-cream max-w-lg leading-tight">
+              Built for every stakeholder in the talent pipeline.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-cream/10">
+            {[
+              { icon: PixelGraduation, label: "Students", desc: "Build skills, discover opportunities, track your career journey." },
+              { icon: PixelBriefcase, label: "Industry", desc: "Find candidates based on verified skills, not just resumes." },
+              { icon: PixelDocument, label: "Academicians", desc: "Understand industry demand and verify student outcomes." },
+              { icon: PixelGraph, label: "Institutions", desc: "Track placement analytics, skill trends and cohort performance." },
+            ].map((item, i) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                className="bg-ink p-6 sm:p-8"
+              >
+                <div className="w-10 h-10 border border-cream/20 flex items-center justify-center mb-5">
+                  <item.icon className="text-cream/60" size={18} />
+                </div>
+                <h3 className="pixel text-[8px] text-cream/70 tracking-wider mb-3">{item.label}</h3>
+                <p className="text-[12px] text-cream/50 leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ FINAL CTA ═══════ */}
+      <section className="py-24 sm:py-32">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-2xl mx-auto"
+          >
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-ink tracking-tight mb-6 leading-tight">
+              Your next opportunity starts with knowing your skills.
+            </h2>
+            <p className="text-[14px] text-ink-light mb-10 max-w-md mx-auto leading-relaxed">
+              Build your evidence-backed skill profile. Discover where you stand. Find where you fit.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link to="/onboarding" className="pixel-btn pixel-btn-green text-[8px]">
+                Get Started <ArrowRight className="w-3 h-3" />
+              </Link>
+              <Link to="/explore" className="pixel-btn pixel-btn-outline text-[8px]">
+                Explore Opportunities
+              </Link>
             </div>
           </motion.div>
         </div>
@@ -256,26 +431,5 @@ export default function Landing() {
 
       <Footer />
     </div>
-  );
-}
-
-function PixelMagnifier({ className, size }: { className?: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" className={className}>
-      <rect x="3" y="2" width="2" height="2" fill="currentColor" />
-      <rect x="5" y="1" width="2" height="2" fill="currentColor" />
-      <rect x="7" y="1" width="2" height="2" fill="currentColor" />
-      <rect x="9" y="2" width="2" height="2" fill="currentColor" />
-      <rect x="1" y="4" width="2" height="2" fill="currentColor" />
-      <rect x="11" y="4" width="2" height="2" fill="currentColor" />
-      <rect x="1" y="6" width="2" height="2" fill="currentColor" />
-      <rect x="11" y="6" width="2" height="2" fill="currentColor" />
-      <rect x="3" y="8" width="2" height="2" fill="currentColor" />
-      <rect x="9" y="8" width="2" height="2" fill="currentColor" />
-      <rect x="5" y="9" width="2" height="2" fill="currentColor" />
-      <rect x="7" y="10" width="2" height="2" fill="currentColor" />
-      <rect x="9" y="11" width="2" height="2" fill="currentColor" />
-      <rect x="11" y="12" width="2" height="2" fill="currentColor" />
-    </svg>
   );
 }
