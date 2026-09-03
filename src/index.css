@@ -1,109 +1,19 @@
-/* DO NOT CHANGE */
 @import "tailwindcss";
 @import "tw-animate-css";
 @custom-variant dark (&:is(.dark *));
 
-/* DO NOT CHANGE */
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-}
-
-:root {
   --radius: 6px;
   --background: #0A0A0F;
   --foreground: #FFFFFF;
-  --card: #0A0A0F;
-  --card-foreground: #FFFFFF;
-  --popover: #0A0A0F;
-  --popover-foreground: #FFFFFF;
   --primary: #22C55E;
-  --primary-foreground: #0A0A0F;
-  --secondary: rgba(255,255,255,0.06);
-  --secondary-foreground: rgba(255,255,255,0.6);
-  --muted: rgba(255,255,255,0.04);
-  --muted-foreground: rgba(255,255,255,0.4);
-  --accent: #22C55E;
-  --accent-foreground: #0A0A0F;
-  --destructive: #EF4444;
   --border: rgba(255,255,255,0.06);
-  --input: rgba(255,255,255,0.06);
   --ring: #22C55E;
-  --chart-1: #22C55E;
-  --chart-2: #3B82F6;
-  --chart-3: #F59E0B;
-  --chart-4: #8B5CF6;
-  --chart-5: #EF4444;
-  --sidebar: #0A0A0F;
-  --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #22C55E;
-  --sidebar-primary-foreground: #0A0A0F;
-  --sidebar-accent: rgba(255,255,255,0.06);
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: rgba(255,255,255,0.06);
-  --sidebar-ring: #22C55E;
+  --destructive: #EF4444;
 }
 
-@layer base {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  html, body, #root {
-    width: 100%;
-    min-height: 100vh;
-    overflow-x: hidden;
-    background: #0A0A0F;
-    color: #FFFFFF;
-  }
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  button:not([disabled]),
-  [role="button"]:not([disabled]) {
-    cursor: pointer;
-  }
-}
-
-::selection {
-  background: rgba(34, 197, 94, 0.3);
-  color: #fff;
-}
-
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body, #root { width: 100%; min-height: 100vh; overflow-x: hidden; background: #0A0A0F; color: #fff; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+::selection { background: rgba(34,197,94,0.3); color: #fff; }
 ::-webkit-scrollbar { width: 0; height: 0; }
