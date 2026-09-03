@@ -15,7 +15,7 @@ export function AboutBento() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section className="bg-slate-50 py-16 px-6 min-h-screen" ref={ref}>
+    <section className="bg-[#f8fafc] -mt-20 relative z-10 pt-24 pb-16 px-6 min-h-screen" ref={ref}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
