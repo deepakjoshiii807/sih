@@ -61,8 +61,6 @@ const PrismaHero = () => {
         {/* Gradient overlay — stronger bottom to blend into bento */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
 
-        {/* Bottom blend gradient — fades from dark into the bento's light bg */}
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-[#f8fafc]" />
 
         {/* Hero content */}
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-2 sm:px-6 md:px-10">

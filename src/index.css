@@ -90,6 +90,9 @@
     background: #0A0A0F;
     color: #FFFFFF;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
