@@ -9,6 +9,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import "./index.css";
 
 import AuthPage from "./pages/Auth.tsx";
+import LoginPage from "./pages/Login.tsx";
 
 class ToolbarErrorBoundary extends React.Component<
   { children: React.ReactNode }, { hasError: boolean }
@@ -28,7 +29,8 @@ createRoot(document.getElementById("root")!).render(
     <ConvexAuthProvider client={convex}>
       <BrowserRouter>
         <Routes>
-          <Route path="*" element={<AuthPage />} />
+          <Route path="/" element={<AuthPage />} />
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </BrowserRouter>
       <Toaster />

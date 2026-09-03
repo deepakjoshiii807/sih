@@ -181,14 +181,14 @@ export function CinematicHero({
           {ctaDescription}
         </p>
         <div className="flex flex-col sm:flex-row gap-6">
-          <a href="/" className="btn-modern-light flex items-center justify-center gap-3 px-8 py-4 rounded-[1.25rem] group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+          <a href="/login" className="btn-modern-light flex items-center justify-center gap-3 px-8 py-4 rounded-[1.25rem] group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
             <svg className="w-7 h-7 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
             <div className="text-left">
               <div className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase mb-[-2px]">Get started on</div>
               <div className="text-xl font-bold leading-none tracking-tight">Lead2Learn</div>
             </div>
           </a>
-          <a href="/" className="btn-modern-dark flex items-center justify-center gap-3 px-8 py-4 rounded-[1.25rem] group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0A0A0F]">
+          <a href="/login" className="btn-modern-dark flex items-center justify-center gap-3 px-8 py-4 rounded-[1.25rem] group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#0A0A0F]">
             <svg className="w-6 h-6 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             <div className="text-left">
               <div className="text-[10px] font-bold tracking-wider text-neutral-400 uppercase mb-[-2px]">Browse</div>
