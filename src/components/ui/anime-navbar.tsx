@@ -47,19 +47,20 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
     const sectionIds = Object.keys(sectionMap);
 
     const observer = new IntersectionObserver(
-      (entries: IntersectionObserverEntry[]) => {
+      (entries) => {
         // Find the most visible entry
-        let bestEntry: IntersectionObserverEntry | null = null;
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
-              bestEntry = entry;
-            }
+        let bestEntry: Element | null = null;
+        let bestRatio = -1;
+        for (let i = 0; i < entries.length; i++) {
+          const entry = entries[i] as IntersectionObserverEntry;
+          if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
+            bestRatio = entry.intersectionRatio;
+            bestEntry = entry.target;
           }
-        });
+        }
 
-        if (bestEntry && bestEntry.target.id && !clickedByUser) {
-          const sectionId = `#${bestEntry.target.id}`;
+        if (bestEntry && bestEntry.id && !clickedByUser) {
+          const sectionId = `#${bestEntry.id}`;
           const tabName = sectionMap[sectionId];
           if (tabName) {
             setActiveTab(tabName);
