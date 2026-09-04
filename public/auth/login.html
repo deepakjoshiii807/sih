@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillBridge — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body class="auth-page">
+
+  <!-- ═══════════════ TOP NAV ═══════════════ -->
+  <nav class="top-nav">
+    <div class="nav-brand">SkillBridge</div>
+    <div class="nav-links">
+      <a href="#">About</a>
+      <a href="#">How it works</a>
+    </div>
+    <a href="/" class="nav-home">Back to Home →</a>
+  </nav>
+
+  <!-- ═══════════════ BENTO GRID ═══════════════ -->
+  <main class="bento" data-initial-mode="login">
+
+    <!-- ── Brand Panel ── -->
+    <div class="bento-card bento-brand anim-fade">
+      <div class="brand-top">
+        <span class="brand-badge">SIH26044</span>
+        <div class="pixel-squares" style="top:12px;right:60px">
+          <i style="background:var(--sage-deep)"></i>
+          <i style="background:var(--lavender);opacity:0.7"></i>
+          <i style="background:var(--yellow);opacity:0.6"></i>
+        </div>
+      </div>
+      <h1 class="brand-headline">SkillBridge</h1>
+      <p class="brand-sub">Academia × Industry Collaboration</p>
+      <p class="brand-desc">Turn your skills into opportunities.</p>
+
+      <!-- Pipeline -->
+      <div class="pipeline" role="list" aria-label="Skill journey">
+        <div class="pipeline-node active" role="listitem">
+          <div class="pipeline-dot">
+            <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          </div>
+          <span class="pipeline-label">Evidence</span>
+        </div>
+        <div class="pipeline-arrow"></div>
+        <div class="pipeline-node active" role="listitem">
+          <div class="pipeline-dot">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <span class="pipeline-label">Skills</span>
+        </div>
+        <div class="pipeline-arrow"></div>
+        <div class="pipeline-node" role="listitem">
+          <div class="pipeline-dot">
+            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <span class="pipeline-label">Gap</span>
+        </div>
+        <div class="pipeline-arrow"></div>
+        <div class="pipeline-node" role="listitem">
+          <div class="pipeline-dot">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
+          </div>
+          <span class="pipeline-label">Match</span>
+        </div>
+        <div class="pipeline-arrow"></div>
+        <div class="pipeline-node" role="listitem">
+          <div class="pipeline-dot">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <span class="pipeline-label">Opportunity</span>
+        </div>
+      </div>
+
+      <!-- Pixel decoration -->
+      <div class="pixel-dots" style="bottom:12px;right:16px;width:24px;height:24px"></div>
+    </div>
+
+    <!-- ── Stats Card 1 ── -->
+    <div class="bento-card stat-card anim-fade anim-delay-1">
+      <div class="stat-icon green">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <span class="stat-number">12K+</span>
+      <span class="stat-label">Learners connected</span>
+    </div>
+
+    <!-- ── Auth Panel ── -->
+    <div class="bento-card bento-auth anim-slide anim-delay-2">
+      <div class="auth-inner">
+
+        <!-- Tabs -->
+        <div class="auth-tabs" role="tablist">
+          <button class="auth-tab active" data-mode="login" role="tab" aria-selected="true">Login</button>
+          <button class="auth-tab" data-mode="signup" role="tab" aria-selected="false">Sign Up</button>
+        </div>
+
+        <div class="auth-form-wrap">
+
+          <!-- ── Login Form ── -->
+          <form id="form-login" class="auth-form" novalidate>
+            <div class="auth-header">
+              <h2>Welcome back</h2>
+              <p>Sign in to your SkillBridge account</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email</label>
+              <div class="form-input-wrap">
+                <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email" required>
+                <svg class="input-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/></svg>
+              </div>
+              <span class="form-error" id="login-email-err">Please enter a valid email</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-password">Password</label>
+              <div class="form-input-wrap">
+                <input class="form-input" type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password" required>
+                <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                <button type="button" class="pw-toggle" aria-label="Toggle password visibility" data-target="login-password">
+                  <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-closed hidden" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/><path d="M14.12 14.12a3 3 0 11-4.24-4.24"/></svg>
+                </button>
+              </div>
+              <span class="form-error" id="login-pw-err">Password is required</span>
+            </div>
+
+            <div class="form-row">
+              <label class="form-check">
+                <input type="checkbox" id="remember-me">
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="form-forgot">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-primary">
+              Sign In
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+
+            <div class="form-divider"><span>or continue with</span></div>
+
+            <button type="button" class="btn-social" tabindex="-1">
+              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Continue with Google
+            </button>
+
+            <p class="auth-switch">Don't have an account? <a data-goto="signup">Create one</a></p>
+          </form>
+
+          <!-- ── Signup Form ── -->
+          <form id="form-signup" class="auth-form hidden" novalidate>
+
+            <!-- Step 1: Role Selection -->
+            <div id="signup-step1">
+              <div class="auth-header">
+                <h2>Create your account</h2>
+                <p>Choose your role to get started</p>
+              </div>
+
+              <div class="role-section">
+                <div class="role-label">Continue as</div>
+                <div class="role-grid">
+                  <button type="button" class="role-card" data-role="student">
+                    <div class="role-icon">
+                      <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                    </div>
+                    <div class="role-text">
+                      <span class="role-name">Student</span>
+                      <span class="role-desc">Build skills, discover opportunities</span>
+                    </div>
+                  </button>
+                  <button type="button" class="role-card" data-role="industry">
+                    <div class="role-icon">
+                      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><path d="M12 12v3"/></svg>
+                    </div>
+                    <div class="role-text">
+                      <span class="role-name">Industry</span>
+                      <span class="role-desc">Find talent, create opportunities</span>
+                    </div>
+                  </button>
+                  <button type="button" class="role-card" data-role="academician">
+                    <div class="role-icon">
+                      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+                    </div>
+                    <div class="role-text">
+                      <span class="role-name">Academician</span>
+                      <span class="role-desc">Connect curriculum with industry</span>
+                    </div>
+                  </button>
+                  <button type="button" class="role-card" data-role="admin">
+                    <div class="role-icon">
+                      <svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v1a3 3 0 006 0V7m0 0V4h6v3m0 0v1a3 3 0 006 0V7"/><path d="M4 21V10.87M20 21V10.87"/></svg>
+                    </div>
+                    <div class="role-text">
+                      <span class="role-name">Institution Admin</span>
+                      <span class="role-desc">Monitor outcomes &amp; insights</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <button type="button" class="btn-primary" id="btn-to-step2" disabled>
+                Continue
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+
+            <!-- Step 2: Dynamic Fields -->
+            <div id="signup-step2" class="hidden">
+
+              <button type="button" class="auth-switch" id="btn-back-role" style="margin-top:0;margin-bottom:12px;text-align:left;font-size:0.78rem">
+                ← Back to role selection
+              </button>
+
+              <div class="auth-header">
+                <h2 id="step2-title">Student Registration</h2>
+                <p id="step2-sub">Fill in your details to create an account</p>
+              </div>
+
+              <!-- Student Fields -->
+              <div class="role-fields" data-for="student">
+                <div class="form-group">
+                  <label class="form-label" for="s-name">Full Name</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="text" id="s-name" placeholder="Your full name" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4-4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="s-email">Email</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="email" id="s-email" placeholder="you@institution.edu" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/></svg>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="s-pw">Password</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="password" id="s-pw" placeholder="Create a strong password" autocomplete="new-password" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    <button type="button" class="pw-toggle" aria-label="Toggle password" data-target="s-pw">
+                      <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <svg class="eye-closed hidden" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/><path d="M14.12 14.12a3 3 0 11-4.24-4.24"/></svg>
+                    </button>
+                  </div>
+                  <div class="pw-strength" id="s-pw-strength">
+                    <div class="pw-bar-wrap">
+                      <div class="pw-bar"><div class="pw-bar-fill"></div></div>
+                      <span class="pw-label"></span>
+                    </div>
+                    <div class="pw-reqs"></div>
+                  </div>
+                </div>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label class="form-label" for="s-inst">Institution</label>
+                    <input class="form-input no-icon" type="text" id="s-inst" placeholder="College / University">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="s-course">Course / Program</label>
+                    <input class="form-input no-icon" type="text" id="s-course" placeholder="e.g. B.Tech CSE">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="s-year">Graduation Year</label>
+                  <select class="form-input form-select no-icon" id="s-year">
+                    <option value="">Select year</option>
+                    <option>2025</option><option>2026</option><option>2027</option><option>2028</option><option>2029</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Industry Fields -->
+              <div class="role-fields hidden" data-for="industry">
+                <div class="form-group">
+                  <label class="form-label" for="i-name">Organization Name</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="text" id="i-name" placeholder="Company name" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="i-email">Official Email</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="email" id="i-email" placeholder="hr@company.com" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/></svg>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="i-pw">Password</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="password" id="i-pw" placeholder="Create a strong password" autocomplete="new-password" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    <button type="button" class="pw-toggle" aria-label="Toggle password" data-target="i-pw">
+                      <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <svg class="eye-closed hidden" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/><path d="M14.12 14.12a3 3 0 11-4.24-4.24"/></svg>
+                    </button>
+                  </div>
+                  <div class="pw-strength" id="i-pw-strength">
+                    <div class="pw-bar-wrap"><div class="pw-bar"><div class="pw-bar-fill"></div></div><span class="pw-label"></span></div>
+                    <div class="pw-reqs"></div>
+                  </div>
+                </div>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label class="form-label" for="i-sector">Industry / Sector</label>
+                    <select class="form-input form-select no-icon" id="i-sector">
+                      <option value="">Select sector</option>
+                      <option>Technology</option><option>Finance</option><option>Healthcare</option><option>Manufacturing</option><option>Education</option><option>Consulting</option><option>Other</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="i-web">Website</label>
+                    <input class="form-input no-icon" type="url" id="i-web" placeholder="https://company.com">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Academician Fields -->
+              <div class="role-fields hidden" data-for="academician">
+                <div class="form-group">
+                  <label class="form-label" for="a-name">Full Name</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="text" id="a-name" placeholder="Your full name" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4-4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="a-email">Institutional Email</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="email" id="a-email" placeholder="you@university.edu" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/></svg>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="a-pw">Password</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="password" id="a-pw" placeholder="Create a strong password" autocomplete="new-password" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    <button type="button" class="pw-toggle" aria-label="Toggle password" data-target="a-pw">
+                      <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <svg class="eye-closed hidden" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/><path d="M14.12 14.12a3 3 0 11-4.24-4.24"/></svg>
+                    </button>
+                  </div>
+                  <div class="pw-strength" id="a-pw-strength">
+                    <div class="pw-bar-wrap"><div class="pw-bar"><div class="pw-bar-fill"></div></div><span class="pw-label"></span></div>
+                    <div class="pw-reqs"></div>
+                  </div>
+                </div>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label class="form-label" for="a-inst">Institution</label>
+                    <input class="form-input no-icon" type="text" id="a-inst" placeholder="University / College">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="a-dept">Department</label>
+                    <input class="form-input no-icon" type="text" id="a-dept" placeholder="e.g. Computer Science">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="a-desig">Designation</label>
+                  <select class="form-input form-select no-icon" id="a-desig">
+                    <option value="">Select designation</option>
+                    <option>Professor</option><option>Associate Professor</option><option>Assistant Professor</option><option>Lecturer</option><option>Head of Department</option><option>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Admin Fields -->
+              <div class="role-fields hidden" data-for="admin">
+                <div class="form-group">
+                  <label class="form-label" for="ad-name">Full Name</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="text" id="ad-name" placeholder="Your full name" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4-4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="ad-email">Official Email</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="email" id="ad-email" placeholder="admin@institution.edu" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/></svg>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="ad-pw">Password</label>
+                  <div class="form-input-wrap">
+                    <input class="form-input" type="password" id="ad-pw" placeholder="Create a strong password" autocomplete="new-password" required>
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    <button type="button" class="pw-toggle" aria-label="Toggle password" data-target="ad-pw">
+                      <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <svg class="eye-closed hidden" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/><path d="M14.12 14.12a3 3 0 11-4.24-4.24"/></svg>
+                    </button>
+                  </div>
+                  <div class="pw-strength" id="ad-pw-strength">
+                    <div class="pw-bar-wrap"><div class="pw-bar"><div class="pw-bar-fill"></div></div><span class="pw-label"></span></div>
+                    <div class="pw-reqs"></div>
+                  </div>
+                </div>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label class="form-label" for="ad-inst">Institution</label>
+                    <input class="form-input no-icon" type="text" id="ad-inst" placeholder="Institution name">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="ad-desig">Designation</label>
+                    <select class="form-input form-select no-icon" id="ad-desig">
+                      <option value="">Select designation</option>
+                      <option>Director</option><option>Dean</option><option>Registrar</option><option>Placement Head</option><option>Admin Officer</option><option>Other</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <p class="form-terms">By creating an account you agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+
+              <button type="submit" class="btn-primary" id="btn-create-account">
+                Create Account
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+
+              <p class="auth-switch">Already have an account? <a data-goto="login">Sign in</a></p>
+            </div>
+          </form>
+
+        </div><!-- /auth-form-wrap -->
+      </div><!-- /auth-inner -->
+    </div><!-- /bento-auth -->
+
+    <!-- ── Stats Card 2 ── -->
+    <div class="bento-card stat-card anim-fade anim-delay-3">
+      <div class="stat-icon lavender">
+        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      </div>
+      <span class="stat-number">850+</span>
+      <span class="stat-label">Opportunities posted</span>
+    </div>
+
+    <!-- ── Match Card ── -->
+    <div class="bento-card match-card anim-fade anim-delay-4">
+      <div class="match-title">Skill Match</div>
+      <div class="match-skill">Frontend Development</div>
+      <div class="match-bar-wrap">
+        <div class="match-bar">
+          <div class="match-fill" style="--fill-w:92%"></div>
+        </div>
+        <span class="match-pct">92%</span>
+      </div>
+      <span class="match-sub">Frontend Intern @ TechPartner · 92% Match</span>
+    </div>
+
+  </main>
+
+  <script src="auth.js"></script>
+</body>
+</html>
