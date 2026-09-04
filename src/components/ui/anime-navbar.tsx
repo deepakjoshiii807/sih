@@ -25,10 +25,65 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
   const [mounted, setMounted] = useState(false);
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>(defaultActive);
+  const [clickedByUser, setClickedByUser] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Scroll-based active tab detection
+  useEffect(() => {
+    if (!mounted) return;
+
+    const sectionMap: Record<string, string> = {
+      "#hero": "Home",
+      "#about": "About",
+      "#skills": "Skills",
+      "#features": "Features",
+    };
+
+    const sectionIds = Object.keys(sectionMap);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the most visible entry
+        let bestEntry: IntersectionObserverEntry | null = null;
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
+              bestEntry = entry;
+            }
+          }
+        });
+
+        if (bestEntry && bestEntry.target.id && !clickedByUser) {
+          const sectionId = `#${bestEntry.target.id}`;
+          const tabName = sectionMap[sectionId];
+          if (tabName) {
+            setActiveTab(tabName);
+          }
+        }
+      },
+      {
+        threshold: [0.1, 0.3, 0.5, 0.7],
+        rootMargin: "-20% 0px -60% 0px",
+      }
+    );
+
+    sectionIds.forEach((id) => {
+      const el = document.querySelector(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [mounted, clickedByUser]);
+
+  // Reset clickedByUser after scroll settles
+  useEffect(() => {
+    if (!clickedByUser) return;
+    const timer = setTimeout(() => setClickedByUser(false), 1500);
+    return () => clearTimeout(timer);
+  }, [clickedByUser]);
 
   if (!mounted) return null;
 
@@ -54,12 +109,14 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
                   if (item.isAction) {
                     navigate(item.url);
                   } else if (item.url.startsWith("#")) {
+                    setClickedByUser(true);
                     const el = document.querySelector(item.url);
                     if (el) {
                       el.scrollIntoView({ behavior: "smooth" });
                     }
                     setActiveTab(item.name);
                   } else {
+                    setClickedByUser(true);
                     setActiveTab(item.name);
                   }
                 }}
