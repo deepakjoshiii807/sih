@@ -9,7 +9,7 @@ const navItems = [
   { name: "About", url: "/", icon: Compass },
   { name: "Scholarships", url: "/", icon: GraduationCap },
   { name: "Internships", url: "/", icon: Briefcase },
-  { name: "Login", url: "/login", icon: LogIn, isAction: true, highlight: true },
+  { name: "Login", url: "/auth/login.html", icon: LogIn, isAction: true, highlight: true },
 ];
 
 export default function Auth() {
