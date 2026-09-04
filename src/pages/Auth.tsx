@@ -23,7 +23,7 @@ export default function Auth() {
       <AboutBento />
 
       {/* Magic scroll text section */}
-      <section className="bg-white py-16 sm:py-32 px-4 sm:px-6">
+      <section className="bg-white hidden lg:block py-16 sm:py-32 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           <MagicText
             text="Hi there! We're Lead2Learn, building the future of opportunity discovery for students across India. Thank you for all the support and love. We hope you enjoy using L2L as much as we enjoyed creating it."
