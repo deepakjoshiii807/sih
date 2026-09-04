@@ -263,24 +263,40 @@ export default function AuthSwitch() {
     <div className="min-h-screen w-full relative overflow-hidden" style={{ background: "linear-gradient(160deg, #e0f2fe 0%, #f0f9ff 25%, #ecfdf5 50%, #f0fdf4 75%, #e0f2fe 100%)" }}>
       {/* Animated background */}
       <style>{`
-        @keyframes float1 { 0%, 100% { transform: translate(0, 0) scale(1); } 25% { transform: translate(80px, -60px) scale(1.1); } 50% { transform: translate(-40px, 40px) scale(0.95); } 75% { transform: translate(60px, 20px) scale(1.05); } }
-        @keyframes float2 { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(-100px, 50px) scale(1.15); } 66% { transform: translate(50px, -80px) scale(0.9); } }
-        @keyframes float3 { 0%, 100% { transform: translate(0, 0) scale(1); } 20% { transform: translate(60px, 80px) scale(1.08); } 50% { transform: translate(-80px, -30px) scale(0.92); } 80% { transform: translate(30px, -60px) scale(1.12); } }
-        @keyframes float4 { 0%, 100% { transform: translate(0, 0) scale(1); } 40% { transform: translate(-60px, -90px) scale(1.1); } 70% { transform: translate(90px, 40px) scale(0.95); } }
-        @keyframes float5 { 0%, 100% { transform: translate(0, 0) scale(1); } 30% { transform: translate(70px, 60px) scale(1.05); } 60% { transform: translate(-50px, -70px) scale(1.1); } }
-        @keyframes ring-spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); } 25% { transform: translate(120px, -80px) rotate(45deg) scale(1.15); } 50% { transform: translate(-60px, 60px) rotate(90deg) scale(0.9); } 75% { transform: translate(80px, 30px) rotate(135deg) scale(1.1); } }
+        @keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); } 33% { transform: translate(-140px, 70px) rotate(-60deg) scale(1.2); } 66% { transform: translate(70px, -120px) rotate(-120deg) scale(0.85); } }
+        @keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1); } 20% { transform: translate(90px, 100px) scale(1.1); } 50% { transform: translate(-100px, -50px) scale(0.88); } 80% { transform: translate(40px, -80px) scale(1.15); } }
+        @keyframes drift4 { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 40% { transform: translate(-80px, -120px) rotate(90deg); } 70% { transform: translate(120px, 50px) rotate(180deg); } }
+        @keyframes drift5 { 0%, 100% { transform: translate(0, 0) scale(1); } 30% { transform: translate(100px, 80px) scale(1.1); } 60% { transform: translate(-70px, -90px) scale(1.15); } }
+        @keyframes drift6 { 0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); } 50% { transform: translate(-50px, 100px) rotate(180deg) scale(1.2); } }
+        @keyframes gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes ring-orbit { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
       `}</style>
 
-      {/* Floating gradient blobs */}
-      <div className="absolute w-[500px] h-[500px] rounded-full opacity-40 blur-[80px]" style={{ top: "-5%", left: "10%", background: "radial-gradient(circle, #a5f3fc 0%, transparent 70%)", animation: "float1 18s ease-in-out infinite" }} />
-      <div className="absolute w-[450px] h-[450px] rounded-full opacity-35 blur-[70px]" style={{ top: "60%", right: "5%", background: "radial-gradient(circle, #bbf7d0 0%, transparent 70%)", animation: "float2 22s ease-in-out infinite" }} />
-      <div className="absolute w-[350px] h-[350px] rounded-full opacity-25 blur-[60px]" style={{ top: "30%", left: "55%", background: "radial-gradient(circle, #c4b5fd 0%, transparent 70%)", animation: "float3 20s ease-in-out infinite" }} />
-      <div className="absolute w-[300px] h-[300px] rounded-full opacity-20 blur-[50px]" style={{ bottom: "10%", left: "20%", background: "radial-gradient(circle, #fde68a 0%, transparent 70%)", animation: "float4 25s ease-in-out infinite" }} />
-      <div className="absolute w-[250px] h-[250px] rounded-full opacity-15 blur-[40px]" style={{ top: "15%", right: "25%", background: "radial-gradient(circle, #fbcfe8 0%, transparent 70%)", animation: "float5 16s ease-in-out infinite" }} />
+      {/* Animated gradient base */}
+      <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #dbeafe, #ecfdf5, #ede9fe, #fef3c7, #fce7f3, #dbeafe)", backgroundSize: "400% 400%", animation: "gradient-shift 12s ease infinite" }} />
 
-      {/* Slow-spinning rings */}
-      <div className="absolute top-1/2 left-1/2 w-[700px] h-[700px] rounded-full border border-white/30 pointer-events-none" style={{ animation: "ring-spin 60s linear infinite" }} />
-      <div className="absolute top-1/2 left-1/2 w-[900px] h-[900px] rounded-full border border-white/15 pointer-events-none" style={{ animation: "ring-spin 90s linear infinite reverse" }} />
+      {/* Floating shapes — circles */}
+      <div className="absolute w-[320px] h-[320px] rounded-full" style={{ top: "-8%", left: "8%", background: "linear-gradient(135deg, rgba(56,189,248,0.35), rgba(34,197,94,0.2))", filter: "blur(40px)", animation: "drift1 20s ease-in-out infinite" }} />
+      <div className="absolute w-[280px] h-[280px] rounded-full" style={{ top: "55%", right: "-5%", background: "linear-gradient(225deg, rgba(167,139,250,0.3), rgba(251,146,60,0.2))", filter: "blur(35px)", animation: "drift2 24s ease-in-out infinite" }} />
+      <div className="absolute w-[220px] h-[220px] rounded-full" style={{ top: "25%", left: "60%", background: "linear-gradient(180deg, rgba(251,207,232,0.3), rgba(167,139,250,0.15))", filter: "blur(30px)", animation: "drift3 18s ease-in-out infinite" }} />
+
+      {/* Floating shapes — rounded squares */}
+      <div className="absolute w-[180px] h-[180px] rounded-[32px]" style={{ bottom: "15%", left: "15%", background: "linear-gradient(135deg, rgba(253,230,138,0.3), rgba(251,146,60,0.15))", filter: "blur(25px)", animation: "drift4 26s ease-in-out infinite" }} />
+      <div className="absolute w-[140px] h-[140px] rounded-[28px]" style={{ top: "12%", right: "20%", background: "linear-gradient(45deg, rgba(187,247,208,0.3), rgba(56,189,248,0.15))", filter: "blur(20px)", animation: "drift5 22s ease-in-out infinite" }} />
+      <div className="absolute w-[100px] h-[100px] rounded-[20px]" style={{ top: "70%", left: "45%", background: "linear-gradient(90deg, rgba(244,114,182,0.25), rgba(167,139,250,0.15))", filter: "blur(18px)", animation: "drift6 15s ease-in-out infinite" }} />
+
+      {/* Small floating dots */}
+      <div className="absolute w-3 h-3 rounded-full bg-sky-400/40" style={{ top: "20%", left: "30%", animation: "drift1 12s ease-in-out infinite" }} />
+      <div className="absolute w-2 h-2 rounded-full bg-emerald-400/50" style={{ top: "65%", right: "30%", animation: "drift3 14s ease-in-out infinite" }} />
+      <div className="absolute w-2.5 h-2.5 rounded-full bg-violet-400/40" style={{ top: "40%", left: "75%", animation: "drift5 10s ease-in-out infinite" }} />
+      <div className="absolute w-2 h-2 rounded-full bg-amber-400/45" style={{ bottom: "25%", right: "15%", animation: "drift2 16s ease-in-out infinite" }} />
+      <div className="absolute w-1.5 h-1.5 rounded-full bg-pink-400/40" style={{ top: "80%", left: "10%", animation: "drift4 11s ease-in-out infinite" }} />
+
+      {/* Orbiting rings */}
+      <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] rounded-full border-2 border-white/20 pointer-events-none" style={{ animation: "ring-orbit 50s linear infinite" }} />
+      <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] rounded-full border border-white/10 pointer-events-none" style={{ animation: "ring-orbit 80s linear infinite reverse" }} />
+      <div className="absolute top-1/2 left-1/2 w-[1000px] h-[1000px] rounded-full border border-white/5 pointer-events-none" style={{ animation: "ring-orbit 120s linear infinite" }} />
 
       {/* Back to Home */}
       <a href="/" className="absolute top-5 right-6 lg:top-7 lg:right-10 z-20 flex items-center gap-1.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 bg-white/50 backdrop-blur-sm border border-gray-200/60 rounded-full px-4 py-2 transition-all hover:bg-white/70 hover:shadow-sm">
@@ -290,10 +306,10 @@ export default function AuthSwitch() {
 
       {/* Brand */}
       <div className="relative z-10 flex items-center gap-2.5 px-6 lg:px-10 pt-6 lg:pt-8">
-        <div className="w-9 h-9 rounded-xl bg-gray-900 flex items-center justify-center shadow-sm">
-          <span className="text-white font-bold text-sm">S</span>
+        <div className="w-9 h-9 rounded-xl bg-gray-900 px-1 flex items-center justify-center shadow-sm">
+          <span className="text-white font-bold text-[10px] tracking-tight">L2L</span>
         </div>
-        <span className="text-gray-900 font-semibold text-[15px] tracking-tight">SkillBridge</span>
+        <span className="text-gray-900 font-semibold text-[15px] tracking-tight">Lead2Learn</span>
       </div>
 
       {/* Main Content */}
