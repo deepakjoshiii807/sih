@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { cn } from "@/lib/utils";
 import {
   Mail,
@@ -46,6 +46,7 @@ const PIPELINE = [
 ];
 
 export default function AuthSwitch() {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<AuthMode>("login");
   const [step, setStep] = useState<SignupStep>("role");
   const [role, setRole] = useState<RoleType | null>(null);
@@ -91,7 +92,7 @@ export default function AuthSwitch() {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1000));
     setLoading(false);
-    alert("Signed in as " + email);
+    navigate("/dashboard");
   };
 
   const doSignup = async (e: React.FormEvent) => {
@@ -108,7 +109,7 @@ export default function AuthSwitch() {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1200));
     setLoading(false);
-    alert(role + " account created for " + email);
+    navigate("/dashboard");
   };
 
   // ─── Strength Bar ───
