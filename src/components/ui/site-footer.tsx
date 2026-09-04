@@ -10,7 +10,7 @@ export default function SiteFooter() {
         }
       `}</style>
 
-      <footer className="footer-poppins flex flex-col items-center justify-around w-full py-16 text-sm bg-[#0A0A0F] text-white">
+      <footer className="footer-poppins flex flex-col items-center justify-around w-full py-16 text-sm bg-[#0A0A0F] text-white border-t border-white/[0.06]">
         {/* L2L SVG Logo */}
         <svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           {/* Shield shape */}
