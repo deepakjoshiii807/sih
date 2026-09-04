@@ -69,10 +69,10 @@ const PrismaHero = () => {
             
             <div className="col-span-12 lg:col-span-8">
               <h1
-                className="leading-[0.85] tracking-[-0.07em] text-[26vw] sm:text-[24vw] md:text-[22vw] lg:text-[20vw] xl:text-[19vw] 2xl:text-[20vw]"
-                style={{ color: "#E1E0CC", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}
+                className="leading-[0.85] tracking-[-0.04em] text-[28vw] sm:text-[26vw] md:text-[24vw] lg:text-[22vw] xl:text-[20vw] 2xl:text-[20vw]"
+                style={{ color: "#E1E0CC", fontFamily: "'Syne', sans-serif", fontWeight: 800 }}
               >
-                <WordsPullUp text="L2L" showAsterisk />
+                <WordsPullUp text="L2L" />
               </h1>
             </div>
 
@@ -83,7 +83,7 @@ const PrismaHero = () => {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 className="text-xs sm:text-sm md:text-base"
-                style={{ lineHeight: 1.2, color: "rgba(225, 224, 204, 0.7)", fontFamily: "'Syne', sans-serif", fontWeight: 400 }}
+                style={{ lineHeight: 1.3, color: "rgba(225, 224, 204, 0.65)", fontFamily: "'Syne', sans-serif", fontWeight: 400 }}
               >
                 Lead2Learn is a platform for students and young professionals in India to discover courses, scholarships, internships and jobs tailored to their goals, skills and interests.
               </motion.p>
@@ -92,8 +92,9 @@ const PrismaHero = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                onClick={() => window.location.href = '/login'}
 
-                className="group inline-flex items-center gap-2 self-start rounded-full py-1 pl-5 pr-1 text-sm transition-all hover:gap-3 sm:text-base"
+                className="group inline-flex items-center gap-2 self-start rounded-full py-1.5 pl-6 pr-1.5 text-sm transition-all hover:gap-3 sm:text-base"
                 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600, backgroundColor: "#E1E0CC", color: "#0A0A0F" }}
               >
                 Get Started
