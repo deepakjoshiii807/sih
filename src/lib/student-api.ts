@@ -10,7 +10,7 @@
  *
  * Replace the body of `getDashboard` with, for example:
  *
- *   export const api = {
+ *   export const studentApi = {
  *     async getDashboard(): Promise<StudentDashboard> {
  *       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/student/dashboard`);
  *       if (!res.ok) throw new Error(`Dashboard request failed (${res.status})`);
@@ -366,7 +366,7 @@ const mockDashboard: StudentDashboard = {
 };
 
 /** Mock transport — swap the body for a real fetch once the API exists. */
-export const api = {
+export const studentApi = {
   async getDashboard(): Promise<StudentDashboard> {
     // Simulated network latency so loading/refresh states behave like production.
     await new Promise((resolve) => setTimeout(resolve, 350));

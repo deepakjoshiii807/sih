@@ -1,923 +1,989 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import {
-  User,
-  BookOpen,
-  Target,
-  Briefcase,
-  TrendingUp,
-  ChevronRight,
-  Shield,
-  CheckCircle2,
-  Clock,
-  AlertTriangle,
-  ArrowUpRight,
-  Award,
-  FileText,
-  Zap,
-  Star,
-  LogOut,
-  Search,
-  Filter,
-  Calendar,
-  MapPin,
-  IndianRupee,
-  BarChart3,
-  GraduationCap,
-  BriefcaseBusiness,
-  Sparkles,
-  FolderOpen,
-} from "lucide-react";
-import {
-  api,
-  type StudentDashboard,
-  type StudentSkill,
-  type SkillGap,
-  type Opportunity,
-  type Application,
-  type LearningRecommendation,
-} from "@/lib/student-api";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router";
+import type { StudentDashboard } from "@/lib/student-api";
+import { studentApi } from "@/lib/student-api";
+const fetchDashboard = () => studentApi.getDashboard();
 
-/* ─────────────────────── helpers ─────────────────────── */
+/* ──────────────── helpers ──────────────── */
 
-const fadeUp = {
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: "easeOut" },
+function pxSegs(pct: number, n = 18) {
+  const filled = Math.round((pct / 100) * n);
+  return Array.from({ length: n }, (_, i) => (
+    <span
+      key={i}
+      className={`seg ${i < filled ? "on" : ""}`}
+    />
+  ));
+}
+
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+/* ──────────────── SVG Icons ──────────────── */
+
+const IC = {
+  home: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1Z" /></svg>,
+  user: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21a8 8 0 0 0-16 0" /><circle cx="12" cy="7" r="4" /></svg>,
+  vault: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" /><path d="m9 15 2 2 4-4" /></svg>,
+  target: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4.5" /><circle cx="12" cy="12" r="1" fill="currentColor" /></svg>,
+  gap: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 9h16" /><path d="m7 6-3 3 3 3" /><path d="M20 15H4" /><path d="m17 12 3 3-3 3" /></svg>,
+  brief: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /></svg>,
+  doc: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" /></svg>,
+  star: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z" /></svg>,
+  grid: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>,
+  gear: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.02a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.02a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" /></svg>,
+  out: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /></svg>,
+  menu: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h16" /></svg>,
+  folder: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2Z" /></svg>,
+  pulse: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h4l3-8 6 16 3-8h4" /></svg>,
+  chart: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="M8 15v3" /><path d="M13 11v7" /><path d="M18 7v11" /></svg>,
+  pen: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>,
+  note: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>,
+  search: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>,
+  bell: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>,
 };
 
-const stagger = {
-  animate: { transition: { staggerChildren: 0.07 } },
-};
+const navItems = [
+  { id: "Overview", label: "Overview", icon: "home" as const },
+  { id: "Profile", label: "My Profile", icon: "user" as const },
+  { id: "Evidence", label: "Evidence Vault", icon: "vault" as const, count: 12 },
+  { id: "Skills", label: "Skills", icon: "target" as const },
+  { id: "Skill Gap", label: "Skill Gap", icon: "gap" as const },
+  { id: "Opportunities", label: "Opportunities", icon: "brief" as const, count: 3 },
+  { id: "Applications", label: "Applications", icon: "doc" as const },
+  { id: "Recommendations", label: "Recommendations", icon: "star" as const },
+  { id: "Portfolio", label: "Portfolio", icon: "grid" as const },
+];
 
-const Card = ({
-  children,
-  className = "",
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay, ease: "easeOut" }}
-    className={`bg-[#0e0e14] border border-white/[0.06] rounded-2xl ${className}`}
-  >
-    {children}
-  </motion.div>
-);
+const bottomNav = [
+  { id: "Overview", icon: "home" as const },
+  { id: "Skills", icon: "target" as const },
+  { id: "Opportunities", icon: "brief" as const },
+  { id: "Applications", icon: "doc" as const },
+  { id: "Profile", icon: "user" as const },
+];
 
-const Pill = ({ children, color = "#22C55E" }: { children: React.ReactNode; color?: string }) => (
-  <span
-    className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full"
-    style={{
-      background: `${color}15`,
-      color,
-      border: `1px solid ${color}30`,
-    }}
-  >
-    {children}
-  </span>
-);
-
-const stageColors: Record<string, string> = {
-  applied: "#3B82F6",
-  shortlisted: "#F59E0B",
-  interview: "#A855F7",
-  offer: "#22C55E",
-  joined: "#10B981",
-};
-
-/* ─────────────────────── main ─────────────────────── */
+/* ──────────────── main component ──────────────── */
 
 export default function StudentDashboard() {
+  const navigate = useNavigate();
   const [data, setData] = useState<StudentDashboard | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "skills" | "opportunities" | "applications" | "portfolio"
-  >("overview");
+  const [activeNav, setActiveNav] = useState("Overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [profOpen, setProfOpen] = useState(false);
+  const [toast, setToast] = useState("");
+  const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
-    api.getDashboard().then((d) => {
+    studentApi.getDashboard().then((d) => {
       setData(d);
       setLoading(false);
     });
   }, []);
 
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handler = () => {
+      setNotifOpen(false);
+      setProfOpen(false);
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(""), 2400);
+  };
+
+  const handleNav = (id: string) => {
+    setActiveNav(id);
+    setSidebarOpen(false);
+    setNotifOpen(false);
+    setProfOpen(false);
+    showToast(id === "Overview" ? "Back to your overview" : `"${id}" — module preview (prototype)`);
+  };
+
   if (loading || !data) {
     return (
-      <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center">
-        <motion.div
-          className="flex flex-col items-center gap-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <div className="w-10 h-10 border-2 border-[#22C55E]/30 border-t-[#22C55E] rounded-full animate-spin" />
-          <span className="text-white/40 text-sm font-medium">
-            Loading your dashboard…
-          </span>
-        </motion.div>
+      <div className="db-loading">
+        <div className="db-spinner" />
+        <span>Loading your dashboard…</span>
       </div>
     );
   }
 
-  const { student, stats, skills, gaps, bestMatch, applications, recommendations, evidence, portfolio } =
-    data;
+  const { student, stats, skills, gaps, bestMatch, applications, recommendations, evidence, portfolio } = data;
+
+  const QUICK_ACTIONS = [
+    { label: "Upload Evidence", desc: "Back skills with proof", icon: "vault", c: "c1" },
+    { label: "Explore Opportunities", desc: `${bestMatch.match}% match waiting`, icon: "brief", c: "c2" },
+    { label: "Check Skill Gaps", desc: `${gaps.length} gaps to close`, icon: "gap", c: "c3" },
+    { label: "Update Profile", desc: `${stats.profileCompletion}% complete`, icon: "user", c: "c4" },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F]">
-      {/* ─── Top Nav ─── */}
-      <nav className="sticky top-0 z-50 bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#22C55E] flex items-center justify-center">
-                <span className="text-black font-bold text-[10px] tracking-tight">
-                  L2L
-                </span>
-              </div>
-              <span className="text-[#E1E0CC] font-semibold text-sm tracking-tight hidden sm:block">
-                Lead2Learn
-              </span>
-            </div>
+    <>
+      {/* Scoped styles */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
 
-            {/* Tabs — desktop */}
-            <div className="hidden md:flex items-center gap-1">
-              {(
-                [
-                  ["overview", "Overview", BarChart3],
-                  ["skills", "Skills", BookOpen],
-                  ["opportunities", "Opportunities", Search],
-                  ["applications", "Applications", Briefcase],
-                  ["portfolio", "Portfolio", FolderOpen],
-                ] as const
-              ).map(([key, label, Icon]) => (
+        .db-root { --bg:#F7F6F0; --bg-soft:#EFEDE3; --ink:#171A18; --muted:#6B6F68; --faint:#9A9D94; --forest:#244B35; --forest-deep:#1B3A2A; --forest-ink:#16301F; --sage:#DCE6D0; --lavender:#C8B5DE; --lavender-dk:#8A6FB8; --yellow:#E8D36B; --yellow-dk:#B99A22; --peach:#E8C7AE; --peach-dk:#C98B5F; --card:#FFFFFF; --line:#E6E3D7; --line-2:#EDEBE0; --shadow:0 1px 2px rgba(23,26,24,.04),0 18px 40px -26px rgba(23,26,24,.28); --radius:18px; --mono:"Space Mono",ui-monospace,monospace; --disp:"Space Grotesk",system-ui,sans-serif; --sans:"Inter",system-ui,sans-serif; font-family:var(--sans); color:var(--ink); background:var(--bg); -webkit-font-smoothing:antialiased; line-height:1.5; }
+        .db-root * { box-sizing:border-box; margin:0; padding:0; }
+        .db-root a { color:inherit; text-decoration:none; }
+        .db-root button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+        .db-root ::selection { background:var(--sage); }
+
+        /* Eyebrow */
+        .eyebrow { font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); display:inline-flex; align-items:center; gap:8px; }
+        .eyebrow::before { content:""; width:7px; height:7px; background:var(--ink); opacity:.85; box-shadow:0 7px 0 -2px var(--bg); }
+        .panel-title { font-family:var(--disp); font-weight:600; font-size:19px; letter-spacing:-.01em; margin:10px 0 2px; }
+        .panel-sub { font-size:13px; color:var(--muted); margin-bottom:18px; }
+
+        /* Tags */
+        .tag { display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:6px; white-space:nowrap; }
+        .tag-verified { background:var(--sage); color:var(--forest-ink); }
+        .tag-self { background:var(--line-2); color:var(--muted); }
+        .tag-med { background:var(--yellow); color:#5c4a08; }
+        .tag-high { background:var(--peach); color:#7a3f1a; }
+        .tag-lav { background:var(--lavender); color:#4d3a74; }
+        .tag-process { background:#E3E9F6; color:#3d5790; }
+        .tag-review { background:var(--peach); color:#7a3f1a; }
+
+        /* Buttons */
+        .btn { display:inline-flex; align-items:center; gap:8px; font-family:var(--disp); font-weight:600; font-size:14px; padding:10px 16px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); transition:transform .18s,box-shadow .18s; }
+        .btn:hover { transform:translateY(-1px); box-shadow:0 10px 22px -14px rgba(23,26,24,.5); }
+        .btn .arr { transition:transform .2s; display:inline-block; }
+        .btn:hover .arr { transform:translateX(3px); }
+        .btn-primary { background:var(--forest); border-color:var(--forest); color:#F7F6F0; }
+        .btn-primary:hover { background:var(--forest-deep); }
+        .btn-peach { background:var(--peach); border-color:var(--peach); color:#5a2f12; }
+        .link-more { font-family:var(--mono); font-size:12px; font-weight:700; color:var(--forest); letter-spacing:.02em; display:inline-flex; align-items:center; gap:6px; transition:gap .2s; }
+        .link-more:hover { gap:10px; }
+
+        /* Layout */
+        .app { display:flex; min-height:100vh; }
+        .sidebar { position:fixed; inset:0 auto 0 0; width:264px; z-index:60; background:var(--forest-ink); color:var(--sage); display:flex; flex-direction:column; padding:22px 16px 18px; transform:translateX(0); transition:transform .3s cubic-bezier(.2,.7,.2,1); border-right:1px solid rgba(220,230,208,.08); }
+        .brand { display:flex; align-items:center; gap:11px; padding:2px 8px 20px; }
+        .brand-mark { width:36px; height:36px; border-radius:10px; background:var(--sage); color:var(--forest-ink); display:grid; place-items:center; font-family:var(--disp); font-weight:700; font-size:15px; box-shadow:inset 0 0 0 2px rgba(36,75,53,.25); }
+        .brand-name { font-family:var(--disp); font-weight:700; font-size:17px; color:#F7F6F0; letter-spacing:-.01em; }
+        .brand-name em { font-style:normal; color:var(--yellow); }
+        .nav { flex:1; overflow-y:auto; margin-top:6px; }
+        .nav-label { font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(220,230,208,.4); padding:0 10px; margin-bottom:8px; }
+        .nav-item { display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:10px; margin-bottom:2px; border-radius:10px; color:rgba(220,230,208,.75); font-size:14px; font-weight:500; transition:background .15s,color .15s; position:relative; }
+        .nav-item:hover { background:rgba(220,230,208,.08); color:#F7F6F0; }
+        .nav-item .ic { width:19px; height:19px; flex:none; opacity:.85; }
+        .nav-item.active { background:var(--sage); color:var(--forest-ink); font-weight:600; }
+        .nav-item.active::after { content:""; position:absolute; left:-16px; top:50%; transform:translateY(-50%); width:3px; height:22px; background:var(--yellow); border-radius:0 3px 3px 0; }
+        .nav-item .count { margin-left:auto; font-family:var(--mono); font-size:10px; background:rgba(220,230,208,.14); color:var(--sage); padding:2px 6px; border-radius:6px; }
+        .nav-item.active .count { background:var(--forest); color:var(--sage); }
+        .sidebar-foot { border-top:1px solid rgba(220,230,208,.12); padding-top:14px; margin-top:6px; }
+        .side-meta { display:flex; align-items:center; gap:7px; padding:8px 10px; border-radius:10px; color:rgba(220,230,208,.6); font-size:12px; font-weight:500; transition:background .15s,color .15s; }
+        .side-meta:hover { background:rgba(220,230,208,.08); color:#F7F6F0; }
+        .side-meta .ic { width:16px; height:16px; }
+        .mini-card { margin-top:10px; padding:12px; border-radius:12px; background:rgba(220,230,208,.07); border:1px solid rgba(220,230,208,.1); }
+        .mini-top { display:flex; align-items:center; gap:10px; }
+        .avatar { width:38px; height:38px; border-radius:11px; flex:none; background:var(--yellow); color:var(--forest-ink); display:grid; place-items:center; font-family:var(--disp); font-weight:700; font-size:13px; }
+        .mini-name { font-family:var(--disp); font-weight:600; font-size:13.5px; color:#F7F6F0; line-height:1.2; }
+        .mini-role { font-size:11px; color:rgba(220,230,208,.55); font-family:var(--mono); }
+        .mini-pct { margin-top:10px; font-family:var(--mono); font-size:10px; color:rgba(220,230,208,.6); display:flex; justify-content:space-between; margin-bottom:5px; }
+        .mini-bar { height:6px; border-radius:4px; background:rgba(220,230,208,.14); overflow:hidden; }
+        .mini-fill { height:100%; width:82%; border-radius:4px; background:var(--yellow); }
+        .main { flex:1; margin-left:264px; min-width:0; display:flex; flex-direction:column; }
+
+        /* Topbar */
+        .topbar { position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:16px; padding:20px 28px; background:rgba(247,246,240,.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+        .burger { display:none; width:40px; height:40px; border-radius:10px; border:1px solid var(--line); place-items:center; }
+        .burger:hover { background:var(--bg-soft); }
+        .h-title { font-family:var(--disp); font-weight:700; font-size:22px; letter-spacing:-.02em; }
+        .h-title span { color:var(--forest); }
+        .h-sub { font-size:13px; color:var(--muted); }
+        .top-actions { margin-left:auto; display:flex; align-items:center; gap:10px; }
+        .search { display:flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:10px; padding:9px 12px; background:var(--card); width:210px; color:var(--faint); font-size:13px; }
+        .search:focus-within { border-color:var(--forest); box-shadow:0 0 0 3px rgba(36,75,53,.12); }
+        .search svg { width:16px; height:16px; flex:none; }
+        .search input { border:none; outline:none; background:none; flex:1; font-family:inherit; font-size:13px; color:var(--ink); }
+        .icon-btn { position:relative; width:40px; height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:grid; place-items:center; color:var(--ink); transition:transform .15s,background .15s; }
+        .icon-btn:hover { background:var(--bg-soft); transform:translateY(-1px); }
+        .icon-btn svg { width:18px; height:18px; }
+        .icon-btn .dot { position:absolute; top:9px; right:9px; width:7px; height:7px; border-radius:50%; background:var(--peach-dk); border:2px solid var(--card); }
+        .avatar-hd { width:40px; height:40px; border-radius:11px; background:var(--yellow); color:var(--forest-ink); display:grid; place-items:center; font-family:var(--disp); font-weight:700; font-size:14px; cursor:pointer; }
+        .dd-wrap { position:relative; }
+        .dd { position:absolute; top:calc(100% + 10px); right:0; z-index:70; background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); min-width:280px; opacity:0; visibility:hidden; transform:translateY(-6px); transition:opacity .18s,transform .18s,visibility .18s; overflow:hidden; }
+        .dd.open { opacity:1; visibility:visible; transform:none; }
+        .dd-head { padding:14px 16px; border-bottom:1px solid var(--line-2); display:flex; align-items:center; justify-content:space-between; }
+        .dd-head strong { font-family:var(--disp); font-size:14px; }
+        .dd-head span { font-family:var(--mono); font-size:10px; color:var(--muted); }
+        .dd-item { display:flex; gap:12px; padding:12px 16px; border-bottom:1px solid var(--line-2); align-items:flex-start; }
+        .dd-item:last-child { border-bottom:none; }
+        .dd-item:hover { background:var(--bg-soft); }
+        .dd-ic { width:30px; height:30px; flex:none; border-radius:8px; display:grid; place-items:center; font-size:14px; }
+        .dd-t { font-size:13px; font-weight:600; }
+        .dd-d { font-size:12px; color:var(--muted); font-family:var(--mono); }
+        .dd-item .dot { width:7px; height:7px; border-radius:50%; margin-left:auto; flex:none; margin-top:4px; }
+        .dot-green { background:var(--forest); }
+        .dot-yellow { background:var(--yellow-dk); }
+        .dot-peach { background:var(--peach-dk); }
+        .profile-dd { width:230px; min-width:230px; padding:8px; }
+        .pdd-top { display:flex; align-items:center; gap:10px; padding:8px 8px 12px; border-bottom:1px solid var(--line-2); }
+        .pdd-item { display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:8px; font-size:13.5px; font-weight:500; border-bottom:none; }
+        .pdd-item:hover { background:var(--bg-soft); }
+        .pdd-item.danger { color:#A0441E; }
+
+        /* Content Bento */
+        .content { padding:26px 28px 60px; }
+        .grid { display:grid; gap:20px; grid-template-columns:repeat(3,1fr); grid-template-areas:"progress snapshot match""progress gaps journey""reco evidence portfolio""quick quick portfolio"; }
+        .p-hero { grid-area:progress; } .p-snapshot { grid-area:snapshot; } .p-match { grid-area:match; }
+        .p-gaps { grid-area:gaps; } .p-journey { grid-area:journey; } .p-reco { grid-area:reco; }
+        .p-evidence { grid-area:evidence; } .p-portfolio { grid-area:portfolio; } .p-quick { grid-area:quick; }
+        .panel { position:relative; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:24px; overflow:hidden; transition:transform .2s cubic-bezier(.2,.7,.2,1),box-shadow .2s; }
+        .panel:hover { transform:translateY(-3px); box-shadow:var(--shadow); }
+        .px-dots { position:absolute; right:14px; bottom:14px; width:64px; height:64px; opacity:.5; pointer-events:none; background-image:radial-gradient(var(--faint) 1px,transparent 1px); background-size:8px 8px; mask-image:linear-gradient(135deg,transparent 30%,#000); -webkit-mask-image:linear-gradient(135deg,transparent 30%,#000); }
+
+        /* Hero */
+        .hero { background:linear-gradient(160deg,#FFFFFF 0%,#FBF9F2 55%,#F2EFE2 100%); display:flex; flex-direction:column; }
+        .hero-top { display:flex; align-items:center; gap:12px; }
+        .hero-badge { font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.1em; background:var(--forest); color:var(--sage); padding:4px 9px; border-radius:6px; margin-left:auto; }
+        .hero h2 { font-family:var(--disp); font-weight:700; font-size:clamp(22px,2.4vw,30px); letter-spacing:-.02em; line-height:1.12; margin:16px 0 10px; }
+        .hero h2 em { font-style:normal; color:var(--forest); position:relative; }
+        .hero h2 em::after { content:""; position:absolute; left:0; right:0; bottom:2px; height:7px; background:var(--yellow); opacity:.5; z-index:-1; }
+        .hero p { font-size:14px; color:var(--muted); max-width:40ch; margin-bottom:22px; }
+        .hero-metrics { display:flex; gap:12px; flex-wrap:wrap; }
+        .metric { flex:1; min-width:96px; border:1px solid var(--line); border-radius:12px; padding:12px 13px; background:#fff; }
+        .metric-num { font-family:var(--disp); font-weight:700; font-size:24px; letter-spacing:-.02em; }
+        .metric-num small { font-size:13px; color:var(--muted); font-weight:600; }
+        .metric-label { font-family:var(--mono); font-size:10px; color:var(--muted); margin-top:2px; line-height:1.3; }
+        .metric .pix { display:flex; gap:3px; margin-top:8px; }
+        .metric .pix i { width:8px; height:6px; background:var(--line-2); display:block; border-radius:1px; }
+        .metric.m-forest .metric-num { color:var(--forest); }
+        .metric.m-forest .pix i.on { background:var(--forest); }
+        .metric.m-yellow .metric-num { color:var(--yellow-dk); }
+        .metric.m-yellow .pix i.on { background:var(--yellow-dk); }
+        .metric.m-peach .metric-num { color:var(--peach-dk); }
+        .metric.m-peach .pix i.on { background:var(--peach-dk); }
+
+        /* Journey */
+        .journey { margin-top:24px; border-top:1px dashed var(--line); padding-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:0 22px; }
+        .journey-title { grid-column:1/-1; font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.14em; color:var(--faint); text-transform:uppercase; margin-bottom:14px; }
+        .jstep { position:relative; display:flex; gap:12px; padding-bottom:18px; }
+        .jstep:last-child { padding-bottom:0; }
+        .jline { position:absolute; left:11px; top:24px; bottom:4px; width:2px; background:var(--line); }
+        .jstep.done .jline { background:var(--forest); }
+        .jnode { width:24px; height:24px; flex:none; border-radius:7px; z-index:1; display:grid; place-items:center; font-family:var(--mono); font-size:11px; font-weight:700; background:#fff; border:2px solid var(--line); color:var(--faint); }
+        .jstep.done .jnode { background:var(--forest); border-color:var(--forest); color:#F7F6F0; }
+        .jstep.active .jnode { background:var(--yellow); border-color:var(--yellow-dk); color:var(--forest-ink); box-shadow:0 0 0 4px rgba(232,211,107,.25); }
+        .jstep.future .jnode { border-style:dashed; }
+        .jlab { font-family:var(--disp); font-weight:600; font-size:13.5px; }
+        .jsub { font-family:var(--mono); font-size:10px; color:var(--faint); }
+
+        /* Skill rows */
+        .skill-row { padding:11px 0; border-bottom:1px solid var(--line-2); }
+        .skill-row:last-of-type { border-bottom:none; }
+        .skill-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+        .skill-name { font-family:var(--disp); font-weight:600; font-size:14px; }
+        .skill-val { margin-left:auto; font-family:var(--mono); font-weight:700; font-size:12px; }
+        .skill-val::after { content:"%"; color:var(--faint); font-size:10px; }
+        .pxbar { display:flex; gap:3px; flex-wrap:wrap; }
+        .pxbar .seg { width:7px; height:13px; background:var(--line-2); display:block; border-radius:1px; }
+        .pxbar.gapbar .seg { height:10px; }
+        .pxbar .seg.on { background:var(--forest); }
+        .pxbar.yellow .seg.on { background:var(--yellow-dk); }
+
+        /* Match */
+        .match-layout { display:flex; flex-direction:column; gap:18px; }
+        .match-top { display:flex; gap:16px; align-items:flex-start; }
+        .match-ring-wrap { position:relative; flex:none; width:116px; height:116px; }
+        .match-ring { width:116px; height:116px; transform:rotate(-90deg); }
+        .match-ring .b { fill:none; stroke:var(--line-2); stroke-width:11; }
+        .match-ring .f { fill:none; stroke:var(--peach-dk); stroke-width:11; stroke-linecap:round; stroke-dasharray:326.7; stroke-dashoffset:326.7; transition:stroke-dashoffset 1.2s cubic-bezier(.2,.7,.2,1); }
+        .match-ring.in .f { stroke-dashoffset:26.1; }
+        .ring-num { position:absolute; inset:0; display:grid; place-items:center; font-family:var(--disp); font-weight:700; font-size:26px; color:var(--peach-dk); }
+        .ring-num small { font-size:12px; color:var(--muted); font-weight:600; }
+        .match-role { font-family:var(--disp); font-weight:700; font-size:20px; letter-spacing:-.01em; line-height:1.15; }
+        .match-org { font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:4px; }
+        .match-meta { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+        .chip { font-family:var(--mono); font-size:10.5px; font-weight:700; border:1px solid var(--line); border-radius:6px; padding:3px 8px; color:var(--muted); display:inline-flex; align-items:center; gap:5px; }
+        .chip.loc::before { content:"●"; color:var(--peach-dk); font-size:8px; }
+        .chip.dur::before { content:"▮"; color:var(--peach-dk); font-size:8px; }
+        .skills-title { font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.12em; color:var(--faint); text-transform:uppercase; margin-bottom:8px; }
+        .skills-chips { display:flex; flex-wrap:wrap; gap:6px; }
+        .mch { font-size:11.5px; font-weight:500; border-radius:6px; padding:4px 9px; background:var(--sage); color:var(--forest-ink); }
+        .mch.miss { background:var(--line-2); color:var(--muted); text-decoration:line-through; }
+        .match-note { font-size:12px; color:var(--muted); border-top:1px dashed var(--line); padding-top:14px; display:flex; gap:8px; line-height:1.5; }
+        .match-note .ic { flex:none; color:var(--peach-dk); width:15px; height:15px; margin-top:1px; }
+        .match-actions { display:flex; gap:10px; margin-top:4px; flex-wrap:wrap; }
+
+        /* Gaps */
+        .gap-row { padding:11px 0; border-bottom:1px solid var(--line-2); }
+        .gap-row:last-of-type { border-bottom:none; }
+        .gap-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:7px; }
+        .gap-name { font-family:var(--disp); font-weight:600; font-size:14px; }
+        .gap-pct { font-family:var(--mono); font-weight:700; font-size:12px; }
+        .gap-meta { display:flex; align-items:center; gap:10px; margin-top:7px; }
+        .gap-target { font-size:11px; color:var(--faint); font-family:var(--mono); }
+        .gap-cta { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:16px; flex-wrap:wrap; }
+
+        /* Applications */
+        .app-item { position:relative; padding-left:26px; padding-bottom:20px; }
+        .app-item:not(:last-child)::before { content:""; position:absolute; left:6px; top:16px; bottom:2px; width:2px; background:var(--line); }
+        .app-dot { position:absolute; left:0; top:4px; width:14px; height:14px; border-radius:5px; background:var(--line-2); border:2px solid var(--card); box-shadow:0 0 0 1px var(--line); }
+        .app-item.applied .app-dot { background:var(--forest); box-shadow:0 0 0 3px rgba(36,75,53,.18); }
+        .app-item.shortlisted .app-dot { background:var(--yellow); box-shadow:0 0 0 3px rgba(232,211,107,.25); }
+        .app-role { font-family:var(--disp); font-weight:600; font-size:14.5px; }
+        .app-org { font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:1px; }
+        .app-status { display:flex; align-items:center; gap:8px; margin-top:7px; font-size:12.5px; color:var(--muted); }
+        .app-status .tick { font-family:var(--mono); font-weight:700; font-size:11px; padding:2px 7px; border-radius:5px; }
+        .app-status.applied .tick { background:var(--sage); color:var(--forest-ink); }
+        .app-status.shortlisted .tick { background:var(--yellow); color:#5c4a08; }
+
+        /* Reco */
+        .reco-item { display:flex; gap:12px; padding:13px 0; border-bottom:1px solid var(--line-2); }
+        .reco-item:last-of-type { border-bottom:none; }
+        .reco-ic { width:36px; height:36px; flex:none; border-radius:10px; background:var(--lavender); color:#4d3a74; display:grid; place-items:center; }
+        .reco-ic svg { width:17px; height:17px; }
+        .reco-gap { font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.12em; color:var(--lavender-dk); text-transform:uppercase; }
+        .reco-course { font-family:var(--disp); font-weight:600; font-size:14.5px; margin-top:3px; }
+        .reco-why { font-size:12px; color:var(--muted); margin-top:4px; }
+
+        /* Evidence */
+        .ev-stats { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-bottom:16px; }
+        .ev-stat { border:1px solid var(--line); border-radius:11px; padding:10px 12px; background:var(--bg-soft); }
+        .ev-num { font-family:var(--disp); font-weight:700; font-size:19px; display:flex; align-items:center; gap:7px; }
+        .ev-num .pix { display:inline-flex; gap:2px; }
+        .ev-num .pix i { width:6px; height:6px; background:var(--line-2); display:block; border-radius:1px; }
+        .ev-num.green .pix i { background:var(--forest); }
+        .ev-num.blue .pix i { background:var(--lavender-dk); }
+        .ev-num.peach .pix i { background:var(--peach-dk); }
+        .ev-lab { font-family:var(--mono); font-size:10px; color:var(--muted); }
+        .ev-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line-2); font-size:13px; }
+        .ev-item:last-of-type { border-bottom:none; }
+        .ev-file { width:26px; height:30px; flex:none; border:1px solid var(--line); border-radius:5px; position:relative; background:#fff; }
+        .ev-file::before { content:""; position:absolute; top:-1px; right:-1px; width:9px; height:9px; background:var(--bg); border-bottom-left-radius:4px; border:1px solid var(--line); border-top:none; border-right:none; }
+        .ev-name { font-weight:500; font-size:13px; }
+        .ev-sub { font-size:11px; color:var(--faint); font-family:var(--mono); }
+        .ev-status { margin-left:auto; }
+        .upload-btn { margin-top:14px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; border:1.5px dashed var(--forest); border-radius:11px; color:var(--forest); font-family:var(--disp); font-weight:600; font-size:13.5px; padding:11px; transition:background .15s,transform .15s; }
+        .upload-btn:hover { background:var(--sage); transform:translateY(-1px); }
+
+        /* Quick Actions */
+        .quick-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+        .qaction { display:flex; align-items:center; gap:11px; border:1px solid var(--line); border-radius:12px; padding:13px 14px; background:#fff; text-align:left; transition:transform .18s,border .18s,box-shadow .18s; }
+        .qaction:hover { transform:translateY(-2px); border-color:var(--forest); box-shadow:var(--shadow); }
+        .qa-ic { width:34px; height:34px; flex:none; border-radius:9px; display:grid; place-items:center; }
+        .qa-ic svg { width:17px; height:17px; }
+        .qa-ic.c1 { background:var(--sage); color:var(--forest-ink); }
+        .qa-ic.c2 { background:var(--peach); color:#7a3f1a; }
+        .qa-ic.c3 { background:var(--yellow); color:#5c4a08; }
+        .qa-ic.c4 { background:var(--lavender); color:#4d3a74; }
+        .qa-t { font-family:var(--disp); font-weight:600; font-size:13.5px; line-height:1.2; }
+        .qa-d { font-size:11px; color:var(--faint); font-family:var(--mono); }
+
+        /* Portfolio */
+        .portfolio { padding:24px; }
+        .pf-stats { display:flex; flex-direction:column; gap:9px; margin:14px 0; }
+        .pf-stat { display:flex; align-items:center; justify-content:space-between; font-size:13px; border-bottom:1px solid var(--line-2); padding-bottom:8px; }
+        .pf-stat span:first-child { color:var(--muted); }
+        .pf-stat b { font-family:var(--disp); font-weight:700; font-size:15px; }
+        .pf-cards { display:flex; gap:8px; margin-top:4px; }
+        .pf-mini { flex:1; border:1px solid var(--line); border-radius:9px; padding:8px; background:var(--bg-soft); }
+        .pfm-ic { width:22px; height:22px; border-radius:6px; background:var(--sage); color:var(--forest-ink); display:grid; place-items:center; margin-bottom:6px; }
+        .pfm-ic svg { width:12px; height:12px; }
+        .pfm-t { font-size:10px; font-weight:600; line-height:1.2; }
+        .pfm-d { font-size:9px; color:var(--faint); font-family:var(--mono); }
+        .pf-open { margin-top:14px; width:100%; }
+
+        /* Dash note */
+        .dash-note { margin-top:26px; text-align:center; font-family:var(--mono); font-size:11px; color:var(--faint); display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; }
+        .dash-note .lb { background:var(--line-2); color:var(--muted); padding:2px 7px; border-radius:5px; letter-spacing:.08em; }
+
+        /* Toast */
+        .toast { position:fixed; left:50%; bottom:26px; transform:translate(-50%,16px); background:var(--forest-ink); color:var(--sage); font-size:13px; padding:12px 18px; border-radius:11px; box-shadow:var(--shadow); z-index:100; opacity:0; visibility:hidden; transition:opacity .25s,transform .25s,visibility .25s; display:flex; align-items:center; gap:9px; }
+        .toast.show { opacity:1; visibility:visible; transform:translate(-50%,0); }
+        .toast .pix { display:inline-flex; gap:2px; }
+        .toast .pix i { width:5px; height:5px; background:var(--yellow); display:block; border-radius:50%; }
+        .backdrop { position:fixed; inset:0; z-index:55; background:rgba(23,26,24,.4); opacity:0; visibility:hidden; transition:opacity .25s,visibility .25s; }
+        .backdrop.show { opacity:1; visibility:visible; }
+        .bottomnav { display:none; }
+
+        /* Loading */
+        .db-loading { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; background:var(--bg); gap:16px; font-size:14px; color:var(--muted); }
+        .db-spinner { width:36px; height:36px; border:3px solid var(--line); border-top-color:var(--forest); border-radius:50%; animation:spin .8s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width:1100px) {
+          .grid { grid-template-columns:repeat(2,1fr); grid-template-areas:"progress progress""snapshot match""gaps journey""reco evidence""quick portfolio"; }
+          .quick-grid { grid-template-columns:repeat(2,1fr); }
+        }
+        @media (max-width:1024px) {
+          .sidebar { transform:translateX(-100%); }
+          .sidebar.open { transform:translateX(0); box-shadow:30px 0 60px -30px rgba(23,26,24,.5); }
+          .main { margin-left:0; }
+          .burger { display:grid; }
+          .backdrop.show { opacity:1; visibility:visible; }
+        }
+        @media (max-width:760px) {
+          .topbar { padding:16px; }
+          .search { display:none; }
+          .h-title { font-size:19px; }
+          .content { padding:18px 16px 92px; }
+          .grid { grid-template-columns:1fr; grid-template-areas:"progress""snapshot""gaps""match""journey""reco""evidence""quick""portfolio"; gap:14px; }
+          .panel { padding:18px; border-radius:15px; }
+          .hero-metrics { flex-direction:column; }
+          .metric { display:flex; align-items:center; justify-content:space-between; }
+          .metric .pix { display:none; }
+          .journey { grid-template-columns:1fr; gap:0; }
+          .hero h2 { font-size:24px; }
+          .match-top { flex-direction:column; }
+          .match-ring-wrap { align-self:flex-start; }
+          .quick-grid { grid-template-columns:1fr 1fr; gap:10px; }
+          .qaction { padding:11px; gap:9px; }
+          .qa-t { font-size:12.5px; }
+          .qa-d { display:none; }
+          .qa-ic { width:30px; height:30px; }
+          .bottomnav { display:flex; position:fixed; left:0; right:0; bottom:0; z-index:50; background:rgba(247,246,240,.92); backdrop-filter:blur(10px); border-top:1px solid var(--line); padding:8px 6px calc(8px + env(safe-area-inset-bottom)); }
+          .bottomnav a { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:var(--mono); font-size:9px; letter-spacing:.02em; color:var(--faint); padding:5px 2px; border-radius:8px; }
+          .bottomnav a.active { color:var(--forest-ink); font-weight:700; background:var(--sage); }
+          .bottomnav a svg { width:19px; height:19px; }
+        }
+      `}</style>
+
+      <div className="db-root">
+        <div className="app">
+          {/* ─── SIDEBAR ─── */}
+          <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+            <div className="brand">
+              <div className="brand-mark">SB</div>
+              <div className="brand-name">
+                Lead<em>2</em>Learn
+              </div>
+            </div>
+            <nav className="nav">
+              <div className="nav-label">Workspace</div>
+              {navItems.map((item) => (
                 <button
-                  key={key}
-                  onClick={() => setActiveTab(key)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all ${
-                    activeTab === key
-                      ? "bg-[#22C55E]/15 text-[#22C55E]"
-                      : "text-white/40 hover:text-white/70 hover:bg-white/[0.04]"
-                  }`}
+                  key={item.id}
+                  className={`nav-item ${activeNav === item.id ? "active" : ""}`}
+                  onClick={() => handleNav(item.id)}
                 >
-                  <Icon size={14} />
-                  {label}
+                  <span className="ic">{IC[item.icon]}</span>
+                  {item.label}
+                  {item.count !== undefined && (
+                    <span className="count">{item.count}</span>
+                  )}
                 </button>
               ))}
-            </div>
-
-            {/* User pill */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 bg-white/[0.04] rounded-full px-3 py-1.5 border border-white/[0.06]">
-                <div className="w-6 h-6 rounded-full bg-[#22C55E]/20 flex items-center justify-center text-[10px] font-bold text-[#22C55E]">
-                  {student.initials}
-                </div>
-                <span className="text-xs text-white/60 hidden sm:block">
-                  {student.name.split(" ")[0]}
-                </span>
-              </div>
-              <button className="text-white/30 hover:text-white/60 transition-colors">
-                <LogOut size={16} />
+            </nav>
+            <div className="sidebar-foot">
+              <button className="side-meta">
+                <span className="ic">{IC.gear}</span>Settings
               </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* ─── Mobile Tabs ─── */}
-      <div className="md:hidden sticky top-14 sm:top-16 z-40 bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-white/[0.06] overflow-x-auto">
-        <div className="flex gap-1 px-3 py-2 min-w-max">
-          {(
-            [
-              ["overview", "Overview"],
-              ["skills", "Skills"],
-              ["opportunities", "Opps"],
-              ["applications", "Apps"],
-              ["portfolio", "Portfolio"],
-            ] as const
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setActiveTab(key)}
-              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all ${
-                activeTab === key
-                  ? "bg-[#22C55E]/15 text-[#22C55E]"
-                  : "text-white/40"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ─── Content ─── */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-        {/* ─── OVERVIEW TAB ─── */}
-        {activeTab === "overview" && (
-          <motion.div {...stagger} initial="initial" animate="animate" className="space-y-6">
-            {/* Profile Header */}
-            <motion.div variants={fadeUp}>
-              <Card className="p-5 sm:p-8">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#22C55E]/20 to-[#22C55E]/5 border border-[#22C55E]/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-[#22C55E] font-bold text-xl sm:text-2xl">
-                      {student.initials}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h1 className="text-xl sm:text-2xl font-bold text-[#E1E0CC] tracking-tight">
-                      {student.name}
-                    </h1>
-                    <p className="text-white/40 text-sm mt-1">
-                      {student.course} · {student.year} · {student.institution}
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      <Pill color="#3B82F6">
-                        <Target size={10} />
-                        {student.targetRole}
-                      </Pill>
-                      <Pill>
-                        <MapPin size={10} />
-                        {student.location}
-                      </Pill>
+              <button className="side-meta" onClick={() => navigate("/")}>
+                <span className="ic">{IC.out}</span>Logout
+              </button>
+              <div className="mini-card">
+                <div className="mini-top">
+                  <div className="avatar">{student.initials}</div>
+                  <div>
+                    <div className="mini-name">{student.name}</div>
+                    <div className="mini-role">
+                      {student.course} · {student.year}
                     </div>
                   </div>
-                  <div className="hidden sm:flex flex-col items-end gap-2">
-                    <div className="text-right">
-                      <span className="text-white/30 text-[10px] uppercase tracking-wider font-semibold">
-                        Best Match
-                      </span>
-                      <div className="text-[#22C55E] text-3xl font-bold">
-                        {stats.bestMatch}%
+                </div>
+                <div className="mini-pct">
+                  <span>Profile</span>
+                  <span>{stats.profileCompletion}% complete</span>
+                </div>
+                <div className="mini-bar">
+                  <div className="mini-fill" style={{ width: `${stats.profileCompletion}%` }} />
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* ─── BACKDROP ─── */}
+          <div
+            className={`backdrop ${sidebarOpen ? "show" : ""}`}
+            onClick={() => setSidebarOpen(false)}
+          />
+
+          {/* ─── MAIN ─── */}
+          <div className="main">
+            {/* Topbar */}
+            <header className="topbar">
+              <button className="burger" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                {IC.menu}
+              </button>
+              <div>
+                <div className="h-title">
+                  {greeting()}, <span>{student.name.split(" ")[0]}</span>.
+                </div>
+                <div className="h-sub">
+                  Here&apos;s what your skill journey looks like today.
+                </div>
+              </div>
+              <div className="top-actions">
+                <div className="search">
+                  {IC.search}
+                  <input type="text" placeholder="Search skills, opportunities…" />
+                </div>
+                <div className="dd-wrap" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    className="icon-btn"
+                    onClick={() => { setNotifOpen(!notifOpen); setProfOpen(false); }}
+                  >
+                    {IC.bell}
+                    <span className="dot" />
+                  </button>
+                  <div className={`dd ${notifOpen ? "open" : ""}`}>
+                    <div className="dd-head">
+                      <strong>Notifications</strong>
+                      <span>3 new</span>
+                    </div>
+                    <div className="dd-item">
+                      <span className="dd-ic" style={{ background: "var(--sage)" }}>✓</span>
+                      <div>
+                        <div className="dd-t">Evidence verified</div>
+                        <div className="dd-d">Python Certificate approved</div>
+                      </div>
+                      <span className="dot dot-green" />
+                    </div>
+                    <div className="dd-item">
+                      <span className="dd-ic" style={{ background: "var(--peach)" }}>★</span>
+                      <div>
+                        <div className="dd-t">New match · {bestMatch.match}%</div>
+                        <div className="dd-d">{bestMatch.title}</div>
+                      </div>
+                      <span className="dot dot-yellow" />
+                    </div>
+                    <div className="dd-item">
+                      <span className="dd-ic" style={{ background: "var(--lavender)" }}>▤</span>
+                      <div>
+                        <div className="dd-t">Course recommended</div>
+                        <div className="dd-d">For Statistical Analysis</div>
+                      </div>
+                      <span className="dot dot-peach" />
+                    </div>
+                  </div>
+                </div>
+                <div className="dd-wrap" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    className="avatar-hd"
+                    onClick={() => { setProfOpen(!profOpen); setNotifOpen(false); }}
+                  >
+                    {student.initials}
+                  </button>
+                  <div className={`dd profile-dd ${profOpen ? "open" : ""}`}>
+                    <div className="pdd-top">
+                      <div className="avatar">{student.initials}</div>
+                      <div>
+                        <div style={{ fontFamily: "var(--disp)", fontWeight: 600, fontSize: 14 }}>
+                          {student.name}
+                        </div>
+                        <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--muted)" }}>
+                          {student.institution}
+                        </div>
                       </div>
                     </div>
+                    <button className="pdd-item" onClick={() => handleNav("Profile")}>
+                      My Profile
+                    </button>
+                    <button className="pdd-item" onClick={() => handleNav("Overview")}>
+                      Settings
+                    </button>
+                    <button className="pdd-item danger" onClick={() => navigate("/")}>
+                      Sign out
+                    </button>
                   </div>
                 </div>
-              </Card>
-            </motion.div>
+              </div>
+            </header>
 
-            {/* Stats Row */}
-            <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-              {[
-                {
-                  label: "Profile Completion",
-                  value: `${stats.profileCompletion}%`,
-                  icon: User,
-                  color: "#22C55E",
-                },
-                {
-                  label: "Skill Confidence",
-                  value: `${stats.skillConfidence}%`,
-                  icon: BookOpen,
-                  color: "#3B82F6",
-                },
-                {
-                  label: "Applications",
-                  value: applications.length.toString(),
-                  icon: Briefcase,
-                  color: "#F59E0B",
-                },
-                {
-                  label: "Verified Docs",
-                  value: `${evidence.verified}/${evidence.total}`,
-                  icon: Shield,
-                  color: "#A855F7",
-                },
-              ].map((s) => (
-                <Card key={s.label} className="p-4 sm:p-5">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center mb-3"
-                    style={{ background: `${s.color}15` }}
-                  >
-                    <s.icon size={16} style={{ color: s.color }} />
+            {/* Content */}
+            <main className="content">
+              <div className="grid">
+                {/* ─── HERO / Progress ─── */}
+                <section className="panel hero p-hero">
+                  <span className="px-dots" />
+                  <div className="hero-top">
+                    <span className="eyebrow">Personal Progress</span>
+                    <span className="hero-badge">DEMO DATA</span>
                   </div>
-                  <div className="text-xl sm:text-2xl font-bold text-[#E1E0CC]">
-                    {s.value}
-                  </div>
-                  <div className="text-white/35 text-[11px] font-medium mt-0.5">
-                    {s.label}
-                  </div>
-                </Card>
-              ))}
-            </motion.div>
-
-            {/* Best Match */}
-            <motion.div variants={fadeUp}>
-              <h3 className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Star size={14} className="text-[#22C55E]" />
-                Best Matching Opportunity
-              </h3>
-              <OpportunityCard opp={bestMatch} featured />
-            </motion.div>
-
-            {/* Two-column: Applications + Recommendations */}
-            <motion.div variants={fadeUp} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Applications */}
-              <div>
-                <h3 className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Briefcase size={14} className="text-[#3B82F6]" />
-                  Recent Applications
-                </h3>
-                <div className="space-y-3">
-                  {applications.map((app) => (
-                    <ApplicationCard key={app.id} app={app} />
-                  ))}
-                </div>
-              </div>
-
-              {/* Recommendations */}
-              <div>
-                <h3 className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Sparkles size={14} className="text-[#F59E0B]" />
-                  Recommended For You
-                </h3>
-                <div className="space-y-3">
-                  {recommendations.map((rec) => (
-                    <RecommendationCard key={rec.id} rec={rec} />
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* ─── SKILLS TAB ─── */}
-        {activeTab === "skills" && (
-          <motion.div {...stagger} initial="initial" animate="animate" className="space-y-6">
-            <motion.div variants={fadeUp}>
-              <h2 className="text-xl font-bold text-[#E1E0CC] mb-1">Your Skills</h2>
-              <p className="text-white/35 text-sm">
-                Skills detected from your academic records, certificates and self-declarations.
-              </p>
-            </motion.div>
-
-            {/* Skills Grid */}
-            <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {skills.map((sk) => (
-                <SkillCard key={sk.id} skill={sk} />
-              ))}
-            </motion.div>
-
-            {/* Skill Gaps */}
-            <motion.div variants={fadeUp}>
-              <h3 className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <AlertTriangle size={14} className="text-[#F59E0B]" />
-                Skill Gaps for {student.targetRole}
-              </h3>
-              <div className="space-y-3">
-                {gaps.map((gap) => (
-                  <GapCard key={gap.id} gap={gap} />
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* ─── OPPORTUNITIES TAB ─── */}
-        {activeTab === "opportunities" && (
-          <motion.div {...stagger} initial="initial" animate="animate" className="space-y-6">
-            <motion.div variants={fadeUp}>
-              <h2 className="text-xl font-bold text-[#E1E0CC] mb-1">
-                Matching Opportunities
-              </h2>
-              <p className="text-white/35 text-sm">
-                Opportunities matched to your skills and target role.
-              </p>
-            </motion.div>
-
-            <motion.div variants={fadeUp} className="flex items-center gap-3">
-              <div className="flex-1 bg-[#0e0e14] border border-white/[0.06] rounded-xl px-4 py-2.5 flex items-center gap-2">
-                <Search size={14} className="text-white/30" />
-                <span className="text-white/30 text-sm">Search opportunities…</span>
-              </div>
-              <button className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-4 py-2.5 flex items-center gap-2 text-white/40 text-sm hover:bg-white/[0.08] transition-colors">
-                <Filter size={14} />
-                Filters
-              </button>
-            </motion.div>
-
-            <motion.div variants={fadeUp}>
-              <OpportunityCard opp={bestMatch} featured />
-            </motion.div>
-
-            {/* Extra mock opportunities */}
-            {[
-              {
-                id: "op-2",
-                title: "AYUSH Research Fellowship",
-                org: "CCRAS",
-                division: "Central Research Council",
-                location: "New Delhi",
-                duration: "6 Months",
-                stipend: "₹18,000/mo",
-                match: 85,
-                matchedSkills: ["Research Methods", "Data Analysis"],
-                missingSkills: ["Scientific Writing"],
-                explanation: "85% match — strong alignment with research and data skills.",
-              },
-              {
-                id: "op-3",
-                title: "Pharmacovigilance Intern",
-                org: "NIPER",
-                division: "Drug Safety Division",
-                location: "Hyderabad",
-                duration: "4 Months",
-                match: 78,
-                matchedSkills: ["Clinical Research"],
-                missingSkills: ["Statistical Analysis", "Scientific Writing"],
-                explanation: "78% match — clinical research experience is highly valued here.",
-              },
-              {
-                id: "op-4",
-                title: "Public Health Data Analyst",
-                org: "MoHFW",
-                division: "National Health Mission",
-                location: "Remote",
-                duration: "3 Months",
-                stipend: "₹10,000/mo",
-                match: 74,
-                matchedSkills: ["Python", "Data Analysis"],
-                missingSkills: ["Statistical Analysis"],
-                explanation: "74% match — your Python and data analysis skills are a strong fit.",
-              },
-            ].map((opp) => (
-              <motion.div key={opp.id} variants={fadeUp}>
-                <OpportunityCard opp={opp as Opportunity} />
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-
-        {/* ─── APPLICATIONS TAB ─── */}
-        {activeTab === "applications" && (
-          <motion.div {...stagger} initial="initial" animate="animate" className="space-y-6">
-            <motion.div variants={fadeUp}>
-              <h2 className="text-xl font-bold text-[#E1E0CC] mb-1">Applications</h2>
-              <p className="text-white/35 text-sm">
-                Track your applications and their progress.
-              </p>
-            </motion.div>
-
-            {/* Pipeline */}
-            <motion.div variants={fadeUp}>
-              <Card className="p-5 sm:p-6">
-                <div className="flex items-center justify-between gap-1 sm:gap-2">
-                  {["Applied", "Shortlisted", "Interview", "Offer", "Joined"].map(
-                    (stage, i) => {
-                      const count = applications.filter(
-                        (a) => a.stageLabel === stage
-                      ).length;
-                      return (
-                        <div key={stage} className="flex items-center flex-1">
-                          <div className="flex-1 text-center">
-                            <div
-                              className={`text-lg sm:text-xl font-bold ${
-                                count > 0 ? "text-[#E1E0CC]" : "text-white/20"
-                              }`}
-                            >
-                              {count}
-                            </div>
-                            <div className="text-[9px] sm:text-[10px] text-white/30 font-medium mt-0.5">
-                              {stage}
-                            </div>
+                  <h2>
+                    Your next opportunity <em>starts with your skills.</em>
+                  </h2>
+                  <p>
+                    You&apos;ve built a strong foundation. Close a few skill gaps to
+                    unlock better matches.
+                  </p>
+                  <div className="hero-metrics">
+                    {[
+                      { label: "Profile Completion", value: stats.profileCompletion, color: "forest", px: Math.round(stats.profileCompletion / 100 * 6) },
+                      { label: "Skill Confidence", value: stats.skillConfidence, color: "yellow", px: Math.round(stats.skillConfidence / 100 * 6) },
+                      { label: "Best Match", value: stats.bestMatch, color: "peach", px: Math.round(stats.bestMatch / 100 * 6) },
+                    ].map((m) => (
+                      <div key={m.label} className={`metric m-${m.color}`}>
+                        <div>
+                          <div className="metric-num">
+                            {m.value}<small>%</small>
                           </div>
-                          {i < 4 && (
-                            <div className="w-4 sm:w-8 h-px bg-white/[0.06] mx-1" />
-                          )}
+                          <div className="metric-label">{m.label}</div>
                         </div>
-                      );
-                    }
-                  )}
-                </div>
-              </Card>
-            </motion.div>
-
-            {/* Application list */}
-            <motion.div variants={fadeUp} className="space-y-3">
-              {applications.map((app) => (
-                <ApplicationCard key={app.id} app={app} full />
-              ))}
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* ─── PORTFOLIO TAB ─── */}
-        {activeTab === "portfolio" && (
-          <motion.div {...stagger} initial="initial" animate="animate" className="space-y-6">
-            <motion.div variants={fadeUp}>
-              <h2 className="text-xl font-bold text-[#E1E0CC] mb-1">Portfolio</h2>
-              <p className="text-white/35 text-sm">
-                Your projects, certificates and verified skills.
-              </p>
-            </motion.div>
-
-            {/* Stats */}
-            <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: "Projects", value: portfolio.projects, icon: FolderOpen, color: "#22C55E" },
-                { label: "Certificates", value: portfolio.certificates, icon: Award, color: "#3B82F6" },
-                { label: "Verified Skills", value: portfolio.verifiedSkills, icon: Shield, color: "#A855F7" },
-                {
-                  label: "Evidence",
-                  value: `${evidence.verified}/${evidence.total}`,
-                  icon: FileText,
-                  color: "#F59E0B",
-                },
-              ].map((s) => (
-                <Card key={s.label} className="p-4 text-center">
-                  <s.icon size={18} style={{ color: s.color }} className="mx-auto mb-2" />
-                  <div className="text-xl font-bold text-[#E1E0CC]">{s.value}</div>
-                  <div className="text-[10px] text-white/30 font-medium mt-0.5">
-                    {s.label}
+                        <div className="pix">
+                          {Array.from({ length: 6 }, (_, i) => (
+                            <i key={i} className={i < m.px ? "on" : ""} />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </Card>
-              ))}
-            </motion.div>
+                  <div className="journey">
+                    <div className="journey-title">Your Skill Journey</div>
+                    {[
+                      { label: "Evidence", sub: "6 items verified", done: true },
+                      { label: "Skills", sub: "18 extracted", done: true },
+                      { label: "Skill Gap", sub: `Close ${gaps.length} gaps`, active: true },
+                      { label: "Match", sub: `Best match ${stats.bestMatch}%` },
+                      { label: "Opportunity", sub: "Apply now" },
+                    ].map((s, i) => (
+                      <div
+                        key={s.label}
+                        className={`jstep ${s.done ? "done" : s.active ? "active" : "future"}`}
+                      >
+                        {i < 4 && <div className="jline" />}
+                        <div className="jnode">{s.done ? "✓" : i + 1}</div>
+                        <div>
+                          <div className="jlab">{s.label}</div>
+                          <div className="jsub">{s.sub}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
 
-            {/* Featured Projects */}
-            <motion.div variants={fadeUp}>
-              <h3 className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Zap size={14} className="text-[#22C55E]" />
-                Featured Work
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {portfolio.featured.map((f, i) => (
-                  <Card key={i} className="p-5 group hover:border-[#22C55E]/20 transition-colors cursor-pointer">
-                    <div className="flex items-start justify-between mb-3">
-                      <FolderOpen size={18} className="text-[#22C55E]/50" />
-                      <ArrowUpRight
-                        size={14}
-                        className="text-white/20 group-hover:text-[#22C55E] transition-colors"
-                      />
+                {/* ─── SKILL SNAPSHOT ─── */}
+                <section className="panel p-snapshot">
+                  <span className="eyebrow">Skill Snapshot</span>
+                  <div className="panel-title">Your Skill Snapshot</div>
+                  <div className="panel-sub">Verified vs self-declared</div>
+                  {skills.map((sk) => (
+                    <div key={sk.id} className="skill-row">
+                      <div className="skill-head">
+                        <span className="skill-name">{sk.name}</span>
+                        {sk.origin === "evidence" ? (
+                          <span className="tag tag-verified">✓ Evidence</span>
+                        ) : (
+                          <span className="tag tag-self">Self-declared</span>
+                        )}
+                        <span className="skill-val">{sk.confidence}</span>
+                      </div>
+                      <div className={`pxbar ${sk.origin === "self-declared" ? "yellow" : ""}`}>
+                        {pxSegs(sk.confidence)}
+                      </div>
                     </div>
-                    <h4 className="text-sm font-semibold text-[#E1E0CC] mb-1">
-                      {f.title}
-                    </h4>
-                    <Pill>{f.tag}</Pill>
-                  </Card>
-                ))}
-              </div>
-            </motion.div>
+                  ))}
+                  <button
+                    className="link-more"
+                    style={{ marginTop: 10 }}
+                    onClick={() => handleNav("Skills")}
+                  >
+                    View all skills <span>→</span>
+                  </button>
+                </section>
 
-            {/* Evidence */}
-            <motion.div variants={fadeUp}>
-              <h3 className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <FileText size={14} className="text-[#A855F7]" />
-                Evidence Documents
-              </h3>
-              <div className="space-y-2">
-                {evidence.items.map((ev) => (
-                  <Card key={ev.id} className="p-4 flex items-center gap-4">
-                    <div
-                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                      style={{
-                        background:
+                {/* ─── BEST MATCH ─── */}
+                <section className="panel p-match">
+                  <span className="eyebrow">Best Match</span>
+                  <div className="panel-title">Best Match For You</div>
+                  <div className="match-layout">
+                    <div className="match-top">
+                      <div className="match-ring-wrap">
+                        <svg className="match-ring" viewBox="0 0 120 120">
+                          <circle className="b" cx="60" cy="60" r="52" />
+                          <circle className="f" cx="60" cy="60" r="52" />
+                        </svg>
+                        <div className="ring-num">
+                          {bestMatch.match}<small>%</small>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="match-role">{bestMatch.title}</div>
+                        <div className="match-org">
+                          {bestMatch.org} / {bestMatch.division}
+                        </div>
+                        <div className="match-meta">
+                          <span className="chip loc">{bestMatch.location}</span>
+                          <span className="chip dur">{bestMatch.duration}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="skills-title">
+                        Skills matched · {bestMatch.matchedSkills.length + bestMatch.missingSkills.length} of 9
+                      </div>
+                      <div className="skills-chips">
+                        {bestMatch.matchedSkills.map((s) => (
+                          <span key={s} className="mch">✓ {s}</span>
+                        ))}
+                        {bestMatch.missingSkills.map((s) => (
+                          <span key={s} className="mch miss">{s}</span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="match-note">
+                      <span className="ic">{IC.note}</span>
+                      <span>{bestMatch.explanation}</span>
+                    </div>
+                    <div className="match-actions">
+                      <button className="btn btn-peach" onClick={() => handleNav("Opportunities")}>
+                        View opportunity <span className="arr">→</span>
+                      </button>
+                      <button className="btn" onClick={() => handleNav("Opportunities")}>
+                        See all opportunities
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                {/* ─── SKILL GAPS ─── */}
+                <section className="panel p-gaps">
+                  <span className="eyebrow" style={{ color: "var(--yellow-dk)" }}>Skill Gap</span>
+                  <div className="panel-title">Your Biggest Skill Gaps</div>
+                  <div className="panel-sub">
+                    Matched against your target role · <b style={{ color: "var(--ink)" }}>{student.targetRole}</b>
+                  </div>
+                  {gaps.map((g) => (
+                    <div key={g.id} className="gap-row">
+                      <div className="gap-head">
+                        <span className="gap-name">{g.name}</span>
+                        <span className="gap-pct">{g.current}%</span>
+                      </div>
+                      <div className="pxbar gapbar yellow">{pxSegs(g.current, 16)}</div>
+                      <div className="gap-meta">
+                        <span className={`tag ${g.severity === "High" ? "tag-high" : "tag-med"}`}>
+                          Gap: {g.severity}
+                        </span>
+                        <span className="gap-target">Target {g.required}%+</span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="gap-cta">
+                    <span style={{ fontSize: 11, color: "var(--faint)", fontFamily: "var(--mono)" }}>
+                      vs. target role requirements
+                    </span>
+                    <button className="link-more" onClick={() => handleNav("Skill Gap")}>
+                      Close these gaps <span>→</span>
+                    </button>
+                  </div>
+                </section>
+
+                {/* ─── APPLICATIONS ─── */}
+                <section className="panel p-journey">
+                  <span className="eyebrow">Applications</span>
+                  <div className="panel-title">Application Journey</div>
+                  <div className="panel-sub">Quick status of your submissions</div>
+                  {applications.map((app) => (
+                    <div key={app.id} className={`app-item ${app.stage}`}>
+                      <span className="app-dot" />
+                      <div className="app-role">{app.role}</div>
+                      <div className="app-org">{app.org}</div>
+                      <div className={`app-status ${app.stage}`}>
+                        <span className="tick">{app.stageLabel}</span>
+                        <span>{app.status}</span>
+                      </div>
+                    </div>
+                  ))}
+                  <button className="link-more" onClick={() => handleNav("Applications")}>
+                    View all applications <span>→</span>
+                  </button>
+                </section>
+
+                {/* ─── RECOMMENDATIONS ─── */}
+                <section className="panel p-reco">
+                  <span className="eyebrow" style={{ color: "var(--lavender-dk)" }}>Recommendations</span>
+                  <div className="panel-title">Recommended For Your Skill Gaps</div>
+                  <div className="panel-sub">
+                    Not random — every pick maps to a gap you can close.
+                  </div>
+                  {recommendations.map((r) => (
+                    <div key={r.id} className="reco-item">
+                      <div className="reco-ic">{IC.chart}</div>
+                      <div>
+                        <div className="reco-gap">{r.closesGap}</div>
+                        <div className="reco-course">{r.title}</div>
+                        <span className="tag tag-lav" style={{ marginTop: 6 }}>{r.type}</span>
+                        <p className="reco-why">{r.why}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    className="link-more"
+                    style={{ marginTop: 8 }}
+                    onClick={() => handleNav("Recommendations")}
+                  >
+                    Explore learning paths <span>→</span>
+                  </button>
+                </section>
+
+                {/* ─── EVIDENCE VAULT ─── */}
+                <section className="panel p-evidence">
+                  <span className="eyebrow">Evidence Vault</span>
+                  <div className="panel-title">Evidence Vault</div>
+                  <div className="panel-sub">Proof that backs your skills</div>
+                  <div className="ev-stats">
+                    <div className="ev-stat">
+                      <div className="ev-num">{evidence.total}</div>
+                      <div className="ev-lab">Evidence items</div>
+                    </div>
+                    <div className="ev-stat">
+                      <div className="ev-num green">
+                        <span className="pix"><i /><i /></span>
+                        {evidence.verified}
+                      </div>
+                      <div className="ev-lab">Verified</div>
+                    </div>
+                    <div className="ev-stat">
+                      <div className="ev-num blue">
+                        <span className="pix"><i /><i /></span>
+                        {evidence.processing}
+                      </div>
+                      <div className="ev-lab">Processing</div>
+                    </div>
+                    <div className="ev-stat">
+                      <div className="ev-num peach">
+                        <span className="pix"><i /><i /></span>
+                        {evidence.needsReview}
+                      </div>
+                      <div className="ev-lab">Needs review</div>
+                    </div>
+                  </div>
+                  {evidence.items.map((ev) => (
+                    <div key={ev.id} className="ev-item">
+                      <span className="ev-file" />
+                      <div>
+                        <div className="ev-name">{ev.title}</div>
+                        <div className="ev-sub">{ev.issuer} · {ev.kind}</div>
+                      </div>
+                      <span
+                        className={`tag ev-status ${
                           ev.status === "verified"
-                            ? "#22C55E15"
+                            ? "tag-verified"
                             : ev.status === "processing"
-                              ? "#F59E0B15"
-                              : "#EF444415",
-                      }}
-                    >
-                      {ev.status === "verified" ? (
-                        <CheckCircle2 size={16} className="text-[#22C55E]" />
-                      ) : ev.status === "processing" ? (
-                        <Clock size={16} className="text-[#F59E0B]" />
-                      ) : (
-                        <AlertTriangle size={16} className="text-[#EF4444]" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium text-[#E1E0CC] truncate">
-                        {ev.title}
-                      </h4>
-                      <p className="text-[11px] text-white/30">
-                        {ev.issuer} · {ev.kind}
-                      </p>
-                    </div>
-                    <Pill
-                      color={
-                        ev.status === "verified"
-                          ? "#22C55E"
+                              ? "tag-process"
+                              : "tag-review"
+                        }`}
+                      >
+                        {ev.status === "verified"
+                          ? "✓ Verified"
                           : ev.status === "processing"
-                            ? "#F59E0B"
-                            : "#EF4444"
-                      }
-                    >
-                      {ev.status === "verified"
-                        ? "Verified"
-                        : ev.status === "processing"
-                          ? "Processing"
-                          : "Needs Review"}
-                    </Pill>
-                  </Card>
-                ))}
+                            ? "… Processing"
+                            : "! Needs review"}
+                      </span>
+                    </div>
+                  ))}
+                  <button className="upload-btn" onClick={() => handleNav("Evidence")}>
+                    + Upload evidence
+                  </button>
+                </section>
+
+                {/* ─── QUICK ACTIONS ─── */}
+                <section className="panel p-quick">
+                  <span className="eyebrow">Quick Actions</span>
+                  <div className="panel-title" style={{ marginTop: 6 }}>
+                    What do you want to do?
+                  </div>
+                  <div className="quick-grid" style={{ marginTop: 12 }}>
+                    {QUICK_ACTIONS.map((qa) => (
+                      <button key={qa.label} className="qaction" onClick={() => handleNav(qa.label)}>
+                        <span className={`qa-ic ${qa.c}`}>{IC[qa.icon as keyof typeof IC]}</span>
+                        <span>
+                          <span className="qa-t">{qa.label}</span>
+                          <br />
+                          <span className="qa-d">{qa.desc}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                {/* ─── PORTFOLIO ─── */}
+                <section className="panel portfolio p-portfolio">
+                  <span className="eyebrow">Portfolio</span>
+                  <div className="panel-title">Your Verified Portfolio</div>
+                  <div className="pf-stats">
+                    <div className="pf-stat">
+                      <span>Projects</span>
+                      <b>{portfolio.projects}</b>
+                    </div>
+                    <div className="pf-stat">
+                      <span>Certificates</span>
+                      <b>{portfolio.certificates}</b>
+                    </div>
+                    <div className="pf-stat">
+                      <span>Verified Skills</span>
+                      <b>{portfolio.verifiedSkills}</b>
+                    </div>
+                  </div>
+                  <div className="pf-cards">
+                    {portfolio.featured.map((f, i) => (
+                      <div key={i} className="pf-mini">
+                        <div className="pfm-ic">{IC.folder}</div>
+                        <div className="pfm-t">{f.title}</div>
+                        <div className="pfm-d">Verified</div>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    className="btn btn-primary pf-open"
+                    onClick={() => handleNav("Portfolio")}
+                  >
+                    Open portfolio <span className="arr">→</span>
+                  </button>
+                </section>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </main>
-    </div>
-  );
-}
 
-/* ─────────────────── sub-components ─────────────────── */
-
-function SkillCard({ skill }: { skill: StudentSkill }) {
-  return (
-    <Card className="p-4 group hover:border-[#22C55E]/20 transition-colors">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-[#E1E0CC]">{skill.name}</h4>
-        <Pill color={skill.origin === "evidence" ? "#22C55E" : "#3B82F6"}>
-          {skill.origin === "evidence" ? (
-            <Shield size={9} />
-          ) : (
-            <User size={9} />
-          )}
-          {skill.origin === "evidence" ? "Verified" : "Self-declared"}
-        </Pill>
-      </div>
-
-      {/* Confidence bar */}
-      <div className="flex items-center gap-3">
-        <div className="flex-1 h-2 bg-white/[0.04] rounded-full overflow-hidden">
-          <motion.div
-            className="h-full rounded-full"
-            style={{
-              background: `linear-gradient(90deg, #22C55E, ${
-                skill.confidence >= 80 ? "#22C55E" : skill.confidence >= 60 ? "#F59E0B" : "#EF4444"
-              })`,
-            }}
-            initial={{ width: 0 }}
-            animate={{ width: `${skill.confidence}%` }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-          />
-        </div>
-        <span className="text-xs font-bold text-[#E1E0CC] w-8 text-right">
-          {skill.confidence}%
-        </span>
-      </div>
-
-      {skill.source && (
-        <p className="text-[10px] text-white/25 mt-2.5 flex items-center gap-1">
-          <BookOpen size={9} />
-          {skill.source}
-        </p>
-      )}
-    </Card>
-  );
-}
-
-function GapCard({ gap }: { gap: SkillGap }) {
-  const sevColor =
-    gap.severity === "High"
-      ? "#EF4444"
-      : gap.severity === "Medium"
-        ? "#F59E0B"
-        : "#22C55E";
-
-  return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-[#E1E0CC]">{gap.name}</h4>
-        <Pill color={sevColor}>{gap.severity} Priority</Pill>
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] text-white/30 w-16">Your Level</span>
-          <div className="flex-1 h-2 bg-white/[0.04] rounded-full overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-[#22C55E]"
-              initial={{ width: 0 }}
-              animate={{ width: `${gap.current}%` }}
-              transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-            />
+              <div className="dash-note">
+                <span className="lb">PROTOTYPE</span>
+                <span>
+                  Rendering synthetic demo data · connect the SkillBridge REST API to
+                  go live.
+                </span>
+              </div>
+            </main>
           </div>
-          <span className="text-[10px] text-white/40 w-8 text-right">{gap.current}%</span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] text-white/30 w-16">Required</span>
-          <div className="flex-1 h-2 bg-white/[0.04] rounded-full overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-[#3B82F6]"
-              initial={{ width: 0 }}
-              animate={{ width: `${gap.required}%` }}
-              transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
-            />
-          </div>
-          <span className="text-[10px] text-white/40 w-8 text-right">{gap.required}%</span>
+
+        {/* ─── BOTTOM NAV (mobile) ─── */}
+        <nav className="bottomnav">
+          {bottomNav.map((bn) => (
+            <a
+              key={bn.id}
+              href="#"
+              className={activeNav === bn.id ? "active" : ""}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNav(bn.id);
+              }}
+            >
+              {IC[bn.icon]}
+            </a>
+          ))}
+        </nav>
+
+        {/* ─── TOAST ─── */}
+        <div className={`toast ${toast ? "show" : ""}`}>
+          <span className="pix"><i /><i /><i /></span>
+          <span>{toast}</span>
         </div>
       </div>
-    </Card>
-  );
-}
-
-function OpportunityCard({
-  opp,
-  featured = false,
-}: {
-  opp: Opportunity;
-  featured?: boolean;
-}) {
-  return (
-    <Card
-      className={`p-5 sm:p-6 group hover:border-[#22C55E]/20 transition-all ${
-        featured ? "ring-1 ring-[#22C55E]/10" : ""
-      }`}
-    >
-      <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <h3 className="text-base font-bold text-[#E1E0CC]">{opp.title}</h3>
-            {featured && <Pill color="#22C55E">Best Match</Pill>}
-          </div>
-          <p className="text-white/40 text-sm mb-3">
-            {opp.org} · {opp.division}
-          </p>
-
-          <div className="flex flex-wrap gap-3 text-[11px] text-white/30 mb-4">
-            <span className="flex items-center gap-1">
-              <MapPin size={10} /> {opp.location}
-            </span>
-            <span className="flex items-center gap-1">
-              <Calendar size={10} /> {opp.duration}
-            </span>
-            {opp.stipend && (
-              <span className="flex items-center gap-1">
-                <IndianRupee size={10} /> {opp.stipend}
-              </span>
-            )}
-          </div>
-
-          <p className="text-[12px] text-white/30 mb-4 leading-relaxed">
-            {opp.explanation}
-          </p>
-
-          {/* Matched / Missing Skills */}
-          <div className="flex flex-wrap gap-1.5">
-            {opp.matchedSkills.map((s) => (
-              <span
-                key={s}
-                className="text-[10px] px-2 py-0.5 rounded-full bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20"
-              >
-                ✓ {s}
-              </span>
-            ))}
-            {opp.missingSkills.map((s) => (
-              <span
-                key={s}
-                className="text-[10px] px-2 py-0.5 rounded-full bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/20"
-              >
-                ✗ {s}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Match circle */}
-        <div className="flex sm:flex-col items-center gap-3 sm:items-end flex-shrink-0">
-          <div className="relative w-16 h-16">
-            <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
-              <circle
-                cx="32"
-                cy="32"
-                r="28"
-                fill="none"
-                stroke="rgba(255,255,255,0.06)"
-                strokeWidth="4"
-              />
-              <motion.circle
-                cx="32"
-                cy="32"
-                r="28"
-                fill="none"
-                stroke="#22C55E"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeDasharray={2 * Math.PI * 28}
-                initial={{ strokeDashoffset: 2 * Math.PI * 28 }}
-                animate={{
-                  strokeDashoffset:
-                    2 * Math.PI * 28 * (1 - opp.match / 100),
-                }}
-                transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-lg font-bold text-[#E1E0CC]">
-                {opp.match}
-                <span className="text-[10px] text-white/30">%</span>
-              </span>
-            </div>
-          </div>
-          <button className="flex items-center gap-1.5 text-[11px] font-semibold text-[#22C55E] hover:text-[#16a34a] transition-colors">
-            Apply Now
-            <ArrowUpRight size={12} />
-          </button>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-function ApplicationCard({
-  app,
-  full = false,
-}: {
-  app: Application;
-  full?: boolean;
-}) {
-  const color = stageColors[app.stage] || "#22C55E";
-
-  return (
-    <Card className="p-4">
-      <div className="flex items-center gap-4">
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: `${color}15` }}
-        >
-          <Briefcase size={16} style={{ color }} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <h4 className="text-sm font-semibold text-[#E1E0CC] truncate">
-              {app.role}
-            </h4>
-            <Pill color={color}>{app.stageLabel}</Pill>
-          </div>
-          <p className="text-[11px] text-white/30">{app.org}</p>
-          {full && (
-            <div className="mt-2 space-y-1">
-              <p className="text-[11px] text-white/40">{app.status}</p>
-              {app.nextStep && (
-                <p className="text-[11px] text-[#22C55E]/70 flex items-center gap-1">
-                  <Calendar size={10} />
-                  {app.nextStep}
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-        {full && (
-          <div className="text-right flex-shrink-0">
-            <div className="text-lg font-bold text-[#E1E0CC]">
-              {app.match}
-              <span className="text-[10px] text-white/30">%</span>
-            </div>
-            <div className="text-[9px] text-white/25">match</div>
-          </div>
-        )}
-      </div>
-    </Card>
-  );
-}
-
-function RecommendationCard({ rec }: { rec: LearningRecommendation }) {
-  const typeColors: Record<string, string> = {
-    Course: "#3B82F6",
-    Workshop: "#F59E0B",
-    "Learning path": "#A855F7",
-  };
-
-  return (
-    <Card className="p-4 group hover:border-[#22C55E]/20 transition-colors cursor-pointer">
-      <div className="flex items-start gap-3">
-        <div
-          className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: `${typeColors[rec.type] || "#22C55E"}15` }}
-        >
-          <GraduationCap
-            size={16}
-            style={{ color: typeColors[rec.type] || "#22C55E" }}
-          />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <h4 className="text-sm font-semibold text-[#E1E0CC] truncate">
-              {rec.title}
-            </h4>
-          </div>
-          <p className="text-[11px] text-white/30">
-            {rec.provider} · {rec.duration}
-          </p>
-          <p className="text-[11px] text-white/25 mt-1.5">{rec.why}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <Pill color={typeColors[rec.type] || "#22C55E"}>{rec.type}</Pill>
-            <span className="text-[10px] text-white/20">
-              Closes gap: {rec.closesGap}
-            </span>
-          </div>
-        </div>
-        <ChevronRight
-          size={14}
-          className="text-white/20 group-hover:text-[#22C55E] transition-colors mt-1 flex-shrink-0"
-        />
-      </div>
-    </Card>
+    </>
   );
 }
