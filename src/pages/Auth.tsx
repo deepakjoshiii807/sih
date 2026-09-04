@@ -4,6 +4,7 @@ import AboutBento from "@/components/ui/about-bento";
 import { MagicText } from "@/components/ui/magic-text";
 import { AnimeNavBar } from "@/components/ui/anime-navbar";
 import DigiLockerPanel from "@/components/ui/digilocker-panel";
+import SkillGapPanel from "@/components/ui/skill-gap-panel";
 
 const navItems = [
   { name: "Home", url: "/", icon: Home },
@@ -29,6 +30,9 @@ export default function Auth() {
           />
         </div>
       </section>
+
+      {/* Skill Gap Visualizer */}
+      <SkillGapPanel />
 
       {/* DigiLocker Integration Panel */}
       <DigiLockerPanel />
