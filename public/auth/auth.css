@@ -5,37 +5,37 @@
 
 /* --- Design Tokens --- */
 :root {
-  --bg: #F7F6F0;
-  --bg-alt: #EDECE4;
-  --card: #FFFFFF;
-  --card-raised: #FFFDF8;
-  --forest: #244B35;
-  --forest-mid: #2D6144;
-  --forest-light: #E8F0E4;
-  --charcoal: #171A18;
-  --sage: #DCE6D0;
-  --sage-deep: #B8CBA8;
-  --lavender: #C8B5DE;
-  --lavender-light: #EDE5F5;
-  --yellow: #E8D36B;
-  --yellow-light: #FDF6D8;
-  --peach: #E8C7AE;
-  --peach-light: #FBF0E5;
-  --text: #171A18;
-  --text-2: #4A4E48;
-  --text-3: #7A7F77;
-  --text-inv: #F7F6F0;
-  --border: #E2E1D8;
-  --border-strong: #CECDBF;
-  --input-bg: #F2F1EA;
-  --input-focus: #E8E7DE;
-  --danger: #C0392B;
-  --danger-light: #FCEAE8;
-  --success: #244B35;
-  --shadow-xs: 0 1px 2px rgba(23,26,24,0.04);
-  --shadow-sm: 0 2px 8px rgba(23,26,24,0.06);
-  --shadow-md: 0 4px 20px rgba(23,26,24,0.08);
-  --shadow-lg: 0 8px 40px rgba(23,26,24,0.1);
+  --bg: #0D1117;
+  --bg-alt: #151A20;
+  --card: #161B22;
+  --card-raised: #1C2129;
+  --forest: #3DAF6A;
+  --forest-mid: #2E8B54;
+  --forest-light: rgba(61,175,106,0.1);
+  --charcoal: #E6E1D9;
+  --sage: #2D4A3A;
+  --sage-deep: #3A6350;
+  --lavender: #B08ADA;
+  --lavender-light: rgba(176,138,218,0.1);
+  --yellow: #E8C84A;
+  --yellow-light: rgba(232,200,74,0.08);
+  --peach: #D4896A;
+  --peach-light: rgba(212,137,106,0.08);
+  --text: #E6E1D9;
+  --text-2: #9CA3AD;
+  --text-3: #6B7280;
+  --text-inv: #0D1117;
+  --border: #252A30;
+  --border-strong: #353B42;
+  --input-bg: #1C2129;
+  --input-focus: #252A30;
+  --danger: #E05545;
+  --danger-light: rgba(224,85,69,0.08);
+  --success: #3DAF6A;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
   --r-sm: 8px;
   --r-md: 12px;
   --r-lg: 16px;
@@ -65,13 +65,13 @@ img{display:block;max-width:100%}
 .auth-page{display:flex;flex-direction:column;min-height:100vh}
 
 /* Top Nav */
-.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 24px;background:rgba(247,246,240,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 24px;background:rgba(13,17,23,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 .nav-brand{font-family:var(--font-d);font-weight:700;font-size:1.1rem;color:var(--forest);letter-spacing:-0.02em}
 .nav-links{display:flex;gap:24px}
 .nav-links a{font-size:0.82rem;color:var(--text-2);font-weight:500;transition:color var(--transition)}
 .nav-links a:hover{color:var(--forest)}
-.nav-home{font-size:0.8rem;color:var(--text-3);font-weight:500;display:flex;align-items:center;gap:4px;transition:color var(--transition)}
-.nav-home:hover{color:var(--forest)}
+.nav-home{font-size:0.8rem;color:var(--text-3);font-weight:500;display:flex;align-items:center;gap:4px;transition:color var(--transition);border:1px solid var(--border);border-radius:100px;padding:6px 14px}
+.nav-home:hover{color:var(--forest);border-color:var(--forest)}
 
 /* ==========================================================
    BENTO GRID
@@ -118,7 +118,7 @@ img{display:block;max-width:100%}
 .bento-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
 
 /* --- Brand Panel --- */
-.bento-brand{padding:28px 28px 24px;display:flex;flex-direction:column;gap:16px;background:linear-gradient(168deg,var(--card) 0%,var(--forest-light) 100%)}
+.bento-brand{padding:28px 28px 24px;display:flex;flex-direction:column;gap:16px;background:linear-gradient(168deg,var(--card) 0%,rgba(61,175,106,0.06) 100%)}
 .bento-brand:hover{box-shadow:var(--shadow-md)}
 
 .brand-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
@@ -157,7 +157,10 @@ img{display:block;max-width:100%}
 .stat-icon.peach svg{stroke:#B87A52}
 
 /* Pixel decoration dots on stat cards */
-.stat-card::after{content:'';position:absolute;bottom:14px;right:14px;width:12px;height:12px;background-image:radial-gradient(circle,var(--border-strong) 1.5px,transparent 1.5px);background-size:6px 6px;opacity:0.6}
+.stat-card::after{content:'';position:absolute;bottom:14px;right:14px;width:12px;height:12px;background-image:radial-gradient(circle,var(--border-strong) 1.5px,transparent 1.5px);background-size:6px 6px;opacity:0.4}
+.stat-card.warm{background:linear-gradient(145deg,var(--card) 40%,rgba(212,137,106,0.06) 100%)}
+.stat-card.warm .stat-icon{background:rgba(212,137,106,0.12)}
+.stat-card.warm .stat-icon svg{stroke:var(--peach)}
 
 /* --- Match Card --- */
 .match-card{display:flex;flex-direction:column;gap:10px;padding:22px}
