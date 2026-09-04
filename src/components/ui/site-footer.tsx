@@ -10,7 +10,7 @@ export default function SiteFooter() {
         }
       `}</style>
 
-      <footer className="footer-poppins flex flex-col items-center justify-around w-full py-16 text-sm bg-slate-50 text-gray-800/70">
+      <footer className="footer-poppins flex flex-col items-center justify-around w-full py-16 text-sm bg-gradient-to-b from-[#0c1445] via-[#111d5e] to-[#0a0f3a] text-white">
         {/* L2L SVG Logo */}
         <svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           {/* Shield shape */}
@@ -35,30 +35,30 @@ export default function SiteFooter() {
           {/* Center dot */}
           <circle cx="15.5" cy="20" r="2" fill="#22C55E" />
           {/* L2L text */}
-          <text x="38" y="25" fill="#1a1a1a" fontSize="18" fontWeight="800" fontFamily="'Poppins', sans-serif" letterSpacing="-0.5">
+          <text x="38" y="25" fill="#E1E0CC" fontSize="18" fontWeight="800" fontFamily="'Poppins', sans-serif" letterSpacing="-0.5">
             L2L
           </text>
         </svg>
 
-        <p className="mt-4 text-center max-w-md">
+        <p className="mt-4 text-center max-w-md text-white/50">
           Discover courses, scholarships, internships and jobs tailored to your skills, goals and interests across India.
         </p>
 
         <div className="flex items-center gap-4 mt-6">
-          <a href="#" className="font-medium text-gray-800 hover:text-black transition-all">
+          <a href="#" className="font-medium text-white/60 hover:text-white transition-all">
             About
           </a>
-          <div className="h-4 w-px bg-black/20"></div>
-          <a href="#" className="font-medium text-gray-800 hover:text-black transition-all">
+          <div className="h-4 w-px bg-white/20"></div>
+          <a href="#" className="font-medium text-white/60 hover:text-white transition-all">
             Privacy Policy
           </a>
-          <div className="h-4 w-px bg-black/20"></div>
-          <a href="#" className="font-medium text-gray-800 hover:text-black transition-all">
+          <div className="h-4 w-px bg-white/20"></div>
+          <a href="#" className="font-medium text-white/60 hover:text-white transition-all">
             Terms of Service
           </a>
         </div>
 
-        <p className="mt-6 text-center text-gray-400 text-xs">
+        <p className="mt-6 text-center text-white/30 text-xs">
           Copyright © {new Date().getFullYear()} Lead2Learn. All rights reserved.
         </p>
       </footer>
