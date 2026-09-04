@@ -27,6 +27,7 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
   const [activeTab, setActiveTab] = useState<string>(defaultActive);
   const [clickedByUser, setClickedByUser] = useState(false);
   const [loginClicked, setLoginClicked] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -109,9 +110,10 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
                 onClick={() => {
                   if (item.isAction && item.highlight) {
                     setLoginClicked(true);
+                    setShowTransition(true);
                     setTimeout(() => {
                       navigate(item.url);
-                    }, 800);
+                    }, 600);
                   } else if (item.url.startsWith("#")) {
                     setClickedByUser(true);
                     const el = document.querySelector(item.url);
@@ -257,6 +259,34 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
           })}
         </motion.div>
       </div>
+      {/* Page transition overlay */}
+      <AnimatePresence>
+        {showTransition && (
+          <motion.div
+            className="fixed inset-0 z-[10000] pointer-events-none"
+            initial={{ clipPath: "circle(0% at 95% 3%)" }}
+            animate={{ clipPath: "circle(150% at 95% 3%)" }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
+          >
+            <div className="absolute inset-0 bg-[#0A0A0F]" />
+            {/* Centered L2L text */}
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <span
+                className="text-6xl font-extrabold tracking-tight"
+                style={{ color: "#E1E0CC", fontFamily: "'Syne', sans-serif" }}
+              >
+                L2L
+              </span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
