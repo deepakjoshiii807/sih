@@ -261,14 +261,32 @@ export default function AuthSwitch() {
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden" style={{ background: "linear-gradient(160deg, #e0f2fe 0%, #f0f9ff 25%, #ecfdf5 50%, #f0fdf4 75%, #e0f2fe 100%)" }}>
-      {/* Decorative blobs */}
-      <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full opacity-40" style={{ background: "radial-gradient(circle, #a5f3fc 0%, transparent 70%)" }} />
-      <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full opacity-30" style={{ background: "radial-gradient(circle, #bbf7d0 0%, transparent 70%)" }} />
-      <div className="absolute top-[40%] left-[50%] w-[400px] h-[400px] rounded-full opacity-20 -translate-x-1/2" style={{ background: "radial-gradient(circle, #c4b5fd 0%, transparent 70%)" }} />
+      {/* Animated background */}
+      <style>{`
+        @keyframes float1 { 0%, 100% { transform: translate(0, 0) scale(1); } 25% { transform: translate(80px, -60px) scale(1.1); } 50% { transform: translate(-40px, 40px) scale(0.95); } 75% { transform: translate(60px, 20px) scale(1.05); } }
+        @keyframes float2 { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(-100px, 50px) scale(1.15); } 66% { transform: translate(50px, -80px) scale(0.9); } }
+        @keyframes float3 { 0%, 100% { transform: translate(0, 0) scale(1); } 20% { transform: translate(60px, 80px) scale(1.08); } 50% { transform: translate(-80px, -30px) scale(0.92); } 80% { transform: translate(30px, -60px) scale(1.12); } }
+        @keyframes float4 { 0%, 100% { transform: translate(0, 0) scale(1); } 40% { transform: translate(-60px, -90px) scale(1.1); } 70% { transform: translate(90px, 40px) scale(0.95); } }
+        @keyframes float5 { 0%, 100% { transform: translate(0, 0) scale(1); } 30% { transform: translate(70px, 60px) scale(1.05); } 60% { transform: translate(-50px, -70px) scale(1.1); } }
+        @keyframes ring-spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+      `}</style>
 
-      {/* Subtle ring decoration */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-white/40 pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full border border-white/20 pointer-events-none" />
+      {/* Floating gradient blobs */}
+      <div className="absolute w-[500px] h-[500px] rounded-full opacity-40 blur-[80px]" style={{ top: "-5%", left: "10%", background: "radial-gradient(circle, #a5f3fc 0%, transparent 70%)", animation: "float1 18s ease-in-out infinite" }} />
+      <div className="absolute w-[450px] h-[450px] rounded-full opacity-35 blur-[70px]" style={{ top: "60%", right: "5%", background: "radial-gradient(circle, #bbf7d0 0%, transparent 70%)", animation: "float2 22s ease-in-out infinite" }} />
+      <div className="absolute w-[350px] h-[350px] rounded-full opacity-25 blur-[60px]" style={{ top: "30%", left: "55%", background: "radial-gradient(circle, #c4b5fd 0%, transparent 70%)", animation: "float3 20s ease-in-out infinite" }} />
+      <div className="absolute w-[300px] h-[300px] rounded-full opacity-20 blur-[50px]" style={{ bottom: "10%", left: "20%", background: "radial-gradient(circle, #fde68a 0%, transparent 70%)", animation: "float4 25s ease-in-out infinite" }} />
+      <div className="absolute w-[250px] h-[250px] rounded-full opacity-15 blur-[40px]" style={{ top: "15%", right: "25%", background: "radial-gradient(circle, #fbcfe8 0%, transparent 70%)", animation: "float5 16s ease-in-out infinite" }} />
+
+      {/* Slow-spinning rings */}
+      <div className="absolute top-1/2 left-1/2 w-[700px] h-[700px] rounded-full border border-white/30 pointer-events-none" style={{ animation: "ring-spin 60s linear infinite" }} />
+      <div className="absolute top-1/2 left-1/2 w-[900px] h-[900px] rounded-full border border-white/15 pointer-events-none" style={{ animation: "ring-spin 90s linear infinite reverse" }} />
+
+      {/* Back to Home */}
+      <a href="/" className="absolute top-5 right-6 lg:top-7 lg:right-10 z-20 flex items-center gap-1.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 bg-white/50 backdrop-blur-sm border border-gray-200/60 rounded-full px-4 py-2 transition-all hover:bg-white/70 hover:shadow-sm">
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5" /><polyline points="12 19 5 12 12 5" /></svg>
+        Back to Home
+      </a>
 
       {/* Brand */}
       <div className="relative z-10 flex items-center gap-2.5 px-6 lg:px-10 pt-6 lg:pt-8">
