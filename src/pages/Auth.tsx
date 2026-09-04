@@ -1,4 +1,4 @@
-import { Home, Compass, GraduationCap, Briefcase } from "lucide-react";
+import { Home, Compass, GraduationCap, Briefcase, LogIn } from "lucide-react";
 import { PrismaHero } from "@/components/ui/prisma-hero";
 import AboutBento from "@/components/ui/about-bento";
 import { MagicText } from "@/components/ui/magic-text";
@@ -9,6 +9,7 @@ const navItems = [
   { name: "About", url: "/", icon: Compass },
   { name: "Scholarships", url: "/", icon: GraduationCap },
   { name: "Internships", url: "/", icon: Briefcase },
+  { name: "Login", url: "/login", icon: LogIn, isAction: true, highlight: true },
 ];
 
 export default function Auth() {
