@@ -1,7 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useRef } from "react";
-import { useNavigate } from "react-router";
+
 
 /* ---------------- WordsPullUp ---------------- */
 interface WordsPullUpProps {
@@ -42,8 +42,6 @@ export const WordsPullUp = ({ text, className = "", showAsterisk = false, style 
 
 /* ---------------- Hero ---------------- */
 const PrismaHero = () => {
-  const navigate = useNavigate();
-
   return (
     <section className="h-screen w-full relative">
       <div className="relative h-full w-full overflow-hidden rounded-2xl md:rounded-[2rem]">
@@ -94,7 +92,7 @@ const PrismaHero = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                onClick={() => navigate("/login")}
+
                 className="group inline-flex items-center gap-2 self-start rounded-full py-1 pl-5 pr-1 text-sm transition-all hover:gap-3 sm:text-base"
                 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600, backgroundColor: "#E1E0CC", color: "#0A0A0F" }}
               >
