@@ -59,8 +59,8 @@ const PrismaHero = () => {
         {/* Noise overlay */}
         <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.7] mix-blend-overlay" />
 
-        {/* Gradient overlay — stronger bottom to blend into bento */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+        {/* Gradient overlay — stronger bottom to blend into gradient tail */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
 
 
         {/* Hero content */}
