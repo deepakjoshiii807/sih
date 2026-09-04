@@ -6,6 +6,7 @@ import { AnimeNavBar } from "@/components/ui/anime-navbar";
 import DigiLockerPanel from "@/components/ui/digilocker-panel";
 import SkillGapPanel from "@/components/ui/skill-gap-panel";
 import FeatureSections from "@/components/ui/feature-sections";
+import SiteFooter from "@/components/ui/site-footer";
 
 const navItems = [
   { name: "Home", url: "/", icon: Home },
@@ -40,6 +41,9 @@ export default function Auth() {
 
       {/* Feature Sections */}
       <FeatureSections />
+
+      {/* Footer */}
+      <SiteFooter />
     </div>
   );
 }
