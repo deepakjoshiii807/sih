@@ -52,11 +52,11 @@ export const TextHoverEffect = ({
         >
           {hovered && (
             <>
-              <stop offset="0%" stopColor="#eab308" />
-              <stop offset="25%" stopColor="#ef4444" />
-              <stop offset="50%" stopColor="#80eeb4" />
-              <stop offset="75%" stopColor="#06b6d4" />
-              <stop offset="100%" stopColor="#8b5cf6" />
+              <stop offset="0%" stopColor="#22C55E" />
+              <stop offset="25%" stopColor="#16a34a" />
+              <stop offset="50%" stopColor="#3B82F6" />
+              <stop offset="75%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#22C55E" />
             </>
           )}
         </linearGradient>
@@ -88,8 +88,8 @@ export const TextHoverEffect = ({
         textAnchor="middle"
         dominantBaseline="middle"
         strokeWidth="0.3"
-        className="fill-transparent stroke-neutral-200 font-[helvetica] text-7xl font-bold dark:stroke-neutral-800"
-        style={{ opacity: hovered ? 0.7 : 0 }}
+        className="fill-transparent stroke-slate-300 font-[helvetica] text-7xl font-bold"
+        style={{ opacity: hovered ? 0.5 : 0 }}
       >
         {text}
       </text>
@@ -99,7 +99,7 @@ export const TextHoverEffect = ({
         textAnchor="middle"
         dominantBaseline="middle"
         strokeWidth="0.3"
-        className="fill-transparent stroke-[#22C55E] font-[helvetica] text-7xl font-bold dark:stroke-[#22C55E99]"
+        className="fill-transparent stroke-emerald-500 font-[helvetica] text-7xl font-bold opacity-60"
         initial={{ strokeDashoffset: 1000, strokeDasharray: 1000 }}
         animate={{
           strokeDashoffset: 0,
@@ -131,10 +131,10 @@ export const TextHoverEffect = ({
 export const FooterBackgroundGradient = () => {
   return (
     <div
-      className="absolute inset-0 z-0"
+      className="absolute inset-0 z-0 pointer-events-none"
       style={{
         background:
-          "radial-gradient(125% 125% at 50% 10%, #0F0F1166 50%, #22C55E22 100%)",
+          "radial-gradient(125% 125% at 50% 10%, #f4f4f5 50%, #e4e4e7 100%)",
       }}
     />
   );
