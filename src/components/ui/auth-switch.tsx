@@ -171,7 +171,7 @@ export default function AuthSwitch() {
     </div>
   );
 
-  // ─── Role Cards (Bento Style) ───
+  // ─── Role Cards (Premium Bento) ───
   const RoleCards = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       {ROLES.map((r) => {
@@ -183,25 +183,57 @@ export default function AuthSwitch() {
             type="button"
             onClick={() => setRole(r.id)}
             className={cn(
-              "group relative flex items-start gap-3.5 p-4 rounded-2xl border-2 text-left transition-all duration-200",
-              sel ? "shadow-md scale-[1.01]" : "border-gray-100 hover:border-gray-200 hover:shadow-sm"
+              "group relative flex flex-col items-start gap-0 p-0 rounded-2xl border-2 text-left transition-all duration-300 overflow-hidden",
+              sel
+                ? "shadow-lg scale-[1.02]"
+                : "border-gray-100 hover:border-gray-200 hover:shadow-md hover:scale-[1.01]"
             )}
             style={{
               background: sel ? r.bg : "#ffffff",
-              borderColor: sel ? r.color + "40" : undefined,
+              borderColor: sel ? r.color + "50" : undefined,
             }}
           >
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all" style={{ background: r.iconBg }}>
-              <Icon className="w-5 h-5" style={{ color: r.color }} />
-            </div>
-            <div className="min-w-0 pt-0.5">
-              <span className="block text-[14px] font-semibold text-gray-900">{r.name}</span>
-              <span className="block text-[12px] text-gray-500 mt-0.5 leading-snug">{r.desc}</span>
-            </div>
-            {sel && (
-              <div className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: r.color }}>
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+            {/* Gradient accent strip */}
+            <div
+              className="h-1.5 w-full transition-all duration-300"
+              style={{
+                background: sel
+                  ? `linear-gradient(90deg, ${r.color}, ${r.color}80)`
+                  : `linear-gradient(90deg, ${r.color}20, ${r.color}08)`,
+              }}
+            />
+
+            <div className="p-4 flex items-start gap-3">
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300"
+                style={{
+                  background: sel
+                    ? `linear-gradient(135deg, ${r.color}25, ${r.color}10)`
+                    : r.iconBg,
+                  boxShadow: sel ? `0 4px 12px ${r.color}20` : undefined,
+                }}
+              >
+                <Icon className="w-5 h-5" style={{ color: r.color }} />
               </div>
+              <div className="min-w-0 pt-0.5">
+                <span className="block text-[14px] font-semibold text-gray-900">{r.name}</span>
+                <span className="block text-[12px] text-gray-500 mt-0.5 leading-snug">{r.desc}</span>
+              </div>
+            </div>
+
+            {/* Selected indicator */}
+            {sel && (
+              <div className="absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: r.color, boxShadow: `0 2px 8px ${r.color}40` }}>
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+              </div>
+            )}
+
+            {/* Hover glow effect */}
+            {!sel && (
+              <div
+                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ background: `linear-gradient(135deg, ${r.color}05, transparent)` }}
+              />
             )}
           </button>
         );
@@ -395,9 +427,16 @@ export default function AuthSwitch() {
             {/* ─── Signup: Role Selection ─── */}
             {mode === "signup" && step === "role" && (
               <>
-                <div className="text-center mb-6">
+                {/* Decorative header */}
+                <div className="text-center mb-6 relative">
+                  <div className="flex justify-center gap-1.5 mb-4">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <div className="w-2 h-2 rounded-full bg-blue-400" />
+                    <div className="w-2 h-2 rounded-full bg-violet-400" />
+                    <div className="w-2 h-2 rounded-full bg-amber-400" />
+                  </div>
                   <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">Create your account</h1>
-                  <p className="text-[14px] text-gray-500 mt-1.5">Select your role to get started</p>
+                  <p className="text-[14px] text-gray-500 mt-1.5">Pick your role — we'll customize the experience</p>
                 </div>
 
                 <div className="mb-5">
@@ -406,7 +445,11 @@ export default function AuthSwitch() {
                 </div>
 
                 <button onClick={() => role && setStep("details")} disabled={!role} className={cn("w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]", role ? "bg-gray-900 text-white hover:bg-gray-800" : "bg-gray-100 text-gray-400 cursor-not-allowed")}>
-                  Continue <ArrowRight className="w-4 h-4" />
+                  {role ? (
+                    <>Continue as {ROLES.find((r) => r.id === role)?.name} <ArrowRight className="w-4 h-4" /></>
+                  ) : (
+                    <>Select a role <ArrowRight className="w-4 h-4" /></>
+                  )}
                 </button>
 
                 <p className="text-center text-[13px] text-gray-500 mt-5">
