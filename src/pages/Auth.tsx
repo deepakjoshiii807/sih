@@ -21,6 +21,10 @@ export default function Auth() {
       <AnimeNavBar items={navItems} defaultActive="Home" />
 
       <PrismaHero />
+
+      {/* Blend: dark hero → light about-bento */}
+      <div className="h-16 sm:h-24 bg-gradient-to-b from-[#0A0A0F] to-[#f8fafc]" />
+
       <AboutBento />
 
       {/* Magic scroll text section */}
@@ -32,11 +36,20 @@ export default function Auth() {
         </div>
       </section>
 
+      {/* Blend: light about-bento / magic-text → dark skill-gap */}
+      <div className="h-16 sm:h-24 bg-gradient-to-b from-white via-slate-50 to-[#0A0A0F]" />
+
       {/* Skill Gap Visualizer */}
       <SkillGapPanel />
 
+      {/* Blend: dark skill-gap → light digilocker */}
+      <div className="h-16 sm:h-24 bg-gradient-to-b from-[#0A0A0F] to-white" />
+
       {/* DigiLocker Integration Panel */}
       <DigiLockerPanel />
+
+      {/* Blend: light digilocker → dark roles */}
+      <div className="h-12 sm:h-20 bg-gradient-to-b from-white to-[#0A0A0F]" />
 
       {/* Roles Panel */}
       <RolesPanel />
