@@ -172,74 +172,122 @@ export default function AuthSwitch() {
   );
 
   // ─── Role Cards (Premium Bento) ───
-  const RoleCards = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      {ROLES.map((r) => {
-        const sel = role === r.id;
-        const Icon = r.icon;
-        return (
-          <button
-            key={r.id}
-            type="button"
-            onClick={() => setRole(r.id)}
-            className={cn(
-              "group relative flex flex-col items-start gap-0 p-0 rounded-2xl border-2 text-left transition-all duration-300 overflow-hidden",
-              sel
-                ? "shadow-lg scale-[1.02]"
-                : "border-gray-100 hover:border-gray-200 hover:shadow-md hover:scale-[1.01]"
-            )}
-            style={{
-              background: sel ? r.bg : "#ffffff",
-              borderColor: sel ? r.color + "50" : undefined,
-            }}
-          >
-            {/* Gradient accent strip */}
-            <div
-              className="h-1.5 w-full transition-all duration-300"
-              style={{
-                background: sel
-                  ? `linear-gradient(90deg, ${r.color}, ${r.color}80)`
-                  : `linear-gradient(90deg, ${r.color}20, ${r.color}08)`,
-              }}
-            />
+  const RoleCards = () => {
+    const extras: Record<RoleType, { tag: string; color: string }[]> = {
+      student: [
+        { tag: "Scholarships", color: "#16a34a" },
+        { tag: "Internships", color: "#059669" },
+        { tag: "Courses", color: "#10b981" },
+      ],
+      industry: [
+        { tag: "Hire Talent", color: "#2563eb" },
+        { tag: "Post Jobs", color: "#3b82f6" },
+        { tag: "Assess Skills", color: "#60a5fa" },
+      ],
+      academician: [
+        { tag: "Mentor", color: "#7c3aed" },
+        { tag: "Publish", color: "#8b5cf6" },
+        { tag: "Research", color: "#a78bfa" },
+      ],
+      admin: [
+        { tag: "Analytics", color: "#d97706" },
+        { tag: "Insights", color: "#f59e0b" },
+        { tag: "Reports", color: "#fbbf24" },
+      ],
+    };
 
-            <div className="p-4 flex items-start gap-3">
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {ROLES.map((r) => {
+          const sel = role === r.id;
+          const Icon = r.icon;
+          const tags = extras[r.id];
+          return (
+            <button
+              key={r.id}
+              type="button"
+              onClick={() => setRole(r.id)}
+              className={cn(
+                "group relative flex flex-col rounded-2xl border-2 text-left transition-all duration-300 overflow-hidden",
+                sel
+                  ? "shadow-xl scale-[1.02] border-transparent"
+                  : "border-gray-100 hover:border-gray-200 hover:shadow-lg hover:scale-[1.01]"
+              )}
+              style={{ background: sel ? r.bg : "#ffffff" }}
+            >
+              {/* Colored header area */}
               <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300"
+                className="px-4 pt-4 pb-3 flex items-center gap-3 transition-all duration-300"
                 style={{
                   background: sel
-                    ? `linear-gradient(135deg, ${r.color}25, ${r.color}10)`
-                    : r.iconBg,
-                  boxShadow: sel ? `0 4px 12px ${r.color}20` : undefined,
+                    ? `linear-gradient(135deg, ${r.color}15, ${r.color}08)`
+                    : undefined,
                 }}
               >
-                <Icon className="w-5 h-5" style={{ color: r.color }} />
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300"
+                  style={{
+                    background: sel
+                      ? `linear-gradient(135deg, ${r.color}30, ${r.color}15)`
+                      : r.iconBg,
+                    boxShadow: sel ? `0 4px 16px ${r.color}25` : undefined,
+                  }}
+                >
+                  <Icon className="w-6 h-6" style={{ color: r.color }} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[15px] font-bold text-gray-900">{r.name}</span>
+                    {r.id === "student" && !sel && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Popular</span>
+                    )}
+                  </div>
+                  <span className="block text-[12px] text-gray-500 mt-0.5 leading-snug">{r.desc}</span>
+                </div>
+                {/* Selection check */}
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300"
+                  style={{
+                    background: sel ? r.color : "transparent",
+                    border: sel ? "none" : `2px solid ${r.color}30`,
+                    boxShadow: sel ? `0 2px 10px ${r.color}40` : undefined,
+                  }}
+                >
+                  {sel && (
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                  )}
+                </div>
               </div>
-              <div className="min-w-0 pt-0.5">
-                <span className="block text-[14px] font-semibold text-gray-900">{r.name}</span>
-                <span className="block text-[12px] text-gray-500 mt-0.5 leading-snug">{r.desc}</span>
-              </div>
-            </div>
 
-            {/* Selected indicator */}
-            {sel && (
-              <div className="absolute top-4 right-4 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: r.color, boxShadow: `0 2px 8px ${r.color}40` }}>
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+              {/* Tags row */}
+              <div className="px-4 pb-3.5 pt-1 flex flex-wrap gap-1.5">
+                {tags.map((t) => (
+                  <span
+                    key={t.tag}
+                    className="text-[10px] font-medium px-2 py-0.5 rounded-full transition-all duration-200"
+                    style={{
+                      background: sel ? t.color + "15" : "rgba(0,0,0,0.03)",
+                      color: sel ? t.color : "#6b7280",
+                    }}
+                  >
+                    {t.tag}
+                  </span>
+                ))}
               </div>
-            )}
 
-            {/* Hover glow effect */}
-            {!sel && (
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                style={{ background: `linear-gradient(135deg, ${r.color}05, transparent)` }}
-              />
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
+              {/* Hover glow */}
+              {!sel && (
+                <div
+                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                  style={{ background: `linear-gradient(135deg, ${r.color}06, transparent)` }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
 
   // ─── Role Fields ───
   const Fields = () => {
