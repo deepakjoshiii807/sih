@@ -53,6 +53,12 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
                 onClick={() => {
                   if (item.isAction) {
                     navigate(item.url);
+                  } else if (item.url.startsWith("#")) {
+                    const el = document.querySelector(item.url);
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth" });
+                    }
+                    setActiveTab(item.name);
                   } else {
                     setActiveTab(item.name);
                   }

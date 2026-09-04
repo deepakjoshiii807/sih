@@ -1,4 +1,4 @@
-import { Home, Compass, GraduationCap, Briefcase, LogIn } from "lucide-react";
+import { Home, Compass, BarChart3, Sparkles, LogIn } from "lucide-react";
 import { PrismaHero } from "@/components/ui/prisma-hero";
 import AboutBento from "@/components/ui/about-bento";
 import { MagicText } from "@/components/ui/magic-text";
@@ -9,10 +9,10 @@ import FeatureSections from "@/components/ui/feature-sections";
 import SiteFooter from "@/components/ui/site-footer";
 
 const navItems = [
-  { name: "Home", url: "/", icon: Home },
-  { name: "About", url: "/", icon: Compass },
-  { name: "Scholarships", url: "/", icon: GraduationCap },
-  { name: "Internships", url: "/", icon: Briefcase },
+  { name: "Home", url: "#hero", icon: Home },
+  { name: "About", url: "#about", icon: Compass },
+  { name: "Skills", url: "#skills", icon: BarChart3 },
+  { name: "Features", url: "#features", icon: Sparkles },
   { name: "Login", url: "/login", icon: LogIn, isAction: true, highlight: true },
 ];
 
@@ -21,8 +21,12 @@ export default function Auth() {
     <div className="min-h-screen">
       <AnimeNavBar items={navItems} defaultActive="Home" />
 
-      <PrismaHero />
-      <AboutBento />
+      <div id="hero">
+        <PrismaHero />
+      </div>
+      <div id="about">
+        <AboutBento />
+      </div>
 
       {/* Magic scroll text section */}
       <section className="bg-[#f0f0f2] hidden lg:block py-16 sm:py-32 px-4 sm:px-6">
@@ -34,13 +38,17 @@ export default function Auth() {
       </section>
 
       {/* Skill Gap Visualizer */}
-      <SkillGapPanel />
+      <div id="skills">
+        <SkillGapPanel />
+      </div>
 
       {/* DigiLocker Integration Panel */}
       <DigiLockerPanel />
 
       {/* Feature Sections */}
-      <FeatureSections />
+      <div id="features">
+        <FeatureSections />
+      </div>
 
       {/* Footer */}
       <SiteFooter />
