@@ -158,7 +158,7 @@ export default function StudentDashboard() {
         .link-more:hover { gap:10px; }
 
         /* Layout */
-        .app { display:flex; min-height:100vh; }
+        .db-layout { display:flex; min-height:100vh; }
         .db-sidebar { background:var(--forest-ink); color:var(--sage); }
         .nav-label { font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(220,230,208,.4); padding:0 10px; margin-bottom:8px; }
         .nav-btn { display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:10px; margin-bottom:2px; border-radius:10px; color:rgba(220,230,208,.75); font-size:14px; font-weight:500; transition:background .15s,color .15s; position:relative; }
@@ -169,20 +169,18 @@ export default function StudentDashboard() {
         .nav-btn.active .count { background:var(--forest); color:var(--sage); }
         .side-meta { display:flex; align-items:center; gap:7px; padding:8px 10px; border-radius:10px; color:rgba(220,230,208,.6); font-size:12px; font-weight:500; transition:background .15s,color .15s; width:100%; text-align:left; }
         .side-meta:hover { background:rgba(220,230,208,.08); color:#F7F6F0; }
-        .main { flex:1; min-width:0; display:flex; flex-direction:column; }
+        .db-main { flex:1; min-width:0; display:flex; flex-direction:column; }
 
         /* Topbar */
-        .topbar { position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:16px; padding:20px 28px; background:rgba(247,246,240,.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
-        .burger { display:none; width:40px; height:40px; border-radius:10px; border:1px solid var(--line); place-items:center; }
-        .burger:hover { background:var(--bg-soft); }
+        .db-topbar { position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:16px; padding:20px 28px; background:rgba(247,246,240,.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
         .h-title { font-family:var(--disp); font-weight:700; font-size:22px; letter-spacing:-.02em; }
         .h-title span { color:var(--forest); }
         .h-sub { font-size:13px; color:var(--muted); }
         .top-actions { margin-left:auto; display:flex; align-items:center; gap:10px; }
-        .search { display:flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:10px; padding:9px 12px; background:var(--card); width:210px; color:var(--faint); font-size:13px; }
-        .search:focus-within { border-color:var(--forest); box-shadow:0 0 0 3px rgba(36,75,53,.12); }
-        .search svg { width:16px; height:16px; flex:none; }
-        .search input { border:none; outline:none; background:none; flex:1; font-family:inherit; font-size:13px; color:var(--ink); }
+        .db-search { display:flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:10px; padding:9px 12px; background:var(--card); width:210px; color:var(--faint); font-size:13px; }
+        .db-search:focus-within { border-color:var(--forest); box-shadow:0 0 0 3px rgba(36,75,53,.12); }
+        .db-search svg { width:16px; height:16px; flex:none; }
+        .db-search input { border:none; outline:none; background:none; flex:1; font-family:inherit; font-size:13px; color:var(--ink); }
         .icon-btn { position:relative; width:40px; height:40px; border-radius:10px; border:1px solid var(--line); background:var(--card); display:grid; place-items:center; color:var(--ink); transition:transform .15s,background .15s; }
         .icon-btn:hover { background:var(--bg-soft); transform:translateY(-1px); }
         .icon-btn svg { width:18px; height:18px; }
@@ -211,8 +209,8 @@ export default function StudentDashboard() {
         .pdd-item.danger { color:#A0441E; }
 
         /* Content Bento */
-        .content { padding:26px 28px 60px; }
-        .grid { display:grid; gap:20px; grid-template-columns:repeat(3,1fr); grid-template-areas:"progress snapshot match""progress gaps journey""reco evidence portfolio""quick quick portfolio"; }
+        .db-content { padding:26px 28px 60px; }
+        .db-grid { display:grid; gap:20px; grid-template-columns:repeat(3,1fr); }
         .p-hero { grid-area:progress; } .p-snapshot { grid-area:snapshot; } .p-match { grid-area:match; }
         .p-gaps { grid-area:gaps; } .p-journey { grid-area:journey; } .p-reco { grid-area:reco; }
         .p-evidence { grid-area:evidence; } .p-portfolio { grid-area:portfolio; } .p-quick { grid-area:quick; }
@@ -399,8 +397,8 @@ export default function StudentDashboard() {
           .main { margin-left:0; }
         }
         @media (max-width:760px) {
-          .topbar { padding:16px; }
-          .search { display:none; }
+          .db-topbar { padding:16px; }
+          .db-search { display:none; }
           .h-title { font-size:19px; }
           .db-content { padding:18px 16px 60px; }
           .db-grid { grid-template-columns:1fr; gap:14px; }
@@ -421,7 +419,7 @@ export default function StudentDashboard() {
       `}</style>
 
       <div className="db-root">
-        <div className="app">
+        <div className="db-layout">
           {/* ─── SIDEBAR ─── */}
           <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
             <SidebarBody className="db-sidebar">

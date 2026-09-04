@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useState, createContext, useContext } from "react";
+import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
@@ -64,7 +64,6 @@ export const Sidebar = ({
   );
 };
 
-/** Renders DesktopSidebar + MobileSidebar side by side */
 export const SidebarBody = ({
   className,
   children,
@@ -74,12 +73,8 @@ export const SidebarBody = ({
 }) => {
   return (
     <>
-      <DesktopSidebar className={className}>
-        {children}
-      </DesktopSidebar>
-      <MobileSidebar className={className}>
-        {children}
-      </MobileSidebar>
+      <DesktopSidebar className={className}>{children}</DesktopSidebar>
+      <MobileSidebar className={className}>{children}</MobileSidebar>
     </>
   );
 };
@@ -87,13 +82,15 @@ export const SidebarBody = ({
 export const DesktopSidebar = ({
   className,
   children,
-  ...props
-}: React.ComponentProps<typeof motion.div>) => {
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) => {
   const { open, setOpen, animate } = useSidebar();
   return (
     <motion.div
       className={cn(
-        "h-full px-3 py-4 hidden md:flex md:flex-col flex-shrink-0 overflow-hidden",
+        "h-full px-4 py-4 hidden md:flex md:flex-col flex-shrink-0 overflow-hidden",
         className
       )}
       animate={{
@@ -110,14 +107,14 @@ export const DesktopSidebar = ({
 export const MobileSidebar = ({
   className,
   children,
-  style,
-  ...props
-}: React.ComponentProps<"div">) => {
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) => {
   const { open, setOpen } = useSidebar();
   return (
     <>
-      {/* Mobile hamburger trigger — only visible on small screens */}
-      <div className="md:hidden flex items-center justify-end p-3 w-full">
+      <div className="md:hidden flex items-center justify-end w-full">
         <button
           onClick={() => setOpen(true)}
           className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -126,12 +123,9 @@ export const MobileSidebar = ({
           <Menu size={18} style={{ color: "var(--ink)" }} />
         </button>
       </div>
-
-      {/* Full-screen slide-in drawer */}
       <AnimatePresence>
         {open && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -141,19 +135,16 @@ export const MobileSidebar = ({
               style={{ background: "rgba(23,26,24,.45)" }}
               onClick={() => setOpen(false)}
             />
-            {/* Drawer */}
             <motion.div
               initial={{ x: "-100%", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-100%", opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className={cn(
-                "md:hidden fixed inset-y-0 left-0 z-[100] flex flex-col p-4 overflow-y-auto",
+                "md:hidden fixed inset-y-0 left-0 z-[100] flex flex-col p-4 overflow-y-auto w-[280px]",
                 className
               )}
-              style={{ width: "280px", ...style }}
             >
-              {/* Close button */}
               <div className="flex justify-end mb-2">
                 <button
                   onClick={() => setOpen(false)}
