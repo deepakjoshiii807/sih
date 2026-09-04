@@ -2,6 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import type { StudentDashboard } from "@/lib/student-api";
 import { studentApi } from "@/lib/student-api";
+import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import {
+  Home, User, Shield, Target, GitCompare, Briefcase,
+  FileText, Star, LayoutGrid, Settings, LogOut,
+  Bell, Search, Upload, ChevronRight, BookOpen,
+} from "lucide-react";
+
 const fetchDashboard = () => studentApi.getDashboard();
 
 /* ──────────────── helpers ──────────────── */
@@ -47,24 +56,16 @@ const IC = {
   bell: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>,
 };
 
-const navItems = [
-  { id: "Overview", label: "Overview", icon: "home" as const },
-  { id: "Profile", label: "My Profile", icon: "user" as const },
-  { id: "Evidence", label: "Evidence Vault", icon: "vault" as const, count: 12 },
-  { id: "Skills", label: "Skills", icon: "target" as const },
-  { id: "Skill Gap", label: "Skill Gap", icon: "gap" as const },
-  { id: "Opportunities", label: "Opportunities", icon: "brief" as const, count: 3 },
-  { id: "Applications", label: "Applications", icon: "doc" as const },
-  { id: "Recommendations", label: "Recommendations", icon: "star" as const },
-  { id: "Portfolio", label: "Portfolio", icon: "grid" as const },
-];
-
-const bottomNav = [
-  { id: "Overview", icon: "home" as const },
-  { id: "Skills", icon: "target" as const },
-  { id: "Opportunities", icon: "brief" as const },
-  { id: "Applications", icon: "doc" as const },
-  { id: "Profile", icon: "user" as const },
+const NAV_ITEMS = [
+  { id: "Overview", label: "Overview", icon: <Home className="h-5 w-5 flex-shrink-0" /> },
+  { id: "Profile", label: "My Profile", icon: <User className="h-5 w-5 flex-shrink-0" /> },
+  { id: "Evidence", label: "Evidence Vault", icon: <Shield className="h-5 w-5 flex-shrink-0" />, count: 12 },
+  { id: "Skills", label: "Skills", icon: <Target className="h-5 w-5 flex-shrink-0" /> },
+  { id: "Skill Gap", label: "Skill Gap", icon: <GitCompare className="h-5 w-5 flex-shrink-0" /> },
+  { id: "Opportunities", label: "Opportunities", icon: <Briefcase className="h-5 w-5 flex-shrink-0" />, count: 3 },
+  { id: "Applications", label: "Applications", icon: <FileText className="h-5 w-5 flex-shrink-0" /> },
+  { id: "Recommendations", label: "Recommendations", icon: <Star className="h-5 w-5 flex-shrink-0" /> },
+  { id: "Portfolio", label: "Portfolio", icon: <LayoutGrid className="h-5 w-5 flex-shrink-0" /> },
 ];
 
 /* ──────────────── main component ──────────────── */
@@ -75,8 +76,6 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeNav, setActiveNav] = useState("Overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
-  const [profOpen, setProfOpen] = useState(false);
   const [toast, setToast] = useState("");
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -87,15 +86,7 @@ export default function StudentDashboard() {
     });
   }, []);
 
-  // Close dropdowns on outside click
-  useEffect(() => {
-    const handler = () => {
-      setNotifOpen(false);
-      setProfOpen(false);
-    };
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
-  }, []);
+
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -106,8 +97,6 @@ export default function StudentDashboard() {
   const handleNav = (id: string) => {
     setActiveNav(id);
     setSidebarOpen(false);
-    setNotifOpen(false);
-    setProfOpen(false);
     showToast(id === "Overview" ? "Back to your overview" : `"${id}" — module preview (prototype)`);
   };
 
@@ -458,70 +447,69 @@ export default function StudentDashboard() {
       <div className="db-root">
         <div className="app">
           {/* ─── SIDEBAR ─── */}
-          <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-            <div className="brand">
-              <div className="brand-mark">SB</div>
-              <div className="brand-name">
-                Lead<em>2</em>Learn
+          <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
+            <SidebarBody className="db-sidebar" style={{ background: 'var(--forest-ink)' }}>
+              <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+                {sidebarOpen ? (
+                  <div className="flex items-center gap-2.5 py-1 relative z-20 mb-4">
+                    <div className="h-8 w-8 rounded-xl flex items-center justify-center text-white font-bold text-sm" style={{ background: 'var(--sage)', color: 'var(--forest-ink)' }}>SB</div>
+                    <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="font-semibold text-sm whitespace-pre" style={{ color: '#F7F6F0' }}>Lead2Learn</motion.span>
+                  </div>
+                ) : (
+                  <div className="h-8 w-8 rounded-xl flex items-center justify-center text-white font-bold text-sm relative z-20 mb-4" style={{ background: 'var(--sage)', color: 'var(--forest-ink)' }}>SB</div>
+                )}
+                <div className="nav-label">Workspace</div>
+                <div className="flex flex-col gap-0.5">
+                  {NAV_ITEMS.map((item) => (
+                    <button
+                      key={item.id}
+                      className={`nav-btn ${activeNav === item.id ? 'active' : ''}`}
+                      onClick={() => handleNav(item.id)}
+                    >
+                      {item.icon}
+                      {item.count !== undefined && <span className="count">{item.count}</span>}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-            <nav className="nav">
-              <div className="nav-label">Workspace</div>
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  className={`nav-item ${activeNav === item.id ? "active" : ""}`}
-                  onClick={() => handleNav(item.id)}
-                >
-                  <span className="ic">{IC[item.icon]}</span>
-                  {item.label}
-                  {item.count !== undefined && (
-                    <span className="count">{item.count}</span>
-                  )}
+              <div className="flex flex-col gap-1">
+                <button className="side-meta">
+                  <Settings className="w-4 h-4" /> Settings
                 </button>
-              ))}
-            </nav>
-            <div className="sidebar-foot">
-              <button className="side-meta">
-                <span className="ic">{IC.gear}</span>Settings
-              </button>
-              <button className="side-meta" onClick={() => navigate("/")}>
-                <span className="ic">{IC.out}</span>Logout
-              </button>
-              <div className="mini-card">
-                <div className="mini-top">
-                  <div className="avatar">{student.initials}</div>
-                  <div>
-                    <div className="mini-name">{student.name}</div>
-                    <div className="mini-role">
-                      {student.course} · {student.year}
+                <button className="side-meta" onClick={() => navigate('/') }>
+                  <LogOut className="w-4 h-4" /> Logout
+                </button>
+                <div className="mt-2" style={{ padding: '12px', borderRadius: '12px', background: 'rgba(220,230,208,.07)', border: '1px solid rgba(220,230,208,.1)' }}>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0" style={{ background: 'var(--yellow)', color: 'var(--forest-ink)' }}>{student.initials}</div>
+                    <div className="min-w-0">
+                      <div className="font-semibold text-sm truncate" style={{ color: '#F7F6F0' }}>{student.name}</div>
+                      <div className="text-xs" style={{ color: 'rgba(220,230,208,.55)', fontFamily: 'var(--mono)' }}>{student.course} · {student.year}</div>
+                    </div>
+                  </div>
+                  <div className="mt-2.5">
+                    <div className="flex justify-between text-xs mb-1" style={{ color: 'rgba(220,230,208,.6)', fontFamily: 'var(--mono)' }}>
+                      <span>Profile</span><span>{stats.profileCompletion}%</span>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(220,230,208,.14)' }}>
+                      <div className="h-full rounded-full" style={{ width: `${stats.profileCompletion}%`, background: 'var(--yellow)' }} />
                     </div>
                   </div>
                 </div>
-                <div className="mini-pct">
-                  <span>Profile</span>
-                  <span>{stats.profileCompletion}% complete</span>
-                </div>
-                <div className="mini-bar">
-                  <div className="mini-fill" style={{ width: `${stats.profileCompletion}%` }} />
-                </div>
               </div>
-            </div>
-          </aside>
-
-          {/* ─── BACKDROP ─── */}
-          <div
-            className={`backdrop ${sidebarOpen ? "show" : ""}`}
-            onClick={() => setSidebarOpen(false)}
-          />
+            </SidebarBody>
+          </Sidebar>          {/* ─── BACKDROP ─── */}
+          {sidebarOpen && (
+            <div
+              className="fixed inset-0 z-[55] bg-black/40"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
 
           {/* ─── MAIN ─── */}
           <div className="main">
             {/* Topbar */}
             <header className="topbar">
-              <button className="burger" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                {IC.menu}
-              </button>
               <div>
                 <div className="h-title">
                   {greeting()}, <span>{student.name.split(" ")[0]}</span>.
@@ -532,78 +520,14 @@ export default function StudentDashboard() {
               </div>
               <div className="top-actions">
                 <div className="search">
-                  {IC.search}
+                  <Search size={16} />
                   <input type="text" placeholder="Search skills, opportunities…" />
                 </div>
-                <div className="dd-wrap" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    className="icon-btn"
-                    onClick={() => { setNotifOpen(!notifOpen); setProfOpen(false); }}
-                  >
-                    {IC.bell}
-                    <span className="dot" />
-                  </button>
-                  <div className={`dd ${notifOpen ? "open" : ""}`}>
-                    <div className="dd-head">
-                      <strong>Notifications</strong>
-                      <span>3 new</span>
-                    </div>
-                    <div className="dd-item">
-                      <span className="dd-ic" style={{ background: "var(--sage)" }}>✓</span>
-                      <div>
-                        <div className="dd-t">Evidence verified</div>
-                        <div className="dd-d">Python Certificate approved</div>
-                      </div>
-                      <span className="dot dot-green" />
-                    </div>
-                    <div className="dd-item">
-                      <span className="dd-ic" style={{ background: "var(--peach)" }}>★</span>
-                      <div>
-                        <div className="dd-t">New match · {bestMatch.match}%</div>
-                        <div className="dd-d">{bestMatch.title}</div>
-                      </div>
-                      <span className="dot dot-yellow" />
-                    </div>
-                    <div className="dd-item">
-                      <span className="dd-ic" style={{ background: "var(--lavender)" }}>▤</span>
-                      <div>
-                        <div className="dd-t">Course recommended</div>
-                        <div className="dd-d">For Statistical Analysis</div>
-                      </div>
-                      <span className="dot dot-peach" />
-                    </div>
-                  </div>
-                </div>
-                <div className="dd-wrap" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    className="avatar-hd"
-                    onClick={() => { setProfOpen(!profOpen); setNotifOpen(false); }}
-                  >
-                    {student.initials}
-                  </button>
-                  <div className={`dd profile-dd ${profOpen ? "open" : ""}`}>
-                    <div className="pdd-top">
-                      <div className="avatar">{student.initials}</div>
-                      <div>
-                        <div style={{ fontFamily: "var(--disp)", fontWeight: 600, fontSize: 14 }}>
-                          {student.name}
-                        </div>
-                        <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--muted)" }}>
-                          {student.institution}
-                        </div>
-                      </div>
-                    </div>
-                    <button className="pdd-item" onClick={() => handleNav("Profile")}>
-                      My Profile
-                    </button>
-                    <button className="pdd-item" onClick={() => handleNav("Overview")}>
-                      Settings
-                    </button>
-                    <button className="pdd-item danger" onClick={() => navigate("/")}>
-                      Sign out
-                    </button>
-                  </div>
-                </div>
+                <button className="icon-btn">
+                  <Bell size={18} />
+                  <span className="dot" />
+                </button>
+                <div className="avatar-hd">{student.initials}</div>
               </div>
             </header>
 
@@ -962,21 +886,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* ─── BOTTOM NAV (mobile) ─── */}
-        <nav className="bottomnav">
-          {bottomNav.map((bn) => (
-            <a
-              key={bn.id}
-              href="#"
-              className={activeNav === bn.id ? "active" : ""}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNav(bn.id);
-              }}
-            >
-              {IC[bn.icon]}
-            </a>
-          ))}
-        </nav>
+
 
         {/* ─── TOAST ─── */}
         <div className={`toast ${toast ? "show" : ""}`}>
