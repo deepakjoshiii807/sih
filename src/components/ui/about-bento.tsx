@@ -15,19 +15,19 @@ export function AboutBento() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section className="bg-slate-50 py-16 px-6 min-h-screen" ref={ref}>
+    <section className="bg-slate-50 py-10 sm:py-16 px-4 sm:px-6 lg:min-h-screen" ref={ref}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-8 sm:mb-16"
           initial={{ y: 30, opacity: 0 }}
           animate={isInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <h2 className="text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+          <h2 className="text-3xl sm:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight">
             About Our Impact
           </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
             We've helped thousands of students and young professionals across
             India discover the right opportunities through intelligent
             matching and verified skill profiles.
@@ -35,7 +35,7 @@ export function AboutBento() {
         </motion.div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
 
           {/* Big card — Global Reach */}
           <motion.div
@@ -43,7 +43,7 @@ export function AboutBento() {
             variants={fadeUp}
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
-            className="md:col-span-2 md:row-span-2 bg-white rounded-xl p-12 flex flex-col justify-between border border-slate-200 relative overflow-hidden group"
+            className="col-span-2 md:col-span-2 md:row-span-2 bg-white rounded-xl p-6 sm:p-12 flex flex-col justify-between border border-slate-200 relative overflow-hidden group"
           >
             <svg
               width="377"
@@ -59,16 +59,12 @@ export function AboutBento() {
               <div className="inline-flex px-4 py-2 rounded-full bg-violet-600 text-white text-[10px] font-black uppercase tracking-widest">
                 Nationwide Reach
               </div>
-              <h3 className="text-5xl font-black text-gray-900 tracking-tighter leading-tight">
-                OPPORTUNITIES
-                <br />
-                WITHOUT
-                <br />
-                BOUNDARIES.
+              <h3 className="text-2xl sm:text-5xl font-black text-gray-900 tracking-tighter leading-tight">
+                OPPORTUNITIES<br className="hidden sm:block" /> WITHOUT<br className="hidden sm:block" /> BOUNDARIES.
               </h3>
             </div>
-            <div className="mt-12 relative z-10">
-              <p className="text-xl text-gray-500 leading-relaxed max-w-sm">
+            <div className="mt-6 sm:mt-12 relative z-10">
+              <p className="text-sm sm:text-xl text-gray-500 leading-relaxed max-w-sm">
                 We've helped 10,000+ students across India discover the right
                 courses, scholarships, internships and jobs through verified
                 skill matching.
@@ -82,13 +78,13 @@ export function AboutBento() {
             variants={fadeUp}
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
-            className="bg-emerald-500 rounded-xl p-10 text-white flex flex-col border-none justify-between"
+            className="bg-emerald-500 rounded-xl p-5 sm:p-10 text-white flex flex-col border-none justify-between"
           >
-            <span className="text-xs font-black uppercase tracking-widest opacity-80">
+            <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest opacity-80">
               Avg Skill Match
             </span>
             <div className="space-y-1">
-              <span className="text-6xl font-black tracking-tighter">92%</span>
+              <span className="text-4xl sm:text-6xl font-black tracking-tighter">92%</span>
               <div className="h-1.5 w-full bg-white/20 rounded-full">
                 <div className="h-full w-[92%] bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,0.8)]" />
               </div>
@@ -101,7 +97,7 @@ export function AboutBento() {
             variants={fadeUp}
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
-            className="bg-gray-900 rounded-xl p-10 text-white flex flex-col justify-center gap-4"
+            className="bg-gray-900 rounded-xl p-5 sm:p-10 text-white flex flex-col justify-center gap-3 sm:gap-4"
           >
             <div className="size-10 rounded-lg bg-violet-500 flex items-center justify-center">
               <div className="size-4 bg-white rounded-full" />
@@ -116,17 +112,17 @@ export function AboutBento() {
             variants={fadeUp}
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
-            className="md:col-span-2 rounded-xl p-6 border flex-row border-gray-100 flex items-center justify-between cursor-pointer bg-violet-600 transition-all duration-500 overflow-hidden"
+            className="col-span-2 md:col-span-2 rounded-xl p-4 sm:p-6 border flex-row border-gray-100 flex items-center justify-between cursor-pointer bg-violet-600 transition-all duration-500 overflow-hidden"
           >
             <div className="space-y-2 relative z-10 transition-colors text-white">
-              <h4 className="text-3xl font-black uppercase tracking-tighter">
+              <h4 className="text-lg sm:text-3xl font-black uppercase tracking-tighter">
                 Join the Community
               </h4>
-              <p className="text-white/70">
+              <p className="text-xs sm:text-base text-white/70">
                 Connect with 12,000+ like-minded students and professionals.
               </p>
             </div>
-            <div className="size-20 rounded-full flex items-center justify-center text-3xl bg-white text-violet-600 transition-all duration-500 relative z-10 shrink-0">
+            <div className="size-14 sm:size-20 rounded-full flex items-center justify-center text-2xl sm:text-3xl bg-white text-violet-600 transition-all duration-500 relative z-10 shrink-0">
               →
             </div>
           </motion.div>

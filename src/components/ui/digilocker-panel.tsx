@@ -5,7 +5,7 @@ import { Shield, Check, ArrowLeftRight, Lock, FileCheck, BadgeCheck } from "luci
 
 export default function DigiLockerPanel() {
   return (
-    <section className="bg-white pb-20 px-6">
+    <section className="bg-white pb-10 sm:pb-20 px-4 sm:px-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -20,18 +20,18 @@ export default function DigiLockerPanel() {
             border: "1px solid rgba(139, 92, 246, 0.12)",
           }}
         >
-          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 p-6 sm:p-10 lg:p-14">
+          <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 lg:gap-12 p-5 sm:p-10 lg:p-14">
             {/* Left — Visual */}
-            <div className="flex-1 flex items-center justify-center gap-6 sm:gap-8 min-w-0">
+            <div className="flex-1 flex items-center justify-center gap-4 sm:gap-6 lg:gap-8 min-w-0">
               {/* Shield */}
               <motion.div
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 className="shrink-0"
               >
-                <div className="w-20 h-24 sm:w-24 sm:h-28 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200">
-                  <Shield className="w-10 h-10 sm:w-12 sm:h-12 text-white" strokeWidth={1.8} />
-                  <Check className="absolute w-5 h-5 sm:w-6 sm:h-6 text-white mt-5 sm:mt-6" strokeWidth={3} />
+                <div className="w-16 h-20 sm:w-24 sm:h-28 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200">
+                  <Shield className="w-8 h-8 sm:w-12 sm:h-12 text-white" strokeWidth={1.8} />
+                  <Check className="absolute w-4 h-4 sm:w-6 sm:h-6 text-white mt-4 sm:mt-6" strokeWidth={3} />
                 </div>
               </motion.div>
 
@@ -49,7 +49,7 @@ export default function DigiLockerPanel() {
               <motion.div
                 animate={{ y: [0, 5, 0] }}
                 transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="shrink-0 bg-white rounded-2xl p-5 sm:p-6 shadow-md shadow-purple-100 border border-purple-100/50 min-w-[160px]"
+                className="shrink-0 bg-white rounded-2xl p-4 sm:p-6 shadow-md shadow-purple-100 border border-purple-100/50 min-w-[140px] sm:min-w-[160px]"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center">
@@ -73,15 +73,15 @@ export default function DigiLockerPanel() {
                 New
               </div>
 
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-3">
+              <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-2 sm:mb-3">
                 DigiLocker Integration
               </h2>
 
-              <p className="text-sm sm:text-base font-semibold text-gray-700 mb-2">
+              <p className="text-xs sm:text-base font-semibold text-gray-700 mb-2">
                 Secure. Verified. Digital.
               </p>
 
-              <p className="text-sm sm:text-[15px] text-gray-500 leading-relaxed mb-6 max-w-lg">
+              <p className="text-xs sm:text-[15px] text-gray-500 leading-relaxed mb-4 sm:mb-6 max-w-lg">
                 Lead2Learn integrates with DigiLocker to help students securely access and verify eligible digital documents with user consent, simplifying document management and verification during their career journey.
               </p>
 
