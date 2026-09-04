@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { Link } from "react-router";
 import { cn } from "@/lib/utils";
 import {
   Mail,
@@ -309,11 +310,11 @@ export default function AuthSwitch() {
       <div className="hidden sm:block absolute top-1/2 left-1/2 w-[1000px] h-[1000px] rounded-full border border-white/5 pointer-events-none" style={{ animation: "ring-orbit 120s linear infinite" }} />
 
       {/* Back to Home */}
-      <a href="/" className="absolute top-4 right-4 sm:top-5 sm:right-6 lg:top-7 lg:right-10 z-20 flex items-center gap-1.5 text-[12px] sm:text-[13px] font-medium text-gray-600 hover:text-gray-900 bg-white/50 backdrop-blur-sm border border-gray-200/60 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 transition-all hover:bg-white/70 hover:shadow-sm">
+      <Link to="/" className="absolute top-4 right-4 sm:top-5 sm:right-6 lg:top-7 lg:right-10 z-20 flex items-center gap-1.5 text-[12px] sm:text-[13px] font-medium text-gray-600 hover:text-gray-900 bg-white/50 backdrop-blur-sm border border-gray-200/60 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 transition-all hover:bg-white/70 hover:shadow-sm">
         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5" /><polyline points="12 19 5 12 12 5" /></svg>
         <span className="hidden sm:inline">Back to Home</span>
         <span className="sm:hidden">Home</span>
-      </a>
+      </Link>
 
       {/* Brand */}
       <div className="relative z-10 flex items-center gap-2.5 px-5 sm:px-6 lg:px-10 pt-5 sm:pt-6 lg:pt-8">
