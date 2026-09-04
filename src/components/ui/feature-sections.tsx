@@ -166,7 +166,7 @@ export default function FeatureSections() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="w-full py-16 px-4 sm:px-6" ref={ref}>
+    <section className="w-full py-8 sm:py-16 px-4 sm:px-6" ref={ref}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
         .feature-poppins * {
@@ -180,18 +180,18 @@ export default function FeatureSections() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center max-w-2xl mx-auto mb-12"
+          className="text-center max-w-2xl mx-auto mb-6 sm:mb-12"
         >
-          <h1 className="text-3xl font-semibold text-[#E1E0CC]">
+          <h1 className="text-xl sm:text-3xl font-semibold text-[#E1E0CC]">
             Powerful Features
           </h1>
-          <p className="text-sm text-white/40 mt-2">
+          <p className="text-xs sm:text-sm text-white/40 mt-1 sm:mt-2">
             Everything you need to discover, track, and land the right opportunities — securely and efficiently.
           </p>
         </motion.div>
 
         {/* Feature cards */}
-        <div className="flex flex-wrap items-start justify-center gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           {FEATURES.map((feature, i) => {
             const Illustration = feature.illustration;
             return (
@@ -200,7 +200,7 @@ export default function FeatureSections() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.1 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                className="max-w-80 hover:-translate-y-0.5 transition duration-300"
+                className="hover:-translate-y-0.5 transition duration-300"
               >
                 <Illustration />
                 <h3 className="text-base font-semibold text-[#E1E0CC] mt-4">

@@ -20,9 +20,9 @@ export default function DigiLockerPanel() {
             border: "1px solid rgba(139, 92, 246, 0.12)",
           }}
         >
-          <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 lg:gap-12 p-5 sm:p-10 lg:p-14">
+          <div className="flex flex-col lg:flex-row items-center gap-4 sm:gap-8 lg:gap-12 p-4 sm:p-10 lg:p-14">
             {/* Left — Visual */}
-            <div className="flex-1 flex items-center justify-center gap-4 sm:gap-6 lg:gap-8 min-w-0">
+            <div className="hidden sm:flex flex-1 items-center justify-center gap-4 sm:gap-6 lg:gap-8 min-w-0">
               {/* Shield */}
               <motion.div
                 animate={{ y: [0, -6, 0] }}
@@ -73,15 +73,15 @@ export default function DigiLockerPanel() {
                 New
               </div>
 
-              <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-2 sm:mb-3">
+              <h2 className="text-lg sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-1 sm:mb-3">
                 DigiLocker Integration
               </h2>
 
-              <p className="text-xs sm:text-base font-semibold text-gray-700 mb-2">
+              <p className="text-[11px] sm:text-base font-semibold text-gray-700 mb-1 sm:mb-2">
                 Secure. Verified. Digital.
               </p>
 
-              <p className="text-xs sm:text-[15px] text-gray-500 leading-relaxed mb-4 sm:mb-6 max-w-lg">
+              <p className="text-[11px] sm:text-[15px] text-gray-500 leading-relaxed mb-3 sm:mb-6 max-w-lg">
                 Lead2Learn integrates with DigiLocker to help students securely access and verify eligible digital documents with user consent, simplifying document management and verification during their career journey.
               </p>
 
