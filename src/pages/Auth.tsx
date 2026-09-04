@@ -5,6 +5,7 @@ import { MagicText } from "@/components/ui/magic-text";
 import { AnimeNavBar } from "@/components/ui/anime-navbar";
 import DigiLockerPanel from "@/components/ui/digilocker-panel";
 import SkillGapPanel from "@/components/ui/skill-gap-panel";
+import RolesPanel from "@/components/ui/roles-panel";
 
 const navItems = [
   { name: "Home", url: "/", icon: Home },
@@ -36,6 +37,9 @@ export default function Auth() {
 
       {/* DigiLocker Integration Panel */}
       <DigiLockerPanel />
+
+      {/* Roles Panel */}
+      <RolesPanel />
     </div>
   );
 }
