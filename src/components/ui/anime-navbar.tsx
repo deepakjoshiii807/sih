@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +8,10 @@ interface NavItem {
   name: string;
   url: string;
   icon: LucideIcon;
+  /** When true, clicking navigates to `url` instead of just switching the active tab */
+  isAction?: boolean;
+  /** Renders the item as a highlighted pill (used for Sign Up) */
+  highlight?: boolean;
 }
 
 interface NavBarProps {
@@ -17,6 +21,7 @@ interface NavBarProps {
 }
 
 export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBarProps) {
+  const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>(defaultActive);
@@ -38,23 +43,29 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
         >
           {items.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.name;
+            const isActive = !item.isAction && activeTab === item.name;
             const isHovered = hoveredTab === item.name;
 
             return (
-              <Link
+              <button
                 key={item.name}
-                to={item.url}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab(item.name);
+                type="button"
+                onClick={() => {
+                  if (item.isAction) {
+                    navigate(item.url);
+                  } else {
+                    setActiveTab(item.name);
+                  }
                 }}
                 onMouseEnter={() => setHoveredTab(item.name)}
                 onMouseLeave={() => setHoveredTab(null)}
                 className={cn(
                   "relative cursor-pointer text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300",
-                  "text-white/70 hover:text-white",
-                  isActive && "text-white"
+                  item.highlight
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : item.isAction
+                      ? "text-white/70 hover:text-white"
+                      : cn("text-white/70 hover:text-white", isActive && "text-white")
                 )}
               >
                 {isActive && (
@@ -153,7 +164,7 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
                     </div>
                   </motion.div>
                 )}
-              </Link>
+              </button>
             );
           })}
         </motion.div>
