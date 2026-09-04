@@ -52,12 +52,7 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
                 type="button"
                 onClick={() => {
                   if (item.isAction) {
-                    // External/static paths: do a full navigation
-                    if (item.url.startsWith("/auth") || item.url.startsWith("http")) {
-                      window.location.href = item.url;
-                    } else {
-                      navigate(item.url);
-                    }
+                    navigate(item.url);
                   } else {
                     setActiveTab(item.name);
                   }
