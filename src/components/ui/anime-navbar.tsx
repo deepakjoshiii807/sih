@@ -46,7 +46,7 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
     const sectionIds = Object.keys(sectionMap);
 
     const observer = new IntersectionObserver(
-      (entries) => {
+      (entries: IntersectionObserverEntry[]) => {
         // Find the most visible entry
         let bestEntry: IntersectionObserverEntry | null = null;
         entries.forEach((entry) => {
