@@ -26,6 +26,7 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>(defaultActive);
   const [clickedByUser, setClickedByUser] = useState(false);
+  const [loginClicked, setLoginClicked] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -106,8 +107,11 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
                 key={item.name}
                 type="button"
                 onClick={() => {
-                  if (item.isAction) {
-                    navigate(item.url);
+                  if (item.isAction && item.highlight) {
+                    setLoginClicked(true);
+                    setTimeout(() => {
+                      navigate(item.url);
+                    }, 800);
                   } else if (item.url.startsWith("#")) {
                     setClickedByUser(true);
                     const el = document.querySelector(item.url);
@@ -176,6 +180,16 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
                   )}
                 </AnimatePresence>
 
+                {/* Login click ripple effect */}
+                {item.highlight && loginClicked && (
+                  <motion.div
+                    className="absolute inset-0 rounded-full -z-10"
+                    initial={{ scale: 1, opacity: 0.6 }}
+                    animate={{ scale: 2.5, opacity: 0 }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                  />
+                )}
+
                 {isActive && (
                   <motion.div
                     layoutId="anime-mascot"
@@ -187,9 +201,11 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
                       <motion.div
                         className="absolute w-10 h-10 bg-white rounded-full left-1/2 -translate-x-1/2"
                         animate={
-                          hoveredTab
-                            ? { scale: [1, 1.1, 1], rotate: [0, -5, 5, 0], transition: { duration: 0.5, ease: "easeInOut" } }
-                            : { y: [0, -3, 0], transition: { duration: 2, repeat: Infinity, ease: "easeInOut" } }
+                          loginClicked
+                            ? { scale: [1, 1.4, 0.8, 1.2, 0], rotate: [0, -10, 10, -5, 0], y: [0, -20, 5, -15, -40], transition: { duration: 0.7, ease: "easeInOut" } }
+                            : hoveredTab
+                              ? { scale: [1, 1.1, 1], rotate: [0, -5, 5, 0], transition: { duration: 0.5, ease: "easeInOut" } }
+                              : { y: [0, -3, 0], transition: { duration: 2, repeat: Infinity, ease: "easeInOut" } }
                         }
                       >
                         <motion.div
@@ -210,17 +226,26 @@ export function AnimeNavBar({ items, className, defaultActive = "Home" }: NavBar
                           style={{ left: "30%", top: "60%" }}
                         />
                         <AnimatePresence>
-                          {hoveredTab && (
+                          {(hoveredTab || loginClicked) && (
                             <>
-                              <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0 }} className="absolute -top-1 -right-1 w-2 h-2 text-yellow-300">✨</motion.div>
-                              <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0 }} transition={{ delay: 0.1 }} className="absolute -top-2 left-0 w-2 h-2 text-yellow-300">✨</motion.div>
+                              <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: loginClicked ? 1.5 : 1, y: loginClicked ? -10 : 0 }} exit={{ opacity: 0, scale: 0 }} className="absolute -top-1 -right-1 w-2 h-2 text-yellow-300">✨</motion.div>
+                              <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: loginClicked ? 1.5 : 1, y: loginClicked ? -10 : 0 }} exit={{ opacity: 0, scale: 0 }} transition={{ delay: 0.1 }} className="absolute -top-2 left-0 w-2 h-2 text-yellow-300">✨</motion.div>
+                              {loginClicked && (
+                                <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1.5, y: -15 }} exit={{ opacity: 0 }} transition={{ delay: 0.15 }} className="absolute -top-3 right-1 w-2 h-2 text-yellow-300">✨</motion.div>
+                              )}
                             </>
                           )}
                         </AnimatePresence>
                       </motion.div>
                       <motion.div
                         className="absolute -bottom-1 left-1/2 w-4 h-4 -translate-x-1/2"
-                        animate={hoveredTab ? { y: [0, -4, 0], transition: { duration: 0.3, repeat: Infinity, repeatType: "reverse" as const } } : { y: [0, 2, 0], transition: { duration: 1, repeat: Infinity, ease: "easeInOut", delay: 0.5 } }}
+                        animate={
+                          loginClicked
+                            ? { y: [0, -30, -50], scale: [1, 1.2, 0], rotate: [0, 180, 360], opacity: [1, 1, 0], transition: { duration: 0.7, ease: "easeInOut" } }
+                            : hoveredTab
+                              ? { y: [0, -4, 0], transition: { duration: 0.3, repeat: Infinity, repeatType: "reverse" as const } }
+                              : { y: [0, 2, 0], transition: { duration: 1, repeat: Infinity, ease: "easeInOut", delay: 0.5 } }
+                        }
                       >
                         <div className="w-full h-full bg-white rotate-45 transform origin-center" />
                       </motion.div>
