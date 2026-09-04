@@ -159,33 +159,17 @@ export default function StudentDashboard() {
 
         /* Layout */
         .app { display:flex; min-height:100vh; }
-        .sidebar { position:fixed; inset:0 auto 0 0; width:264px; z-index:60; background:var(--forest-ink); color:var(--sage); display:flex; flex-direction:column; padding:22px 16px 18px; transform:translateX(0); transition:transform .3s cubic-bezier(.2,.7,.2,1); border-right:1px solid rgba(220,230,208,.08); }
-        .brand { display:flex; align-items:center; gap:11px; padding:2px 8px 20px; }
-        .brand-mark { width:36px; height:36px; border-radius:10px; background:var(--sage); color:var(--forest-ink); display:grid; place-items:center; font-family:var(--disp); font-weight:700; font-size:15px; box-shadow:inset 0 0 0 2px rgba(36,75,53,.25); }
-        .brand-name { font-family:var(--disp); font-weight:700; font-size:17px; color:#F7F6F0; letter-spacing:-.01em; }
-        .brand-name em { font-style:normal; color:var(--yellow); }
-        .nav { flex:1; overflow-y:auto; margin-top:6px; }
+        .db-sidebar { background:var(--forest-ink); color:var(--sage); }
         .nav-label { font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(220,230,208,.4); padding:0 10px; margin-bottom:8px; }
-        .nav-item { display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:10px; margin-bottom:2px; border-radius:10px; color:rgba(220,230,208,.75); font-size:14px; font-weight:500; transition:background .15s,color .15s; position:relative; }
-        .nav-item:hover { background:rgba(220,230,208,.08); color:#F7F6F0; }
-        .nav-item .ic { width:19px; height:19px; flex:none; opacity:.85; }
-        .nav-item.active { background:var(--sage); color:var(--forest-ink); font-weight:600; }
-        .nav-item.active::after { content:""; position:absolute; left:-16px; top:50%; transform:translateY(-50%); width:3px; height:22px; background:var(--yellow); border-radius:0 3px 3px 0; }
-        .nav-item .count { margin-left:auto; font-family:var(--mono); font-size:10px; background:rgba(220,230,208,.14); color:var(--sage); padding:2px 6px; border-radius:6px; }
-        .nav-item.active .count { background:var(--forest); color:var(--sage); }
-        .sidebar-foot { border-top:1px solid rgba(220,230,208,.12); padding-top:14px; margin-top:6px; }
-        .side-meta { display:flex; align-items:center; gap:7px; padding:8px 10px; border-radius:10px; color:rgba(220,230,208,.6); font-size:12px; font-weight:500; transition:background .15s,color .15s; }
+        .nav-btn { display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:10px; margin-bottom:2px; border-radius:10px; color:rgba(220,230,208,.75); font-size:14px; font-weight:500; transition:background .15s,color .15s; position:relative; }
+        .nav-btn:hover { background:rgba(220,230,208,.08); color:#F7F6F0; }
+        .nav-btn.active { background:var(--sage); color:var(--forest-ink); font-weight:600; }
+        .nav-btn.active::after { content:""; position:absolute; left:-12px; top:50%; transform:translateY(-50%); width:3px; height:22px; background:var(--yellow); border-radius:0 3px 3px 0; }
+        .nav-btn .count { margin-left:auto; font-family:var(--mono); font-size:10px; background:rgba(220,230,208,.14); color:var(--sage); padding:2px 6px; border-radius:6px; }
+        .nav-btn.active .count { background:var(--forest); color:var(--sage); }
+        .side-meta { display:flex; align-items:center; gap:7px; padding:8px 10px; border-radius:10px; color:rgba(220,230,208,.6); font-size:12px; font-weight:500; transition:background .15s,color .15s; width:100%; text-align:left; }
         .side-meta:hover { background:rgba(220,230,208,.08); color:#F7F6F0; }
-        .side-meta .ic { width:16px; height:16px; }
-        .mini-card { margin-top:10px; padding:12px; border-radius:12px; background:rgba(220,230,208,.07); border:1px solid rgba(220,230,208,.1); }
-        .mini-top { display:flex; align-items:center; gap:10px; }
-        .avatar { width:38px; height:38px; border-radius:11px; flex:none; background:var(--yellow); color:var(--forest-ink); display:grid; place-items:center; font-family:var(--disp); font-weight:700; font-size:13px; }
-        .mini-name { font-family:var(--disp); font-weight:600; font-size:13.5px; color:#F7F6F0; line-height:1.2; }
-        .mini-role { font-size:11px; color:rgba(220,230,208,.55); font-family:var(--mono); }
-        .mini-pct { margin-top:10px; font-family:var(--mono); font-size:10px; color:rgba(220,230,208,.6); display:flex; justify-content:space-between; margin-bottom:5px; }
-        .mini-bar { height:6px; border-radius:4px; background:rgba(220,230,208,.14); overflow:hidden; }
-        .mini-fill { height:100%; width:82%; border-radius:4px; background:var(--yellow); }
-        .main { flex:1; margin-left:264px; min-width:0; display:flex; flex-direction:column; }
+        .main { flex:1; min-width:0; display:flex; flex-direction:column; }
 
         /* Topbar */
         .topbar { position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:16px; padding:20px 28px; background:rgba(247,246,240,.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
@@ -412,18 +396,14 @@ export default function StudentDashboard() {
           .quick-grid { grid-template-columns:repeat(2,1fr); }
         }
         @media (max-width:1024px) {
-          .sidebar { transform:translateX(-100%); }
-          .sidebar.open { transform:translateX(0); box-shadow:30px 0 60px -30px rgba(23,26,24,.5); }
           .main { margin-left:0; }
-          .burger { display:grid; }
-          .backdrop.show { opacity:1; visibility:visible; }
         }
         @media (max-width:760px) {
           .topbar { padding:16px; }
           .search { display:none; }
           .h-title { font-size:19px; }
-          .content { padding:18px 16px 92px; }
-          .grid { grid-template-columns:1fr; grid-template-areas:"progress""snapshot""gaps""match""journey""reco""evidence""quick""portfolio"; gap:14px; }
+          .db-content { padding:18px 16px 60px; }
+          .db-grid { grid-template-columns:1fr; gap:14px; }
           .panel { padding:18px; border-radius:15px; }
           .hero-metrics { flex-direction:column; }
           .metric { display:flex; align-items:center; justify-content:space-between; }
@@ -437,10 +417,6 @@ export default function StudentDashboard() {
           .qa-t { font-size:12.5px; }
           .qa-d { display:none; }
           .qa-ic { width:30px; height:30px; }
-          .bottomnav { display:flex; position:fixed; left:0; right:0; bottom:0; z-index:50; background:rgba(247,246,240,.92); backdrop-filter:blur(10px); border-top:1px solid var(--line); padding:8px 6px calc(8px + env(safe-area-inset-bottom)); }
-          .bottomnav a { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:var(--mono); font-size:9px; letter-spacing:.02em; color:var(--faint); padding:5px 2px; border-radius:8px; }
-          .bottomnav a.active { color:var(--forest-ink); font-weight:700; background:var(--sage); }
-          .bottomnav a svg { width:19px; height:19px; }
         }
       `}</style>
 
@@ -448,7 +424,7 @@ export default function StudentDashboard() {
         <div className="app">
           {/* ─── SIDEBAR ─── */}
           <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
-            <SidebarBody className="db-sidebar" style={{ background: 'var(--forest-ink)' }}>
+            <SidebarBody className="db-sidebar">
               <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                 {sidebarOpen ? (
                   <div className="flex items-center gap-2.5 py-1 relative z-20 mb-4">
