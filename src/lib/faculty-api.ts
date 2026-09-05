@@ -1,36 +1,11 @@
 /**
- * SkillBridge — Faculty Dashboard data layer.
- *
- * The dashboard renders purely from this module. Everything is shaped like a
- * REST JSON response so that, when the FastAPI backend is ready, only the
- * implementation of each method below needs to change — the page components
- * stay untouched.
+ * Lead2Learn — Academician Dashboard data layer.
  *
  *   Frontend  →  REST API  →  Backend  →  PostgreSQL / ML / Document services
- *
- * Replace the body of each function with, for example:
- *
- *   export const facultyApi = {
- *     async getDashboard(): Promise<FacultyDashboard> {
- *       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/faculty/dashboard`);
- *       if (!res.ok) throw new Error(`Dashboard request failed (${res.status})`);
- *       return res.json();
- *     },
- *     async getStudents(): Promise<FacultyStudent[]> { ... },
- *     async reviewEvidence(id: string, action: "approve" | "flag"): Promise<void> { ... },
- *     async postOpportunity(data: PostOpportunityPayload): Promise<void> { ... },
- *     async shortlistApplication(id: string): Promise<void> { ... },
- *     async updateSettings(data: FacultySettingsPayload): Promise<void> { ... },
- *   };
- *
  * NOTE: all values below are SYNTHETIC demo data for the prototype.
  */
 
-/* ═══════════════════════════════════════════════════════
-   TypeScript Interfaces
-   ═══════════════════════════════════════════════════════ */
-
-export interface Faculty {
+export interface Academician {
   name: string;
   initials: string;
   title: string;
@@ -39,242 +14,255 @@ export interface Faculty {
   email: string;
   phone: string;
   bio: string;
+  subjects: string[];
+  researchInterests: string[];
+  experience: number;
   studentsCount: number;
-  pendingReviews: number;
-  opportunitiesPosted: number;
-  verifiedStudents: number;
+  verifiedCount: number;
 }
 
-export type StudentStatus = "active" | "pending" | "inactive";
-
-export interface FacultyStudent {
-  id: number;
+/* ─── Department Skill Intelligence ─── */
+export interface DepartmentSkill {
   name: string;
-  initials: string;
-  course: string;
-  year: string;
-  skills: number;
-  verified: number;
-  match: number;
-  status: StudentStatus;
-  lastActive: string;
+  taxonomyId: string;
+  industryDemand: "High" | "Medium" | "Low";
+  curriculumCoverage: number; // 0-100%
+  studentProficiency: number; // avg 0-100%
+  gapSeverity: "Critical" | "Moderate" | "Acceptable";
+  trend: "increasing" | "stable" | "declining";
+  studentsWithGap: number;
+  totalStudents: number;
 }
 
-export type EvidenceStatus = "pending" | "flagged" | "approved";
-
-export interface PendingEvidence {
-  id: number;
-  student: string;
-  initials: string;
-  name: string;
-  type: "Project" | "Certificate" | "Transcript" | "Portfolio" | "Document" | "Log";
-  submitted: string;
-  status: EvidenceStatus;
+/* ─── Industry Demand Trends ─── */
+export interface DemandTrend {
+  skill: string;
+  direction: "up" | "up-strong" | "stable" | "down";
+  demandLevel: "High" | "Medium" | "Low";
+  changePercent: number;
+  period: string;
 }
 
-export type OpportunityStatus = "active" | "closing" | "closed";
-
-export interface PostedOpportunity {
-  id: number;
+export interface IndustryRole {
   title: string;
-  org: string;
+  demandLevel: "High" | "Medium" | "Low";
+  openings: number;
+  avgMatch: number;
+  topSkills: string[];
+}
+
+/* ─── Curriculum Feedback ─── */
+export interface CurriculumReport {
+  id: string;
+  department: string;
+  generatedDate: string;
+  totalStudents: number;
+  avgReadiness: number;
+  readinessDistribution: { beginning: number; developing: number; jobReady: number };
+  topGaps: { skill: string; gapCount: number; severity: string }[];
+  coverageGaps: { skill: string; coverage: number; demand: string }[];
+  recommendations: string[];
+}
+
+/* ─── Student Verification ─── */
+export type VerificationType = "Internship" | "Project" | "Certificate" | "Outcome" | "Skill Evidence";
+export type VerificationStatus = "pending" | "approved" | "flagged" | "changes-requested";
+
+export interface VerificationRequest {
+  id: string;
+  studentName: string;
+  studentInitials: string;
+  title: string;
+  type: VerificationType;
+  submittedDate: string;
+  status: VerificationStatus;
+  skillsClaimed: string[];
+  description: string;
+  evidenceUrl?: string;
+}
+
+/* ─── Opportunities (FDP, Training, Consultancy, Research) ─── */
+export type OpportunityCategory = "FDP" | "Industrial Training" | "Consultancy" | "Research Collaboration";
+
+export interface AcademicanOpportunity {
+  id: string;
+  title: string;
+  category: OpportunityCategory;
+  organizer: string;
   location: string;
   duration: string;
-  applicants: number;
-  match: number;
-  status: OpportunityStatus;
+  deadline: string;
+  description: string;
+  skillsRelevant: string[];
+  status: "open" | "closing" | "closed";
+  interested: number;
 }
 
-export type ApplicationReviewStatus = "new" | "reviewed" | "shortlisted" | "rejected";
-
-export interface ApplicationToReview {
+/* ─── Curriculum Loop ─── */
+export interface CurriculumLoopStep {
   id: number;
-  student: string;
-  initials: string;
-  role: string;
-  org: string;
-  match: number;
-  applied: string;
-  status: ApplicationReviewStatus;
+  label: string;
+  description: string;
+  status: "completed" | "current" | "upcoming";
+  insight?: string;
 }
 
-export interface SkillDistribution {
-  name: string;
-  count: number;
-  pct: number;
-}
-
-export interface GapSeverity {
-  high: number;
-  medium: number;
-  low: number;
-}
-
-export interface FacultyAnalytics {
+/* ─── Analytics ─── */
+export interface DepartmentAnalytics {
+  totalStudents: number;
   avgSkills: number;
   avgMatch: number;
-  topSkill: string;
-  weakSkill: string;
-  skillDistribution: SkillDistribution[];
-  gapSeverity: GapSeverity;
+  avgReadiness: number;
+  readinessDistribution: { beginning: number; developing: number; jobReady: number };
+  skillDistribution: { name: string; count: number; pct: number }[];
+  monthlyTrend: { month: string; verified: number; placements: number }[];
+  departmentComparison: { dept: string; avgMatch: number; avgReadiness: number }[];
 }
 
-export interface FacultyRecommendation {
-  title: string;
-  type: "Course" | "Workshop" | "Learning path";
-  students: number;
-  gap: string;
-  provider: string;
-}
-
-export interface FacultySettingsPayload {
-  name: string;
-  email: string;
-  phone: string;
-  department: string;
-  institution: string;
-  bio: string;
-  autoApprove: boolean;
-  notifEmail: boolean;
-  notifApp: boolean;
-  notifNewApp: boolean;
-  notifWeekly: boolean;
-}
-
-export interface FacultyDashboard {
-  faculty: Faculty;
-  students: FacultyStudent[];
-  pendingEvidence: PendingEvidence[];
-  postedOpportunities: PostedOpportunity[];
-  applicationsToReview: ApplicationToReview[];
-  analytics: FacultyAnalytics;
-  recommendations: FacultyRecommendation[];
+/* ─── Dashboard Aggregate ─── */
+export interface AcademicianDashboard {
+  academician: Academician;
+  departmentSkills: DepartmentSkill[];
+  demandTrends: DemandTrend[];
+  industryRoles: IndustryRole[];
+  curriculumReport: CurriculumReport;
+  verifications: VerificationRequest[];
+  opportunities: AcademicanOpportunity[];
+  curriculumLoop: CurriculumLoopStep[];
+  analytics: DepartmentAnalytics;
 }
 
 /* ═══════════════════════════════════════════════════════
    Mock Data
    ═══════════════════════════════════════════════════════ */
 
-const mockFaculty: Faculty = {
-  name: "Dr. Priya Mehta",
-  initials: "PM",
+const mockAcademician: Academician = {
+  name: "Dr. Priya Mehta", initials: "PM",
   title: "Professor of Ayurveda & Research",
-  department: "Department of Ayurveda",
-  institution: "All India Institute of Ayurveda",
-  email: "priya.mehta@aiia.ac.in",
-  phone: "+91 98765 12345",
-  bio: "Professor with 12 years of experience in clinical research, AYUSH studies, and mentorship. Specializing in evidence-based Ayurvedic research methodologies.",
-  studentsCount: 24,
-  pendingReviews: 7,
-  opportunitiesPosted: 3,
-  verifiedStudents: 18,
+  department: "Department of Ayurveda", institution: "All India Institute of Ayurveda",
+  email: "priya.mehta@aiia.ac.in", phone: "+91 98765 12345",
+  bio: "Professor with 12 years of experience in clinical research, AYUSH studies, and curriculum development. Specializing in evidence-based Ayurvedic research and industry-academia collaboration.",
+  subjects: ["Clinical Research", "Pharmacology", "Research Methodology", "AYUSH Therapeutics"],
+  researchInterests: ["Herbal Pharmacovigilance", "Clinical Trial Design", "AYUSH Healthcare Delivery"],
+  experience: 12, studentsCount: 24, verifiedCount: 18,
 };
 
-const mockStudents: FacultyStudent[] = [
-  { id: 1, name: "Aarav Sharma", initials: "AS", course: "BAMS", year: "3rd Year", skills: 7, verified: 4, match: 92, status: "active", lastActive: "2 hours ago" },
-  { id: 2, name: "Neha Gupta", initials: "NG", course: "BAMS", year: "2nd Year", skills: 5, verified: 3, match: 78, status: "active", lastActive: "1 day ago" },
-  { id: 3, name: "Rohan Patel", initials: "RP", course: "BAMS", year: "4th Year", skills: 9, verified: 7, match: 88, status: "active", lastActive: "5 hours ago" },
-  { id: 4, name: "Ananya Reddy", initials: "AR", course: "BAMS", year: "3rd Year", skills: 6, verified: 5, match: 85, status: "pending", lastActive: "3 days ago" },
-  { id: 5, name: "Vikram Singh", initials: "VS", course: "BAMS", year: "2nd Year", skills: 4, verified: 2, match: 65, status: "active", lastActive: "12 hours ago" },
-  { id: 6, name: "Meera Joshi", initials: "MJ", course: "BAMS", year: "Final Year", skills: 11, verified: 9, match: 95, status: "active", lastActive: "30 min ago" },
+const mockDepartmentSkills: DepartmentSkill[] = [
+  { name: "Clinical Research", taxonomyId: "TC-CR-03", industryDemand: "High", curriculumCoverage: 32, studentProficiency: 45, gapSeverity: "Critical", trend: "increasing", studentsWithGap: 18, totalStudents: 24 },
+  { name: "Statistical Analysis", taxonomyId: "TC-SA-01", industryDemand: "High", curriculumCoverage: 18, studentProficiency: 35, gapSeverity: "Critical", trend: "increasing", studentsWithGap: 20, totalStudents: 24 },
+  { name: "Pharmacovigilance", taxonomyId: "TC-PV-02", industryDemand: "Medium", curriculumCoverage: 41, studentProficiency: 52, gapSeverity: "Moderate", trend: "stable", studentsWithGap: 12, totalStudents: 24 },
+  { name: "Data Management", taxonomyId: "TC-DM-01", industryDemand: "High", curriculumCoverage: 21, studentProficiency: 40, gapSeverity: "Critical", trend: "increasing", studentsWithGap: 17, totalStudents: 24 },
+  { name: "Python", taxonomyId: "TC-PY-01", industryDemand: "High", curriculumCoverage: 55, studentProficiency: 68, gapSeverity: "Moderate", trend: "increasing", studentsWithGap: 10, totalStudents: 24 },
+  { name: "Scientific Writing", taxonomyId: "TC-SW-02", industryDemand: "Medium", curriculumCoverage: 62, studentProficiency: 58, gapSeverity: "Acceptable", trend: "stable", studentsWithGap: 8, totalStudents: 24 },
+  { name: "Research Methodology", taxonomyId: "TC-RM-04", industryDemand: "High", curriculumCoverage: 70, studentProficiency: 72, gapSeverity: "Acceptable", trend: "stable", studentsWithGap: 6, totalStudents: 24 },
+  { name: "Machine Learning", taxonomyId: "TC-ML-01", industryDemand: "High", curriculumCoverage: 12, studentProficiency: 28, gapSeverity: "Critical", trend: "increasing", studentsWithGap: 19, totalStudents: 24 },
 ];
 
-const mockPendingEvidence: PendingEvidence[] = [
-  { id: 1, student: "Aarav Sharma", initials: "AS", name: "Research Project Report", type: "Project", submitted: "Sept 3, 2025", status: "pending" },
-  { id: 2, student: "Neha Gupta", initials: "NG", name: "Clinical Posting Certificate", type: "Certificate", submitted: "Sept 2, 2025", status: "pending" },
-  { id: 3, student: "Rohan Patel", initials: "RP", name: "NPTEL Course Certificate", type: "Certificate", submitted: "Sept 1, 2025", status: "pending" },
-  { id: 4, student: "Ananya Reddy", initials: "AR", name: "Academic Transcript", type: "Transcript", submitted: "Aug 30, 2025", status: "flagged" },
-  { id: 5, student: "Vikram Singh", initials: "VS", name: "Workshop Attendance", type: "Certificate", submitted: "Aug 28, 2025", status: "pending" },
+const mockDemandTrends: DemandTrend[] = [
+  { skill: "Clinical Research", direction: "up", demandLevel: "High", changePercent: 35, period: "Last 6 months" },
+  { skill: "Data Analysis", direction: "up-strong", demandLevel: "High", changePercent: 52, period: "Last 6 months" },
+  { skill: "Machine Learning", direction: "up-strong", demandLevel: "High", changePercent: 68, period: "Last 6 months" },
+  { skill: "Statistical Analysis", direction: "up", demandLevel: "High", changePercent: 41, period: "Last 6 months" },
+  { skill: "Pharmacology", direction: "stable", demandLevel: "Medium", changePercent: 5, period: "Last 6 months" },
+  { skill: "Documentation", direction: "stable", demandLevel: "Low", changePercent: -2, period: "Last 6 months" },
+  { skill: "Ayurvedic Therapeutics", direction: "up", demandLevel: "Medium", changePercent: 18, period: "Last 6 months" },
 ];
 
-const mockPostedOpportunities: PostedOpportunity[] = [
-  { id: 1, title: "Clinical Research Intern", org: "AIIA / Research Division", location: "New Delhi", duration: "3 Months", applicants: 12, match: 92, status: "active" },
-  { id: 2, title: "AYUSH Research Internship", org: "NIA / Jaipur", location: "Jaipur", duration: "2 Months", applicants: 8, match: 78, status: "active" },
-  { id: 3, title: "Public Health Analyst Intern", org: "MoHFW / Delhi", location: "New Delhi", duration: "4 Months", applicants: 5, match: 72, status: "closing" },
+const mockIndustryRoles: IndustryRole[] = [
+  { title: "Clinical Research Intern", demandLevel: "High", openings: 45, avgMatch: 72, topSkills: ["Clinical Research", "Python", "Data Analysis"] },
+  { title: "Research Data Analyst", demandLevel: "High", openings: 32, avgMatch: 68, topSkills: ["Python", "Statistical Analysis", "Data Analysis"] },
+  { title: "AYUSH Public Health Intern", demandLevel: "Medium", openings: 18, avgMatch: 75, topSkills: ["Research Methodology", "Clinical Research"] },
+  { title: "Pharmacovigilance Associate", demandLevel: "Medium", openings: 12, avgMatch: 65, topSkills: ["Pharmacovigilance", "Scientific Writing", "Clinical Research"] },
 ];
 
-const mockApplicationsToReview: ApplicationToReview[] = [
-  { id: 1, student: "Aarav Sharma", initials: "AS", role: "Clinical Research Intern", org: "AIIA / Research Division", match: 92, applied: "Sept 3, 2025", status: "new" },
-  { id: 2, student: "Neha Gupta", initials: "NG", role: "AYUSH Research Internship", org: "NIA / Jaipur", match: 78, applied: "Sept 2, 2025", status: "reviewed" },
-  { id: 3, student: "Rohan Patel", initials: "RP", role: "Clinical Research Intern", org: "AIIA / Research Division", match: 88, applied: "Sept 1, 2025", status: "shortlisted" },
-  { id: 4, student: "Meera Joshi", initials: "MJ", role: "Public Health Analyst Intern", org: "MoHFW / Delhi", match: 95, applied: "Aug 30, 2025", status: "new" },
+const mockCurriculumReport: CurriculumReport = {
+  id: "rpt-1", department: "Department of Ayurveda", generatedDate: "Sept 2025",
+  totalStudents: 24, avgReadiness: 68,
+  readinessDistribution: { beginning: 6, developing: 12, jobReady: 6 },
+  topGaps: [
+    { skill: "Statistical Analysis", gapCount: 20, severity: "Critical" },
+    { skill: "Machine Learning", gapCount: 19, severity: "Critical" },
+    { skill: "Clinical Research", gapCount: 18, severity: "Critical" },
+    { skill: "Data Management", gapCount: 17, severity: "Critical" },
+  ],
+  coverageGaps: [
+    { skill: "Machine Learning", coverage: 12, demand: "High" },
+    { skill: "Statistical Analysis", coverage: 18, demand: "High" },
+    { skill: "Data Management", coverage: 21, demand: "High" },
+    { skill: "Clinical Research", coverage: 32, demand: "High" },
+  ],
+  recommendations: [
+    "Introduce mandatory Statistical Analysis module in 2nd year",
+    "Add Python for Healthcare elective in 3rd year curriculum",
+    "Partner with industry for Clinical Research practical sessions",
+    "Develop internal Machine Learning lab with real clinical datasets",
+  ],
+};
+
+const mockVerifications: VerificationRequest[] = [
+  { id: "v-1", studentName: "Aarav Sharma", studentInitials: "AS", title: "CVD Risk Prediction Model", type: "Project", submittedDate: "Sept 3, 2025", status: "pending", skillsClaimed: ["Python", "Machine Learning", "Data Analysis"], description: "ML model predicting cardiovascular risk from Ayurvedic markers using Python and scikit-learn." },
+  { id: "v-2", studentName: "Neha Gupta", studentInitials: "NG", title: "Clinical Posting Certificate", type: "Certificate", submittedDate: "Sept 2, 2025", status: "pending", skillsClaimed: ["Clinical Research", "Patient Assessment"], description: "Certificate of completion for 4-week clinical posting at AIIA OPD." },
+  { id: "v-3", studentName: "Rohan Patel", studentInitials: "RP", title: "Herbal Drug Efficacy Study", type: "Project", submittedDate: "Sept 1, 2025", status: "pending", skillsClaimed: ["Research Methodology", "Data Analysis", "Scientific Writing"], description: "Literature review and efficacy analysis of Ashwagandha formulations." },
+  { id: "v-4", studentName: "Ananya Reddy", studentInitials: "AR", title: "NPTEL Statistics Certificate", type: "Certificate", submittedDate: "Aug 30, 2025", status: "flagged", skillsClaimed: ["Statistical Analysis"], description: "Certificate from NPTEL course on Statistics for Health Research." },
+  { id: "v-5", studentName: "Meera Joshi", studentInitials: "MJ", title: "AYUSH Research Internship", type: "Internship", submittedDate: "Aug 28, 2025", status: "approved", skillsClaimed: ["Research", "Clinical Research", "Data Analysis"], description: "3-month research internship at NIA Jaipur on AYUSH healthcare delivery." },
+  { id: "v-6", studentName: "Vikram Singh", studentInitials: "VS", title: "Pharmacognosy Lab Report", type: "Project", submittedDate: "Aug 25, 2025", status: "pending", skillsClaimed: ["Pharmacognosy", "Documentation"], description: "Lab report on identification and authentication of medicinal plants." },
 ];
 
-const mockAnalytics: FacultyAnalytics = {
-  avgSkills: 7.2,
-  avgMatch: 83,
-  topSkill: "Python",
-  weakSkill: "Statistical Analysis",
+const mockOpportunities: AcademicanOpportunity[] = [
+  { id: "ao-1", title: "Faculty Development Programme on AI in Healthcare", category: "FDP", organizer: "AICTE", location: "Online", duration: "2 weeks", deadline: "Oct 15, 2025", description: "Learn to integrate AI/ML concepts into healthcare curriculum.", skillsRelevant: ["Machine Learning", "Data Analysis", "Python"], status: "open", interested: 8 },
+  { id: "ao-2", title: "Industrial Training at CCRAS", category: "Industrial Training", organizer: "CCRAS", location: "New Delhi", duration: "1 month", deadline: "Sept 30, 2025", description: "Hands-on research training at Central Council for Research in Ayurvedic Sciences.", skillsRelevant: ["Research Methodology", "Clinical Research"], status: "open", interested: 5 },
+  { id: "ao-3", title: "Curriculum Consultancy for BAMS Program", category: "Consultancy", organizer: "NCISM", location: "New Delhi", duration: "3 months", deadline: "Nov 1, 2025", description: "Seeking faculty consultants for updating BAMS pharmacology curriculum.", skillsRelevant: ["Pharmacology", "Scientific Writing"], status: "open", interested: 3 },
+  { id: "ao-4", title: "Joint Research: Herbal Drug Safety Database", category: "Research Collaboration", organizer: "AIIA + IIT Delhi", location: "New Delhi", duration: "6 months", deadline: "Oct 20, 2025", description: "Collaborative research project on building a comprehensive herb-drug interaction database.", skillsRelevant: ["Data Analysis", "Python", "Clinical Research"], status: "open", interested: 12 },
+];
+
+const mockCurriculumLoop: CurriculumLoopStep[] = [
+  { id: 1, label: "Industry Demand", description: "Industry reports high demand for Statistical Analysis and ML skills", status: "completed", insight: "72% of posted roles require Statistical Analysis" },
+  { id: 2, label: "Skill Gap Detection", description: "Platform identifies gaps: Statistical Analysis (18% coverage), ML (12% coverage)", status: "completed", insight: "20 of 24 students lack Statistical Analysis proficiency" },
+  { id: 3, label: "Department Report", description: "Aggregated report generated for Department of Ayurveda", status: "completed", insight: "Report shared with HOD on Sept 1, 2025" },
+  { id: 4, label: "Academic Intervention", description: "New modules proposed: Statistics for Healthcare, Python elective", status: "current", insight: "Curriculum committee review scheduled for Sept 15" },
+  { id: 5, label: "Student Skill Development", description: "Students enrolled in recommended courses and projects", status: "upcoming", insight: "Expected completion by end of semester" },
+  { id: 6, label: "Reassessment", description: "Skills reassessed after intervention completion", status: "upcoming", insight: "Scheduled for Jan 2026" },
+];
+
+const mockAnalytics: DepartmentAnalytics = {
+  totalStudents: 24, avgSkills: 7.2, avgMatch: 83, avgReadiness: 68,
+  readinessDistribution: { beginning: 6, developing: 12, jobReady: 6 },
   skillDistribution: [
-    { name: "Python", count: 18, pct: 75 },
-    { name: "Research", count: 16, pct: 67 },
-    { name: "Data Analysis", count: 14, pct: 58 },
-    { name: "Machine Learning", count: 10, pct: 42 },
-    { name: "Clinical Research", count: 8, pct: 33 },
-    { name: "Statistical Analysis", count: 6, pct: 25 },
+    { name: "Python", count: 18, pct: 75 }, { name: "Research", count: 16, pct: 67 },
+    { name: "Data Analysis", count: 14, pct: 58 }, { name: "Machine Learning", count: 10, pct: 42 },
+    { name: "Clinical Research", count: 8, pct: 33 }, { name: "Statistical Analysis", count: 6, pct: 25 },
     { name: "Scientific Writing", count: 9, pct: 38 },
   ],
-  gapSeverity: { high: 3, medium: 5, low: 8 },
+  monthlyTrend: [
+    { month: "May", verified: 12, placements: 2 }, { month: "Jun", verified: 15, placements: 3 },
+    { month: "Jul", verified: 18, placements: 4 }, { month: "Aug", verified: 22, placements: 5 },
+    { month: "Sep", verified: 25, placements: 3 },
+  ],
+  departmentComparison: [
+    { dept: "Ayurveda", avgMatch: 83, avgReadiness: 68 }, { dept: "Surgery", avgMatch: 78, avgReadiness: 62 },
+    { dept: "Pharmacology", avgMatch: 88, avgReadiness: 75 }, { dept: "Kayachikitsa", avgMatch: 76, avgReadiness: 64 },
+  ],
 };
 
-const mockRecommendations: FacultyRecommendation[] = [
-  { title: "Statistics for Health Research", type: "Course", students: 5, gap: "Statistical Analysis", provider: "NPTEL" },
-  { title: "Scientific Writing Fundamentals", type: "Course", students: 4, gap: "Scientific Writing", provider: "Coursera" },
-  { title: "Research Methods in Healthcare", type: "Course", students: 3, gap: "Research Methodology", provider: "edX" },
-  { title: "GCP & Clinical Trial Basics", type: "Workshop", students: 6, gap: "Clinical Trial Documentation", provider: "AIIA" },
-];
-
-const mockDashboard: FacultyDashboard = {
-  faculty: mockFaculty,
-  students: mockStudents,
-  pendingEvidence: mockPendingEvidence,
-  postedOpportunities: mockPostedOpportunities,
-  applicationsToReview: mockApplicationsToReview,
+const mockDashboard: AcademicianDashboard = {
+  academician: mockAcademician, departmentSkills: mockDepartmentSkills,
+  demandTrends: mockDemandTrends, industryRoles: mockIndustryRoles,
+  curriculumReport: mockCurriculumReport, verifications: mockVerifications,
+  opportunities: mockOpportunities, curriculumLoop: mockCurriculumLoop,
   analytics: mockAnalytics,
-  recommendations: mockRecommendations,
 };
-
-/* ═══════════════════════════════════════════════════════
-   API Layer — swap mock bodies for real fetch calls
-   ═══════════════════════════════════════════════════════ */
 
 export const facultyApi = {
-  /** GET /api/faculty/dashboard */
-  async getDashboard(): Promise<FacultyDashboard> {
+  async getDashboard(): Promise<AcademicianDashboard> {
     await new Promise((r) => setTimeout(r, 350));
     return structuredClone(mockDashboard);
   },
-
-  /** POST /api/faculty/evidence/:id/approve */
-  async approveEvidence(id: number): Promise<void> {
+  async verifyStudent(id: string, action: "approved" | "flagged" | "changes-requested"): Promise<void> {
     await new Promise((r) => setTimeout(r, 200));
-    const ev = mockPendingEvidence.find((e) => e.id === id);
-    if (ev) ev.status = "approved";
+    const v = mockVerifications.find((x) => x.id === id);
+    if (v) v.status = action;
   },
-
-  /** POST /api/faculty/evidence/:id/flag */
-  async flagEvidence(id: number): Promise<void> {
-    await new Promise((r) => setTimeout(r, 200));
-    const ev = mockPendingEvidence.find((e) => e.id === id);
-    if (ev) ev.status = "flagged";
-  },
-
-  /** POST /api/faculty/applications/:id/shortlist */
-  async shortlistApplication(id: number): Promise<void> {
-    await new Promise((r) => setTimeout(r, 200));
-    const app = mockApplicationsToReview.find((a) => a.id === id);
-    if (app) app.status = "shortlisted";
-  },
-
-  /** PUT /api/faculty/settings */
-  async updateSettings(_data: FacultySettingsPayload): Promise<void> {
+  async updateSettings(_data: Record<string, unknown>): Promise<void> {
     await new Promise((r) => setTimeout(r, 300));
-    // In production: PUT /api/faculty/settings with _data body
-  },
-
-  /** POST /api/faculty/opportunities */
-  async postOpportunity(_data: Omit<PostedOpportunity, "id" | "applicants">): Promise<void> {
-    await new Promise((r) => setTimeout(r, 300));
-    // In production: POST /api/faculty/opportunities with _data body
   },
 };
