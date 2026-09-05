@@ -892,14 +892,14 @@ export default function StudentDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#F7F6F0" }}>
+    <div className="h-screen flex overflow-hidden" style={{ background: "#F7F6F0" }}>
       <Sidebar open={undefined} setOpen={undefined}>
         <SidebarBody className="justify-between gap-10">
           <SidebarContent activeNav={activeNav} setActiveNav={setActiveNav} />
         </SidebarBody>
       </Sidebar>
 
-      <main className="flex-1 min-h-screen overflow-y-auto">
+      <main className="flex-1 h-screen overflow-y-auto">
         <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-6 md:py-8">
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
             <h1 className="font-semibold text-[22px] md:text-[26px] tracking-tight" style={{ color: "#171A18" }}>
