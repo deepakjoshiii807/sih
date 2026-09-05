@@ -150,8 +150,8 @@ export default function StudentDashboard() {
                   onClick={() => setActiveNav(link.id)}
                   className={`flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                     activeNav === link.id
-                      ? "bg-[#DCE6D0] text-[#16301F] font-semibold"
-                      : "text-[rgba(220,230,208,.75)] hover:bg-[rgba(220,230,208,.08)] hover:text-white"
+                      ? "bg-[#244B35] text-white font-semibold"
+                      : "text-[#6B6F68] hover:bg-[#EDEBE0] hover:text-[#171A18]"
                   }`}
                 >
                   <span className="flex-shrink-0">{link.icon}</span>
@@ -162,7 +162,7 @@ export default function StudentDashboard() {
                   />
                   {link.count !== undefined && (
                     <span className={`ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded-md ${
-                      activeNav === link.id ? "bg-[#244B35] text-[#DCE6D0]" : "bg-[rgba(220,230,208,.14)] text-[#DCE6D0]"
+                      activeNav === link.id ? "bg-white/20 text-white" : "bg-[#EDEBE0] text-[#6B6F68]"
                     }`}>
                       {link.count}
                     </span>
@@ -172,28 +172,28 @@ export default function StudentDashboard() {
             </div>
           </div>
           <div className="border-t border-[rgba(220,230,208,.12)] pt-3 mt-2">
-            <button className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-[rgba(220,230,208,.6)] text-xs font-medium hover:bg-[rgba(220,230,208,.08)] hover:text-white transition-colors">
+            <button className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors">
               <Settings size={16} /> Settings
             </button>
-            <button className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-[rgba(220,230,208,.6)] text-xs font-medium hover:bg-[rgba(220,230,208,.08)] hover:text-white transition-colors">
-              <LogOut size={16} /> Logout
+            <button className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors">
+              <LogOut size={16} /> Log out
             </button>
-            <div className="mt-3 p-3 rounded-xl bg-[rgba(220,230,208,.07)] border border-[rgba(220,230,208,.1)]">
+            <div className="mt-3 p-3 rounded-xl border" style={{ background: "#F7F6F0", borderColor: "#E6E3D7" }}>
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0" style={{ background: "#E8D36B", color: "#16301F" }}>
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0" style={{ background: "#244B35", color: "#DCE6D0" }}>
                   {student.initials}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-semibold text-sm truncate" style={{ color: "#F7F6F0" }}>{student.name}</div>
-                  <div className="text-xs font-mono" style={{ color: "rgba(220,230,208,.55)" }}>{student.course} · {student.year}</div>
+                  <div className="font-semibold text-sm truncate" style={{ color: "#171A18" }}>{student.name}</div>
+                  <div className="text-xs font-mono" style={{ color: "#6B6F68" }}>{student.course} · {student.year}</div>
                 </div>
               </div>
               <div className="mt-2.5">
-                <div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "rgba(220,230,208,.6)" }}>
-                  <span>Profile</span><span>{student.profileCompletion}%</span>
+                <div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "#6B6F68" }}>
+                  <span>Profile {student.profileCompletion}% complete</span>
                 </div>
-                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(220,230,208,.14)" }}>
-                  <div className="h-full rounded-full" style={{ width: `${student.profileCompletion}%`, background: "#E8D36B" }} />
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}>
+                  <div className="h-full rounded-full" style={{ width: `${student.profileCompletion}%`, background: "#244B35" }} />
                 </div>
               </div>
             </div>
@@ -235,72 +235,105 @@ export default function StudentDashboard() {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="col-span-12 lg:col-span-8 rounded-[18px] border p-6 overflow-hidden relative"
-              style={{ background: "linear-gradient(160deg,#FFFFFF 0%,#FBF9F2 55%,#F2EFE2 100%)", borderColor: "#E6E3D7" }}
+              className="col-span-12 rounded-[18px] p-7 overflow-hidden relative"
+              style={{ background: "#244B35", color: "#F7F6F0" }}
             >
-              <div className="absolute right-3.5 bottom-3.5 w-16 h-16 opacity-50 pointer-events-none" style={{ backgroundImage: "radial-gradient(#9A9D94 1px,transparent 1px)", backgroundSize: "8px 8px", maskImage: "linear-gradient(135deg,transparent 30%,#000)" }} />
-              <div className="flex items-center gap-3">
-                <Eyebrow>Personal Progress</Eyebrow>
-                <span className="ml-auto font-mono text-[10px] font-bold tracking-widest bg-[#244B35] text-[#DCE6D0] px-2.5 py-1 rounded-md">DEMO DATA</span>
-              </div>
-              <h2 className="font-bold text-[clamp(22px,2.4vw,30px)] tracking-tight leading-tight mt-4 mb-2.5">
-                Your next opportunity <em className="not-italic relative" style={{ color: "#244B35" }}>
-                  starts with your skills.
-                  <span className="absolute left-0 right-0 bottom-0.5 h-[7px] -z-10" style={{ background: "rgba(232,211,107,.5)" }} />
-                </em>
-              </h2>
-              <p className="text-[14px] max-w-[40ch] mb-5" style={{ color: "#6B6F68" }}>
-                You've built a strong foundation. Close a few skill gaps to unlock better matches.
-              </p>
-              <div className="flex gap-3 flex-wrap">
-                {[
-                  { label: "Profile Completion", value: student.profileCompletion, color: "#244B35", bg: "#244B35", px: 5 },
-                  { label: "Skill Confidence", value: student.skillConfidence, color: "#B99A22", bg: "#B99A22", px: 4 },
-                  { label: "Best Match", value: student.bestMatch, color: "#C98B5F", bg: "#C98B5F", px: 5 },
-                ].map((m) => (
-                  <div key={m.label} className="flex-1 min-w-[96px] border rounded-xl p-3 bg-white" style={{ borderColor: "#E6E3D7" }}>
-                    <div className="font-bold text-2xl tracking-tight" style={{ color: m.color }}>{m.value}<small className="text-[13px] font-semibold" style={{ color: "#6B6F68" }}>%</small></div>
-                    <div className="font-mono text-[10px] mt-0.5 leading-snug" style={{ color: "#6B6F68" }}>{m.label}</div>
-                    <div className="flex gap-[3px] mt-2">
-                      {Array.from({ length: 6 }, (_, i) => (
-                        <span key={i} className="w-2 h-[6px]" style={{ background: i < m.px ? m.bg : "#EDEBE0" }} />
-                      ))}
+              <div className="absolute right-3.5 bottom-3.5 w-16 h-16 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(#DCE6D0 1px,transparent 1px)", backgroundSize: "8px 8px" }} />
+              <div className="flex items-start gap-6">
+                {/* Left: Text + Metrics */}
+                <div className="flex-1 min-w-0">
+                  <span className="font-mono text-[11px] font-bold tracking-[0.16em] uppercase" style={{ color: "#DCE6D0" }}>
+                    <span className="inline-block w-[7px] h-[7px] bg-[#DCE6D0] mr-2 opacity-85" style={{ boxShadow: "0 7px 0 -2px #244B35" }} />
+                    Personal Progress
+                  </span>
+                  <h2 className="font-bold text-[clamp(24px,3vw,36px)] tracking-tight leading-tight mt-4 mb-3">
+                    Your next opportunity <em className="not-italic" style={{ color: "#E8D36B" }}>your skills.</em>
+                  </h2>
+                  <p className="text-[14px] max-w-[42ch] mb-6" style={{ color: "rgba(220,230,208,.75)" }}>
+                    You've built a strong foundation. Close a few skill gaps to unlock better matches.
+                  </p>
+                  {/* Profile Ring + Skill Confidence */}
+                  <div className="flex items-center gap-6 flex-wrap">
+                    {/* Profile Ring */}
+                    <div className="relative w-[100px] h-[100px]">
+                      <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(220,230,208,.15)" strokeWidth="8" />
+                        <motion.circle
+                          cx="50" cy="50" r="42" fill="none" stroke="#DCE6D0" strokeWidth="8" strokeLinecap="round"
+                          strokeDasharray={2 * Math.PI * 42}
+                          initial={{ strokeDashoffset: 2 * Math.PI * 42 }}
+                          animate={{ strokeDashoffset: 2 * Math.PI * 42 * (1 - student.profileCompletion / 100) }}
+                          transition={{ duration: 1.2, ease: "easeOut" }}
+                        />
+                      </svg>
+                      <div className="absolute inset-0 grid place-items-center">
+                        <div className="text-center">
+                          <div className="font-bold text-2xl leading-none" style={{ color: "#DCE6D0" }}>{student.profileCompletion}%</div>
+                          <div className="font-mono text-[9px] tracking-widest uppercase mt-0.5" style={{ color: "rgba(220,230,208,.55)" }}>Profile</div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Skill Confidence */}
+                    <div>
+                      <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "rgba(220,230,208,.55)" }}>Skill Confidence</div>
+                      <div className="flex gap-[3px] mb-2">
+                        {Array.from({ length: 12 }, (_, i) => (
+                          <span key={i} className="w-[10px] h-[14px]" style={{ background: i < Math.round(student.skillConfidence / 100 * 12) ? "#DCE6D0" : "rgba(220,230,208,.15)" }} />
+                        ))}
+                        <span className="ml-2 font-bold text-lg" style={{ color: "#DCE6D0" }}>{student.skillConfidence}%</span>
+                      </div>
+                      <button className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:-translate-y-0.5" style={{ background: "#E8D36B", color: "#16301F" }}>
+                        Best match · {student.bestMatch}% <ChevronRight size={16} />
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
-              {/* Skill Journey */}
-              <div className="mt-6 pt-5 border-t border-dashed" style={{ borderColor: "#E6E3D7" }}>
-                <div className="font-mono text-[11px] font-bold tracking-[0.14em] uppercase mb-3.5" style={{ color: "#9A9D94" }}>Your Skill Journey</div>
-                <div className="grid grid-cols-2 gap-x-6">
+                </div>
+                {/* Right: Skill Journey */}
+                <div className="hidden lg:flex flex-col flex-shrink-0 w-[180px]">
+                  <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-4" style={{ color: "rgba(220,230,208,.55)" }}>Your Skill Journey</div>
                   {[
-                    { label: "Evidence", sub: "6 items verified", done: true },
-                    { label: "Skills", sub: "18 extracted", done: true },
-                    { label: "Skill Gap", sub: `Close ${gaps.length} gaps`, active: true },
-                    { label: "Match", sub: `Best match ${student.bestMatch}%` },
-                    { label: "Opportunity", sub: "Apply now" },
+                    { label: "Evidence", done: true },
+                    { label: "Skills", done: true },
+                    { label: "Skill Gap", active: true, badge: "HERE" },
+                    { label: "Match" },
+                    { label: "Opportunity" },
                   ].map((step, i) => (
-                    <div key={step.label} className={`relative flex gap-3 ${i < 4 ? "pb-4" : ""}`}>
-                      {i < 4 && <div className="absolute left-[11px] top-6 bottom-1 w-0.5" style={{ background: step.done ? "#244B35" : "#E6E3D7" }} />}
-                      <div
-                        className={`w-6 h-6 flex-none rounded-[7px] z-10 grid place-items-center font-mono text-[11px] font-bold border-2 ${
-                          step.done ? "bg-[#244B35] border-[#244B35] text-white"
-                          : step.active ? "bg-[#E8D36B] border-[#B99A22] text-[#16301F] shadow-[0_0_0_4px_rgba(232,211,107,.25)]"
-                          : "bg-white border-dashed"
-                        }`}
-                        style={!step.done && !step.active ? { borderColor: "#E6E3D7", color: "#9A9D94" } : undefined}
-                      >
-                        {step.done ? "✓" : i + 1}
+                    <div key={step.label} className="relative flex items-center gap-2.5">
+                      {i < 4 && <div className="absolute left-[10px] top-[20px] bottom-[-4px] w-[2px]" style={{ background: step.done ? "#DCE6D0" : "rgba(220,230,208,.2)" }} />}
+                      <div className="relative z-10 w-5 h-5 flex-none rounded-md grid place-items-center border-2" style={{
+                        background: step.done ? "#DCE6D0" : step.active ? "#E8D36B" : "transparent",
+                        borderColor: step.done ? "#DCE6D0" : step.active ? "#E8D36B" : "rgba(220,230,208,.3)",
+                        color: step.done ? "#244B35" : step.active ? "#16301F" : "rgba(220,230,208,.4)",
+                      }}>
+                        {step.done ? "✓" : "+"}
                       </div>
-                      <div>
-                        <div className="font-semibold text-[13.5px]">{step.label}</div>
-                        <div className="font-mono text-[10px]" style={{ color: "#9A9D94" }}>{step.sub}</div>
-                      </div>
+                      <span className="text-sm font-medium" style={{ color: step.active || step.done ? "#F7F6F0" : "rgba(220,230,208,.4)" }}>
+                        {step.label}
+                        {step.badge && <span className="ml-1.5 font-mono text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded" style={{ background: "#E8D36B", color: "#16301F" }}>{step.badge}</span>}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             </motion.section>
+
+            {/* ─── Stat Cards Row ─── */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+              className="col-span-12 grid grid-cols-2 sm:grid-cols-4 gap-4"
+            >
+              {[
+                { label: "Profile Completion", value: `${student.profileCompletion}%`, color: "#171A18" },
+                { label: "Skill Confidence", value: `${student.skillConfidence}%`, color: "#6B6F68" },
+                { label: "Evidence Items", value: evidence.total, color: "#171A18" },
+                { label: "Applications", value: applications.length, color: "#171A18" },
+              ].map((s) => (
+                <div key={s.label} className="text-center">
+                  <div className="font-mono text-[10px] font-bold tracking-widest uppercase" style={{ color: "#9A9D94" }}>{s.label}</div>
+                  <div className="font-bold text-3xl mt-1" style={{ color: s.color }}>{s.value}</div>
+                </div>
+              ))}
+            </motion.div>
 
             {/* ─── Skill Snapshot ─── */}
             <motion.section
