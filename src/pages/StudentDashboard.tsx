@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { SignOutButton } from "@/components/ui/sign-out-button";
 import { Sidebar, SidebarBody, Logo, LogoIcon, useSidebar } from "@/components/ui/sidebar";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -123,7 +124,7 @@ function SidebarContent({ activeNav, setActiveNav }: { activeNav: string; setAct
       </div>
       <div className="border-t pt-3 mt-2" style={{ borderColor: open ? "#E6E3D7" : "transparent" }}>
         <button onClick={() => setActiveNav("settings")} className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}><Settings size={16} /> {open && "Settings"}</button>
-        <button className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}><LogOut size={16} /> {open && "Log out"}</button>
+        <SignOutButton open={open} />
         {open && <div className="mt-3 p-3 rounded-xl border" style={{ background: "#F7F6F0", borderColor: "#E6E3D7" }}><div className="flex items-center gap-2.5"><div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0" style={{ background: "#244B35", color: "#DCE6D0" }}>{student.initials}</div><div className="min-w-0"><div className="font-semibold text-sm truncate" style={{ color: "#171A18" }}>{student.name}</div><div className="text-[11px] font-mono" style={{ color: "#6B6F68" }}>{student.course} / {student.year}</div></div></div><div className="mt-2.5"><div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "#6B6F68" }}><span>Profile {student.profileCompletion}%</span></div><div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}><div className="h-full rounded-full" style={{ width: `${student.profileCompletion}%`, background: "#244B35" }} /></div></div></div>}
         {!open && <div className="flex justify-center mt-3"><div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs" style={{ background: "#244B35", color: "#DCE6D0" }}>{student.initials}</div></div>}
       </div>

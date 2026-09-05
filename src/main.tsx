@@ -10,6 +10,7 @@ import "./index.css";
 
 import AuthPage from "./pages/Auth.tsx";
 import LoginPage from "./pages/Login.tsx";
+import RequireRole from "./components/RequireRole.tsx";
 import StudentDashboard from "./pages/StudentDashboard.tsx";
 import FacultyDashboard from "./pages/FacultyDashboard.tsx";
 import IndustryDashboard from "./pages/IndustryDashboard.tsx";
@@ -35,10 +36,48 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
         <Route path="/" element={<AuthPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/student" element={<StudentDashboard />} />
-        <Route path="/faculty" element={<FacultyDashboard />} />
-        <Route path="/industry" element={<IndustryDashboard />} />
-        <Route path="/institution-admin" element={<InstitutionDashboard />} />
+
+        {/* Authenticated, role-scoped dashboards */}
+        <Route
+          path="/student"
+          element={
+            <RequireRole role="student">
+              <StudentDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/faculty"
+          element={
+            <RequireRole role="academician">
+              <FacultyDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/academician"
+          element={
+            <RequireRole role="academician">
+              <FacultyDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/industry"
+          element={
+            <RequireRole role="industry">
+              <IndustryDashboard />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/institution-admin"
+          element={
+            <RequireRole role="institutionAdmin">
+              <InstitutionDashboard />
+            </RequireRole>
+          }
+        />
 
         </Routes>
       </BrowserRouter>

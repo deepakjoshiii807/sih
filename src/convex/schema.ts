@@ -16,6 +16,15 @@ export const roleValidator = v.union(
 );
 export type Role = Infer<typeof roleValidator>;
 
+// The four product profiles (kept separate from the internal `role` field).
+export const profileRoleValidator = v.union(
+  v.literal("student"),
+  v.literal("industry"),
+  v.literal("academician"),
+  v.literal("institutionAdmin"),
+);
+export type ProfileRole = Infer<typeof profileRoleValidator>;
+
 const schema = defineSchema(
   {
     // default auth tables using convex auth.
@@ -30,6 +39,10 @@ const schema = defineSchema(
       isAnonymous: v.optional(v.boolean()), // is the user anonymous. do not remove
 
       role: v.optional(roleValidator), // role of the user. do not remove
+
+      // Which product dashboard this account belongs to (student / industry /
+      // academician / institutionAdmin). null until the user picks a profile.
+      profileRole: v.optional(profileRoleValidator),
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
     // add other tables here

@@ -1,483 +1,360 @@
-import { useState, useCallback } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { useMutation } from "convex/react";
+import { AlertTriangle, ArrowRight, ChevronLeft, Loader2, Mail } from "lucide-react";
+import { toast } from "sonner";
+
+import { api } from "@/convex/_generated/api";
+import { useAuth } from "@/hooks/use-auth";
+import { PROFILE_ROLES, roleHome, type ProfileRoleId } from "@/lib/profile-roles";
 import { cn } from "@/lib/utils";
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  GraduationCap,
-  Briefcase,
-  BookOpen,
-  Building2,
-  ArrowRight,
-  Loader2,
-  AlertTriangle,
-  ChevronLeft,
-} from "lucide-react";
 
-type AuthMode = "login" | "signup";
-type SignupStep = "role" | "details";
-type RoleType = "student" | "industry" | "academician" | "admin";
+type Tab = "demo" | "email";
 
-interface RoleConfig {
-  id: RoleType;
-  name: string;
-  desc: string;
-  icon: typeof GraduationCap;
-  color: string;
-  bg: string;
-  iconBg: string;
+const VALID_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function errorMessage(err: unknown): string {
+  if (err instanceof Error && err.message) return err.message;
+  return "Something went wrong — please try again.";
 }
 
-const ROLES: RoleConfig[] = [
-  { id: "student", name: "Student", desc: "Build skills, discover opportunities", icon: GraduationCap, color: "#16a34a", bg: "#f0fdf4", iconBg: "#dcfce7" },
-  { id: "industry", name: "Industry", desc: "Find talent, create opportunities", icon: Briefcase, color: "#2563eb", bg: "#eff6ff", iconBg: "#dbeafe" },
-  { id: "academician", name: "Academician", desc: "Connect curriculum with industry", icon: BookOpen, color: "#7c3aed", bg: "#f5f3ff", iconBg: "#ede9fe" },
-  { id: "admin", name: "Institution Admin", desc: "Monitor outcomes & insights", icon: Building2, color: "#d97706", bg: "#fffbeb", iconBg: "#fef3c7" },
-];
-
-const PIPELINE = [
-  { label: "Evidence", done: true },
-  { label: "Skills", done: true },
-  { label: "Gap", done: false },
-  { label: "Match", done: false },
-  { label: "Opportunity", done: false },
-];
-
 export default function AuthSwitch() {
+  const { isLoading, isAuthenticated, user, signIn } = useAuth();
+  const setProfileRole = useMutation(api.roles.setProfileRole);
   const navigate = useNavigate();
-  const [mode, setMode] = useState<AuthMode>("login");
-  const [step, setStep] = useState<SignupStep>("role");
-  const [role, setRole] = useState<RoleType | null>(null);
-  const [showPw, setShowPw] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errs, setErrs] = useState<Record<string, string>>({});
 
-  const [email, setEmail] = useState("");
-  const [pw, setPw] = useState("");
+  const [tab, setTab] = useState<Tab>("demo");
   const [name, setName] = useState("");
-  const [confirmPw, setConfirmPw] = useState("");
-  const [inst, setInst] = useState("");
-  const [course, setCourse] = useState("");
-  const [year, setYear] = useState("");
-  const [sector, setSector] = useState("");
-  const [site, setSite] = useState("");
-  const [dept, setDept] = useState("");
-  const [desig, setDesig] = useState("");
-  const [remember, setRemember] = useState(false);
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
-  const roleCfg = ROLES.find((r) => r.id === role);
+  // Signed in but hasn't chosen one of the four product profiles yet.
+  const needsRolePick = isAuthenticated && !!user && !user.profileRole;
 
-  const reset = useCallback((m: AuthMode) => {
-    setMode(m); setStep("role"); setRole(null); setErrs({});
-    setEmail(""); setPw(""); setName(""); setConfirmPw(""); setShowPw(false);
-  }, []);
-
-  const validEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-  const strength = (p: string) => {
-    let s = 0;
-    if (p.length >= 8) s++; if (/[A-Z]/.test(p)) s++; if (/[a-z]/.test(p)) s++; if (/\d/.test(p)) s++; if (/[^A-Za-z0-9]/.test(p)) s++;
-    return s;
+  const pickRole = async (role: ProfileRoleId, label: string) => {
+    if (busy) return;
+    setBusy(`Setting up ${label} workspace…`);
+    setError("");
+    try {
+      await setProfileRole({ profileRole: role });
+      toast.success(`Signed in as ${label}`);
+    } catch (err) {
+      setError(errorMessage(err));
+      toast.error(errorMessage(err));
+    } finally {
+      setBusy(null);
+    }
   };
-  const strInfo = (s: number) => s <= 1 ? { t: "Very weak", c: "#dc2626" } : s <= 2 ? { t: "Weak", c: "#ea580c" } : s <= 3 ? { t: "Fair", c: "#ca8a04" } : { t: "Strong", c: "#16a34a" };
 
-  const doLogin = async (e: React.FormEvent) => {
+  // ─── Auto-redirect: authenticated user with a profile goes to their home ──
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user?.profileRole) {
+      navigate(roleHome(user.profileRole), { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, isAuthenticated, user, navigate]);
+
+  // ─── Enter a demo profile instantly (anonymous session) ────────────────
+  const demoAs = async (role: ProfileRoleId, label: string) => {
+    if (busy) return;
+    setBusy(`Signing in as ${label}…`);
+    setError("");
+    try {
+      if (!isAuthenticated) {
+        await signIn("anonymous");
+      }
+      await setProfileRole({ profileRole: role });
+      toast.success(`Signed in as ${label}`);
+    } catch (err) {
+      setError(errorMessage(err));
+      toast.error(errorMessage(err));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const sendCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    const er: Record<string, string> = {};
-    if (!validEmail(email)) er.email = "Enter a valid email";
-    if (!pw) er.pw = "Password required";
-    setErrs(er);
-    if (Object.keys(er).length) return;
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    navigate("/dashboard");
+    setError("");
+    if (!VALID_EMAIL.test(email)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+    setBusy("Sending code…");
+    try {
+      await signIn("emailOtp", { email: email.trim().toLowerCase() });
+      setOtpSent(true);
+    } catch (err) {
+      setError(errorMessage(err));
+      toast.error(errorMessage(err));
+    } finally {
+      setBusy(null);
+    }
   };
 
-  const doSignup = async (e: React.FormEvent) => {
+  const verifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!role) return;
-    const er: Record<string, string> = {};
-    if (!name.trim()) er.name = "Required";
-    if (!validEmail(email)) er.email = "Enter a valid email";
-    if (pw.length < 8) er.pw = "Min 8 characters";
-    if (strength(pw) < 3) er.pw = "Password too weak";
-    if (pw !== confirmPw) er.cpw = "Passwords don't match";
-    setErrs(er);
-    if (Object.keys(er).length) return;
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    navigate("/dashboard");
+    setError("");
+    if (!/^\d{6}$/.test(code.trim())) {
+      setError("Enter the 6-digit code from the email.");
+      return;
+    }
+    setBusy("Verifying code…");
+    try {
+      const params: Record<string, string> = { email: email.trim().toLowerCase(), code: code.trim() };
+      if (name.trim()) params.name = name.trim();
+      await signIn("emailOtp", params);
+      toast.success("Signed in");
+    } catch (err) {
+      setError(errorMessage(err));
+      toast.error(errorMessage(err));
+    } finally {
+      setBusy(null);
+    }
   };
 
-  // ─── Strength Bar ───
-  const StrBar = ({ v }: { v: string }) => {
-    if (!v) return null;
-    const s = strength(v);
-    const info = strInfo(s);
-    return (
-      <div className="mt-2 space-y-1.5">
-        <div className="flex items-center gap-2">
-          <div className="flex-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-300" style={{ width: `${(s / 5) * 100}%`, background: info.c }} />
-          </div>
-          <span className="text-[11px] font-medium" style={{ color: info.c }}>{info.t}</span>
-        </div>
-        <div className="flex flex-wrap gap-x-3 gap-y-0.5">
-          {[{ l: "8+ chars", ok: v.length >= 8 }, { l: "Uppercase", ok: /[A-Z]/.test(v) }, { l: "Number", ok: /\d/.test(v) }, { l: "Special", ok: /[^A-Za-z0-9]/.test(v) }].map((r) => (
-            <span key={r.l} className={cn("text-[10px]", r.ok ? "text-green-600" : "text-gray-400")}>{r.ok ? "✓" : "○"} {r.l}</span>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // ─── Input ───
-  const Inp = ({ icon: Icon, label, error, ...props }: { icon: typeof Mail; label: string; error?: string } & React.InputHTMLAttributes<HTMLInputElement>) => (
-    <div className="space-y-1.5">
-      <label className="text-[13px] font-medium text-gray-600">{label}</label>
-      <div className="relative">
-        <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input className={cn("w-full pl-10 pr-4 py-3 bg-gray-50/80 border rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-gray-100 transition-all", error ? "border-red-300 bg-red-50/50" : "border-gray-200")} {...props} />
-      </div>
-      {error && <p className="text-[11px] text-red-500 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />{error}</p>}
-    </div>
-  );
-
-  // ─── Password Field ───
-  const PwField = ({ value, onChange, error, label = "Password" }: { value: string; onChange: (v: string) => void; error?: string; label?: string }) => (
-    <div className="space-y-1.5">
-      <label className="text-[13px] font-medium text-gray-600">{label}</label>
-      <div className="relative">
-        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input type={showPw ? "text" : "password"} placeholder="••••••••" value={value} onChange={(e) => onChange(e.target.value)} className={cn("w-full pl-10 pr-10 py-3 bg-gray-50/80 border rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-gray-100 transition-all", error ? "border-red-300 bg-red-50/50" : "border-gray-200")} />
-        <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
-          {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-        </button>
-      </div>
-      {error && <p className="text-[11px] text-red-500 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />{error}</p>}
-      <StrBar v={value} />
-    </div>
-  );
-
-  // ─── Select ───
-  const Sel = ({ label, value, onChange, opts }: { label: string; value: string; onChange: (v: string) => void; opts: string[] }) => (
-    <div className="space-y-1.5">
-      <label className="text-[13px] font-medium text-gray-600">{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full px-3.5 py-3 bg-gray-50/80 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-gray-300 focus:ring-2 focus:ring-gray-100 transition-all appearance-none">
-        <option value="" className="bg-white">Select</option>
-        {opts.map((o) => <option key={o} value={o} className="bg-white">{o}</option>)}
-      </select>
-    </div>
-  );
-
-  // ─── Role Cards (Clean Bento) ───
-  const RoleCards = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      {ROLES.map((r) => {
-        const sel = role === r.id;
-        const Icon = r.icon;
-        return (
-          <button
-            key={r.id}
-            type="button"
-            onClick={() => setRole(r.id)}
-            className={cn(
-              "group relative flex flex-col rounded-2xl border-2 text-left transition-all duration-300 overflow-hidden",
-              sel
-                ? "shadow-lg scale-[1.02] border-transparent"
-                : "border-gray-100 hover:border-gray-200 hover:shadow-md hover:scale-[1.01]"
-            )}
-            style={{ background: sel ? r.bg : "#ffffff" }}
-          >
-            <div className="p-4 flex items-start gap-3">
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300"
-                style={{
-                  background: sel ? `linear-gradient(135deg, ${r.color}25, ${r.color}10)` : r.iconBg,
-                  boxShadow: sel ? `0 4px 12px ${r.color}20` : undefined,
-                }}
-              >
-                <Icon className="w-5 h-5" style={{ color: r.color }} />
-              </div>
-              <div className="min-w-0 pt-0.5">
-                <span className="block text-[14px] font-semibold text-gray-900">{r.name}</span>
-                <span className="block text-[12px] text-gray-500 mt-0.5 leading-snug">{r.desc}</span>
-              </div>
-            </div>
-            {sel && (
-              <div className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: r.color, boxShadow: `0 2px 8px ${r.color}40` }}>
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
-              </div>
-            )}
-            {!sel && (
-              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: `linear-gradient(135deg, ${r.color}05, transparent)` }} />
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
-
-  // ─── Role Fields ───
-  const Fields = () => {
-    if (role === "student") return (
-      <>
-        <Inp icon={GraduationCap} label="Full Name" placeholder="Your full name" value={name} onChange={(e) => setName(e.target.value)} error={errs.name} />
-        <Inp icon={Mail} label="Email" placeholder="you@institution.edu" type="email" value={email} onChange={(e) => setEmail(e.target.value)} error={errs.email} />
-        <PwField value={pw} onChange={setPw} error={errs.pw} />
-        <div className="grid grid-cols-2 gap-3">
-          <Inp icon={Building2} label="Institution" placeholder="College / University" value={inst} onChange={(e) => setInst(e.target.value)} />
-          <Inp icon={BookOpen} label="Course" placeholder="e.g. B.A.M.S." value={course} onChange={(e) => setCourse(e.target.value)} />
-        </div>
-        <Sel label="Graduation Year" value={year} onChange={setYear} opts={["2025", "2026", "2027", "2028", "2029"]} />
-      </>
-    );
-    if (role === "industry") return (
-      <>
-        <Inp icon={Briefcase} label="Organization Name" placeholder="Company name" value={name} onChange={(e) => setName(e.target.value)} error={errs.name} />
-        <Inp icon={Mail} label="Official Email" placeholder="hr@company.com" type="email" value={email} onChange={(e) => setEmail(e.target.value)} error={errs.email} />
-        <PwField value={pw} onChange={setPw} error={errs.pw} />
-        <div className="grid grid-cols-2 gap-3">
-          <Sel label="Sector" value={sector} onChange={setSector} opts={["Pharmaceutical", "Healthcare", "Biotech", "Ayurveda Mfg", "Research", "Other"]} />
-          <Inp icon={Building2} label="Website" placeholder="https://..." type="url" value={site} onChange={(e) => setSite(e.target.value)} />
-        </div>
-      </>
-    );
-    if (role === "academician") return (
-      <>
-        <Inp icon={GraduationCap} label="Full Name" placeholder="Your full name" value={name} onChange={(e) => setName(e.target.value)} error={errs.name} />
-        <Inp icon={Mail} label="Institutional Email" placeholder="you@university.edu" type="email" value={email} onChange={(e) => setEmail(e.target.value)} error={errs.email} />
-        <PwField value={pw} onChange={setPw} error={errs.pw} />
-        <div className="grid grid-cols-2 gap-3">
-          <Inp icon={Building2} label="Institution" placeholder="University" value={inst} onChange={(e) => setInst(e.target.value)} />
-          <Inp icon={BookOpen} label="Department" placeholder="e.g. Rasashastra" value={dept} onChange={(e) => setDept(e.target.value)} />
-        </div>
-        <Sel label="Designation" value={desig} onChange={setDesig} opts={["Professor", "Assoc. Professor", "Asst. Professor", "Lecturer", "HOD", "Other"]} />
-      </>
-    );
-    return (
-      <>
-        <Inp icon={Building2} label="Full Name" placeholder="Your full name" value={name} onChange={(e) => setName(e.target.value)} error={errs.name} />
-        <Inp icon={Mail} label="Official Email" placeholder="admin@institution.edu" type="email" value={email} onChange={(e) => setEmail(e.target.value)} error={errs.email} />
-        <PwField value={pw} onChange={setPw} error={errs.pw} />
-        <div className="grid grid-cols-2 gap-3">
-          <Inp icon={Building2} label="Institution" placeholder="Institution name" value={inst} onChange={(e) => setInst(e.target.value)} />
-          <Sel label="Designation" value={desig} onChange={setDesig} opts={["Director", "Dean", "Registrar", "Placement Head", "Other"]} />
-        </div>
-      </>
-    );
-  };
+  const roleCards = useMemo(() => PROFILE_ROLES, []);
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden" style={{ background: "linear-gradient(160deg, #e0f2fe 0%, #f0f9ff 25%, #ecfdf5 50%, #f0fdf4 75%, #e0f2fe 100%)" }}>
-      {/* Animated background */}
-      <style>{`
-        @keyframes drift1 { 0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); } 25% { transform: translate(120px, -80px) rotate(45deg) scale(1.15); } 50% { transform: translate(-60px, 60px) rotate(90deg) scale(0.9); } 75% { transform: translate(80px, 30px) rotate(135deg) scale(1.1); } }
-        @keyframes drift2 { 0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); } 33% { transform: translate(-140px, 70px) rotate(-60deg) scale(1.2); } 66% { transform: translate(70px, -120px) rotate(-120deg) scale(0.85); } }
-        @keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1); } 20% { transform: translate(90px, 100px) scale(1.1); } 50% { transform: translate(-100px, -50px) scale(0.88); } 80% { transform: translate(40px, -80px) scale(1.15); } }
-        @keyframes drift4 { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 40% { transform: translate(-80px, -120px) rotate(90deg); } 70% { transform: translate(120px, 50px) rotate(180deg); } }
-        @keyframes drift5 { 0%, 100% { transform: translate(0, 0) scale(1); } 30% { transform: translate(100px, 80px) scale(1.1); } 60% { transform: translate(-70px, -90px) scale(1.15); } }
-        @keyframes drift6 { 0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); } 50% { transform: translate(-50px, 100px) rotate(180deg) scale(1.2); } }
-        @keyframes gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @keyframes ring-orbit { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-      `}</style>
+    <div className="relative min-h-screen w-full overflow-hidden" style={{ background: "#f4f7fb" }}>
+      {/* Decorative gradient wash */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full opacity-25 blur-3xl" style={{ background: "radial-gradient(circle, #60a5fa, transparent 70%)" }} />
+        <div className="absolute top-1/3 -right-28 h-96 w-96 rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle, #34d399, transparent 70%)" }} />
+        <div className="absolute -bottom-32 left-1/4 h-96 w-96 rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle, #c084fc, transparent 70%)" }} />
+      </div>
 
-      {/* Animated gradient base */}
-      <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #dbeafe, #ecfdf5, #ede9fe, #fef3c7, #fce7f3, #dbeafe)", backgroundSize: "400% 400%", animation: "gradient-shift 12s ease infinite" }} />
-
-      {/* Floating shapes — circles */}
-      <div className="absolute w-[200px] h-[200px] sm:w-[320px] sm:h-[320px] rounded-full" style={{ top: "-8%", left: "8%", background: "linear-gradient(135deg, rgba(56,189,248,0.35), rgba(34,197,94,0.2))", filter: "blur(40px)", animation: "drift1 20s ease-in-out infinite" }} />
-      <div className="absolute w-[180px] h-[180px] sm:w-[280px] sm:h-[280px] rounded-full" style={{ top: "55%", right: "-5%", background: "linear-gradient(225deg, rgba(167,139,250,0.3), rgba(251,146,60,0.2))", filter: "blur(35px)", animation: "drift2 24s ease-in-out infinite" }} />
-      <div className="absolute w-[140px] h-[140px] sm:w-[220px] sm:h-[220px] rounded-full" style={{ top: "25%", left: "60%", background: "linear-gradient(180deg, rgba(251,207,232,0.3), rgba(167,139,250,0.15))", filter: "blur(30px)", animation: "drift3 18s ease-in-out infinite" }} />
-
-      {/* Floating shapes — rounded squares */}
-      <div className="absolute w-[120px] h-[120px] sm:w-[180px] sm:h-[180px] rounded-[24px] sm:rounded-[32px]" style={{ bottom: "15%", left: "15%", background: "linear-gradient(135deg, rgba(253,230,138,0.3), rgba(251,146,60,0.15))", filter: "blur(25px)", animation: "drift4 26s ease-in-out infinite" }} />
-      <div className="absolute w-[100px] h-[100px] sm:w-[140px] sm:h-[140px] rounded-[20px] sm:rounded-[28px]" style={{ top: "12%", right: "20%", background: "linear-gradient(45deg, rgba(187,247,208,0.3), rgba(56,189,248,0.15))", filter: "blur(20px)", animation: "drift5 22s ease-in-out infinite" }} />
-      <div className="absolute w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] rounded-[16px] sm:rounded-[20px]" style={{ top: "70%", left: "45%", background: "linear-gradient(90deg, rgba(244,114,182,0.25), rgba(167,139,250,0.15))", filter: "blur(18px)", animation: "drift6 15s ease-in-out infinite" }} />
-
-      {/* Small floating dots */}
-      <div className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-sky-400/40" style={{ top: "20%", left: "30%", animation: "drift1 12s ease-in-out infinite" }} />
-      <div className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400/50" style={{ top: "65%", right: "30%", animation: "drift3 14s ease-in-out infinite" }} />
-      <div className="absolute w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-violet-400/40" style={{ top: "40%", left: "75%", animation: "drift5 10s ease-in-out infinite" }} />
-      <div className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-400/45" style={{ bottom: "25%", right: "15%", animation: "drift2 16s ease-in-out infinite" }} />
-      <div className="absolute w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-pink-400/40" style={{ top: "80%", left: "10%", animation: "drift4 11s ease-in-out infinite" }} />
-
-      {/* Orbiting rings */}
-      <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] rounded-full border-2 border-white/20 pointer-events-none" style={{ animation: "ring-orbit 50s linear infinite" }} />
-      <div className="hidden sm:block absolute top-1/2 left-1/2 w-[800px] h-[800px] rounded-full border border-white/10 pointer-events-none" style={{ animation: "ring-orbit 80s linear infinite reverse" }} />
-      <div className="hidden sm:block absolute top-1/2 left-1/2 w-[1000px] h-[1000px] rounded-full border border-white/5 pointer-events-none" style={{ animation: "ring-orbit 120s linear infinite" }} />
-
-      {/* Back to Home */}
-      <Link to="/" className="absolute top-4 right-4 sm:top-5 sm:right-6 lg:top-7 lg:right-10 z-20 flex items-center gap-1.5 text-[12px] sm:text-[13px] font-medium text-gray-600 hover:text-gray-900 bg-white/50 backdrop-blur-sm border border-gray-200/60 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 transition-all hover:bg-white/70 hover:shadow-sm">
-        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5" /><polyline points="12 19 5 12 12 5" /></svg>
-        <span className="hidden sm:inline">Back to Home</span>
-        <span className="sm:hidden">Home</span>
+      {/* Back to home */}
+      <Link
+        to="/"
+        className="absolute top-4 right-4 sm:top-6 sm:right-8 z-20 flex items-center gap-1.5 rounded-full border border-gray-200/70 bg-white/70 px-3.5 py-1.5 text-xs font-medium text-gray-600 backdrop-blur transition-all hover:bg-white hover:text-gray-900 sm:text-[13px]"
+      >
+        <ChevronLeft className="h-3.5 w-3.5" /> Home
       </Link>
 
       {/* Brand */}
-      <div className="relative z-10 flex items-center gap-2.5 px-5 sm:px-6 lg:px-10 pt-5 sm:pt-6 lg:pt-8">
-        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gray-900 px-1 flex items-center justify-center shadow-sm">
-          <span className="text-white font-bold text-[9px] sm:text-[10px] tracking-tight">L2L</span>
+      <div className="relative z-10 flex items-center gap-2.5 px-5 pt-6 sm:px-8">
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gray-900">
+          <span className="text-[9px] font-bold tracking-tight text-white sm:text-[10px]">L2L</span>
         </div>
-        <span className="text-gray-900 font-semibold text-[14px] sm:text-[15px] tracking-tight">Lead2Learn</span>
+        <span className="text-sm font-semibold tracking-tight text-gray-900 sm:text-[15px]">Lead2Learn</span>
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)] px-4 py-6 sm:py-8">
-        <div className="w-full max-w-[440px]">
-
-          {/* ─── Card ─── */}
-          <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.06),0_0_0_1px_rgba(255,255,255,0.8)] p-6 sm:p-8 pb-6 sm:pb-7">
-            {/* Icon */}
-            <div className="flex justify-center mb-4 sm:mb-5">
-              <div className="w-12 h-12 rounded-2xl bg-gray-900 flex items-center justify-center shadow-sm">
-                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" />
-                </svg>
-              </div>
+      {/* Card */}
+      <div className="relative z-10 flex min-h-[calc(100vh-76px)] items-center justify-center px-4 py-8">
+        <div className="w-full max-w-[480px]">
+          <div className="rounded-3xl border border-white/80 bg-white/80 p-6 shadow-[0_8px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-8">
+            <div className="mb-6 text-center">
+              <h1 className="text-[22px] font-bold tracking-tight text-gray-900">AIIA Skills Platform</h1>
+              <p className="mt-1.5 text-sm leading-relaxed text-gray-500">
+                Evidence → Skills → Gap → Match → Opportunity
+              </p>
             </div>
 
-            {/* ─── Login ─── */}
-            {mode === "login" && (
-              <>
-                <div className="text-center mb-5 sm:mb-6">
-                  <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">Sign in with email</h1>
-                  <p className="text-[14px] text-gray-500 mt-1.5 leading-relaxed">Access your AYUSH skills dashboard.<br />Manage evidence, opportunities &amp; growth.</p>
-                </div>
+            {/* Tab switch */}
+            <div className="mb-6 grid grid-cols-2 gap-1 rounded-xl bg-gray-100 p-1">
+              {(
+                [
+                  { id: "demo", label: "Instant demo" },
+                  { id: "email", label: "Email sign in" },
+                ] as { id: Tab; label: string }[]
+              ).map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => {
+                    setTab(t.id);
+                    setError("");
+                  }}
+                  className={cn(
+                    "cursor-pointer rounded-lg py-2 text-[13px] font-semibold transition-all",
+                    tab === t.id ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700",
+                  )}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
 
-                <form onSubmit={doLogin} className="space-y-3.5">
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={cn("w-full pl-10 pr-4 py-3 bg-gray-50/80 border rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-gray-100 transition-all", errs.email ? "border-red-300" : "border-gray-200")} />
-                  </div>
-                  {errs.email && <p className="text-[11px] text-red-500 flex items-center gap-1 -mt-2"><AlertTriangle className="w-3 h-3" />{errs.email}</p>}
-
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input type={showPw ? "text" : "password"} placeholder="Password" value={pw} onChange={(e) => setPw(e.target.value)} className={cn("w-full pl-10 pr-10 py-3 bg-gray-50/80 border rounded-xl text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-gray-100 transition-all", errs.pw ? "border-red-300" : "border-gray-200")} />
-                    <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
-                      {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  {errs.pw && <p className="text-[11px] text-red-500 flex items-center gap-1 -mt-2"><AlertTriangle className="w-3 h-3" />{errs.pw}</p>}
-
-                  <div className="flex items-center justify-between pt-0.5">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="w-3.5 h-3.5 rounded border-gray-300 text-gray-900 focus:ring-gray-200" />
-                      <span className="text-[12px] text-gray-500">Remember me</span>
-                    </label>
-                    <button type="button" className="text-[12px] text-gray-500 hover:text-gray-700 transition-colors">Forgot password?</button>
-                  </div>
-
-                  <button type="submit" disabled={loading} className="w-full py-3 bg-gray-900 text-white font-medium rounded-xl text-sm flex items-center justify-center gap-2 hover:bg-gray-800 active:scale-[0.98] transition-all disabled:opacity-50 mt-2">
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Get Started"}
-                  </button>
-                </form>
-
-                <div className="flex items-center gap-3 my-4 sm:my-5">
-                  <div className="flex-1 border-t border-dashed border-gray-200" />
-                  <span className="text-[11px] text-gray-400 font-medium">Or sign in with</span>
-                  <div className="flex-1 border-t border-dashed border-gray-200" />
-                </div>
-
-                {/* Social buttons */}
-                <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
-                  <button type="button" className="py-2.5 border border-gray-200 rounded-xl flex items-center justify-center hover:bg-gray-50 transition-all">
-                    <svg viewBox="0 0 24 24" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                  </button>
-                  <button type="button" className="py-2.5 border border-gray-200 rounded-xl flex items-center justify-center hover:bg-gray-50 transition-all">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                  </button>
-                  <button type="button" className="py-2.5 border border-gray-200 rounded-xl flex items-center justify-center hover:bg-gray-50 transition-all">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#000"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                  </button>
-                </div>
-
-                <p className="text-center text-[13px] text-gray-500 mt-4 sm:mt-6">
-                  Don't have an account?{" "}
-                  <button type="button" onClick={() => reset("signup")} className="text-gray-900 font-semibold hover:underline">
-                    Create one
-                  </button>
+            {/* ─────────────────────────── DEMO TAB ─────────────────────────── */}
+            {tab === "demo" && (
+              <div>
+                <p className="mb-4 text-center text-[13px] text-gray-500">
+                  One tap per profile — no email or password needed.
                 </p>
-              </>
+                {needsRolePick ? (
+                  <p className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-center text-xs text-amber-700">
+                    You're signed in — choose a profile to open its dashboard.
+                  </p>
+                ) : null}
+                <div className="flex flex-col gap-2.5">
+                  {roleCards.map((r) => {
+                    const Icon = r.icon;
+                    const loading = busy === `Signing in as ${r.name}…`;
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        disabled={!!busy}
+                        onClick={() => demoAs(r.id, r.name)}
+                        className={cn(
+                          "group flex w-full items-center gap-3.5 rounded-2xl border-2 border-gray-100 bg-white p-4 text-left transition-all",
+                          "hover:border-gray-200 hover:shadow-md active:scale-[0.99]",
+                          busy && !loading && "pointer-events-none opacity-50",
+                        )}
+                      >
+                        <div
+                          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105"
+                          style={{ background: r.iconBg }}
+                        >
+                          <Icon className="h-5 w-5" style={{ color: r.color }} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[14px] font-semibold text-gray-900">{r.name}</span>
+                            <span className="rounded-full px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider" style={{ background: r.bg, color: r.color }}>
+                              {r.label}
+                            </span>
+                          </div>
+                          <span className="mt-0.5 block text-[12px] text-gray-500">{r.desc}</span>
+                        </div>
+                        {loading ? (
+                          <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                        ) : (
+                          <ArrowRight className="h-4 w-4 text-gray-300 transition-all group-hover:translate-x-0.5 group-hover:text-gray-500" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             )}
 
-            {/* ─── Signup: Role Selection ─── */}
-            {mode === "signup" && step === "role" && (
-              <>
-                <div className="text-center mb-5 sm:mb-6">
-                  <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">Create your account</h1>
-                  <p className="text-[14px] text-gray-500 mt-1.5">Select your role to get started</p>
-                </div>
-
-                <div className="mb-4 sm:mb-5">
-                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Continue as</p>
-                  <RoleCards />
-                </div>
-
-                <button onClick={() => role && setStep("details")} disabled={!role} className={cn("w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]", role ? "bg-gray-900 text-white hover:bg-gray-800" : "bg-gray-100 text-gray-400 cursor-not-allowed")}>
-                  Continue <ArrowRight className="w-4 h-4" />
-                </button>
-
-                <p className="text-center text-[13px] text-gray-500 mt-4 sm:mt-5">
-                  Already have an account?{" "}
-                  <button type="button" onClick={() => reset("login")} className="text-gray-900 font-semibold hover:underline">Sign in</button>
-                </p>
-              </>
-            )}
-
-            {/* ─── Signup: Details ─── */}
-            {mode === "signup" && step === "details" && (
-              <form onSubmit={doSignup} className="space-y-3.5">
-                <button type="button" onClick={() => setStep("role")} className="flex items-center gap-1 text-[13px] text-gray-400 hover:text-gray-600 transition-colors mb-1">
-                  <ChevronLeft className="w-3.5 h-3.5" /> Back
-                </button>
-
-                {roleCfg && (
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: roleCfg.iconBg }}>
-                      <roleCfg.icon className="w-5 h-5" style={{ color: roleCfg.color }} />
+            {/* ────────────────────────── EMAIL TAB ─────────────────────────── */}
+            {tab === "email" && (
+              <div>
+                {!otpSent ? (
+                  <form onSubmit={sendCode} className="space-y-3.5">
+                    <p className="text-center text-[13px] text-gray-500">
+                      Enter your email and we'll send a one-time code.
+                    </p>
+                    <div className="space-y-1.5">
+                      <label className="text-[13px] font-medium text-gray-600">Full name (optional, new accounts)</label>
+                      <div className="relative">
+                        <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder="Your name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="w-full rounded-xl border border-gray-200 bg-gray-50/80 py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-gray-100"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-lg font-bold text-gray-900">{roleCfg.name}</h2>
-                      <p className="text-[12px] text-gray-500">Create your account</p>
+                    <div className="space-y-1.5">
+                      <label className="text-[13px] font-medium text-gray-600">Email</label>
+                      <div className="relative">
+                        <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="email"
+                          placeholder="you@institution.edu"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full rounded-xl border border-gray-200 bg-gray-50/80 py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-gray-100"
+                        />
+                      </div>
+                    </div>
+                    {error && (
+                      <p className="flex items-center gap-1.5 text-[12px] text-red-500">
+                        <AlertTriangle className="h-3 w-3 flex-shrink-0" /> {error}
+                      </p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={!!busy}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 py-3 text-sm font-medium text-white transition-all hover:bg-gray-800 active:scale-[0.99] disabled:opacity-50"
+                    >
+                      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Send code <ArrowRight className="h-4 w-4" /></>}
+                    </button>
+                  </form>
+                ) : needsRolePick ? null : (
+                  <form onSubmit={verifyCode} className="space-y-3.5">
+                    <div className="flex items-center gap-1 text-[13px] text-gray-500">
+                      <button type="button" onClick={() => { setOtpSent(false); setCode(""); setError(""); }} className="flex items-center gap-1 text-gray-400 transition-colors hover:text-gray-600">
+                        <ChevronLeft className="h-3.5 w-3.5" /> Change email
+                      </button>
+                    </div>
+                    <p className="text-center text-[13px] text-gray-500">
+                      We emailed a 6-digit code to <span className="font-semibold text-gray-700">{email}</span>
+                    </p>
+                    <div className="space-y-1.5">
+                      <label className="text-[13px] font-medium text-gray-600">One-time code</label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        maxLength={6}
+                        placeholder="000000"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                        className="w-full rounded-xl border border-gray-200 bg-gray-50/80 py-3 pl-4 pr-4 text-center font-mono text-lg tracking-[0.4em] text-gray-900 outline-none transition-all placeholder:text-gray-300 focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-gray-100"
+                      />
+                    </div>
+                    {error && (
+                      <p className="flex items-center gap-1.5 text-[12px] text-red-500">
+                        <AlertTriangle className="h-3 w-3 flex-shrink-0" /> {error}
+                      </p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={!!busy}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-900 py-3 text-sm font-medium text-white transition-all hover:bg-gray-800 active:scale-[0.99] disabled:opacity-50"
+                    >
+                      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Verify & continue <ArrowRight className="h-4 w-4" /></>}
+                    </button>
+                    <p className="text-center text-[11px] text-gray-400">
+                      Didn't get it? Check spam, or go back to resend.
+                    </p>
+                  </form>
+                )}
+
+                {/* Profile picker shown right after a successful email sign-in */}
+                {needsRolePick && (
+                  <div className="border-t border-gray-100 pt-4">
+                    <p className="mb-3 text-center text-[13px] font-semibold text-gray-700">
+                      Welcome! Pick your profile to continue
+                    </p>
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      {roleCards.map((r) => {
+                        const Icon = r.icon;
+                        return (
+                          <button
+                            key={r.id}
+                            type="button"
+                            disabled={!!busy}
+                            onClick={() => pickRole(r.id, r.name)}
+                            className="group flex items-center gap-2.5 rounded-xl border border-gray-100 bg-white p-3 text-left transition-all hover:border-gray-200 hover:shadow-sm active:scale-[0.98]"
+                          >
+                            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg" style={{ background: r.iconBg }}>
+                              <Icon className="h-4 w-4" style={{ color: r.color }} />
+                            </div>
+                            <span className="text-[13px] font-semibold text-gray-800">{r.name}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
-
-                <Fields />
-
-                <p className="text-[11px] text-gray-400 leading-relaxed">
-                  By continuing you agree to our <a href="#" className="text-gray-600 hover:underline">Terms</a> and <a href="#" className="text-gray-600 hover:underline">Privacy Policy</a>.
-                </p>
-
-                <button type="submit" disabled={loading} className="w-full py-3 bg-gray-900 text-white font-medium rounded-xl text-sm flex items-center justify-center gap-2 hover:bg-gray-800 active:scale-[0.98] transition-all disabled:opacity-50">
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Account"}
-                </button>
-
-                <p className="text-center text-[13px] text-gray-500">
-                  Already have an account?{" "}
-                  <button type="button" onClick={() => reset("login")} className="text-gray-900 font-semibold hover:underline">Sign in</button>
-                </p>
-              </form>
+              </div>
             )}
           </div>
 
-          {/* Pipeline (below card) */}
-          <div className="flex items-center justify-center gap-0.5 sm:gap-1 mt-4 sm:mt-6">
-            {PIPELINE.map((p, i) => (
-              <div key={p.label} className="flex items-center">
-                <div className={cn("w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center text-[8px] sm:text-[9px] font-bold", p.done ? "bg-gray-900 text-white" : "bg-white/60 text-gray-400 border border-gray-200/60")}>
-                  {p.done ? <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg> : i + 1}
-                </div>
-                {i < PIPELINE.length - 1 && <div className={cn("w-3 sm:w-5 h-px mx-0.5", p.done ? "bg-gray-300" : "bg-gray-200")} />}
-              </div>
-            ))}
-          </div>
-          <p className="text-center text-[9px] sm:text-[10px] text-gray-400 mt-1.5 sm:mt-2">Evidence → Skills → Gap → Match → Opportunity</p>
+          <p className="mt-4 text-center text-[11px] text-gray-400">
+            Prototype for the AIIA Academia–Industry collaboration demo.
+          </p>
         </div>
       </div>
     </div>
