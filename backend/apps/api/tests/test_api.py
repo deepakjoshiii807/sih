@@ -112,6 +112,11 @@ class SeedDataTestCase(TestCase):
         response = self.client.get("/api/student/dashboard")
         self.assertEqual(response.status_code, 401)
 
+    def test_health_endpoint(self):
+        response = self.client.get("/api/health")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.json()["status"], "ok")
+
     # --------------------------------------------------------------- actions
     def test_student_apply_workflow(self):
         user = self._login(STUDENT)

@@ -39,8 +39,50 @@ python manage.py test apps.api                      # 14 smoke tests
 
 Production posture: set `SECRET_KEY`, `DEBUG=False`, `DJANGO_ALLOWED_HOSTS`,
 `CORS_ALLOW_ALL_ORIGINS=False` + `CORS_ALLOWED_ORIGINS`, and point
-`DATABASE_URL` at Postgres (add `dj-database-url` to requirements). Serves via
-`gunicorn config.wsgi:application` (or `uvicorn config.asgi`).
+`DATABASE_URL` at Postgres. The app refuses to boot with `DEBUG=False` and a
+default `SECRET_KEY`. Serves via gunicorn; static files are handled by
+WhiteNoise.
+
+## Run with Docker (Postgres included)
+
+```bash
+cd backend
+SECRET_KEY=$(openssl rand -hex 32) docker compose up --build
+```
+
+`env.example` lists every variable — export them from your shell, or save the
+file as `.env` next to `docker-compose.yml` (Compose auto-loads `.env`).
+
+The `web` service waits for Postgres, runs migrations, seeds demo data
+(`SEED_DEMO=1` by default; set `SEED_DEMO=0` for a clean DB), collects static
+files and starts gunicorn on `http://localhost:8000`. Both services expose
+healthchecks wired through `/api/health`.
+
+Useful compose overrides:
+
+| Var | Default | Notes |
+|---|---|---|
+| `SEED_DEMO` | `1` | set `0` to skip demo data on boot |
+| `DEMO_PASSWORD` | `DemoPass@123` | seed logins password |
+| `WEB_CONCURRENCY` / `WEB_THREADS` | `2` / `2` | gunicorn sizing |
+| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | `skillbridge` | db credentials |
+| `CORS_ALLOW_ALL_ORIGINS` | `True` | flip off + set `CORS_ALLOWED_ORIGINS` for prod |
+
+## Deploy checklist (VM / K8s / PaaS)
+
+1. `DEBUG=False` and a strong `SECRET_KEY` (boot fails otherwise).
+2. Point `DATABASE_URL` at managed Postgres; run `migrate` as a release step
+   (`docker compose run --rm web python manage.py migrate`).
+3. `DJANGO_ALLOWED_HOSTS` = your real domain(s);
+   `DJANGO_CSRF_TRUSTED_ORIGINS` = `https://your-domain` (needed for admin +
+   browsable API over HTTPS).
+4. Terminate TLS at a proxy and set `SECURE_SSL_REDIRECT=True` to enable
+   secure cookies; `CORS_ALLOW_ALL_ORIGINS=False` + explicit origins.
+5. Run with `WEB_CONCURRENCY` ≈ (2 × CPU) + 1 behind the proxy;
+   healthcheck = `GET /api/health`.
+6. CI (`.github/workflows/django.yml`) runs `check`, migration drift,
+   migrations, seed and the API suite against a Postgres service on every
+   `backend/**` push — keep it green before merging.
 
 ---
 
@@ -99,6 +141,8 @@ Design rules baked in:
 | `CORS_ALLOW_ALL_ORIGINS` | `True` | dev convenience |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | used when allow-all is off |
 | `DEMO_PASSWORD` | `DemoPass@123` | password for seeded demo logins |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | *(empty)* | comma-separated HTTPS origins for admin/browsable API |
+| `SECURE_SSL_REDIRECT` | `False` | `True` behind a TLS proxy → HTTPS redirect + secure cookies |
 
 No `.env` loader is bundled on purpose — export these in your shell/CI/container
 or add a loader (`django-environ`) if you prefer a `.env` file.
@@ -133,6 +177,8 @@ application actions (`shortlist|interview|offer|reject`), ratings
 
 **Institution admin** — dashboard, profile, anomaly review
 (`resolve|escalate`), report generation
+
+**Ops** — `GET /api/health` (public, checks DB connectivity)
 
 Dashboard payloads are camelCase and mirror `src/lib/student-api.ts`,
 `industry-api.ts`, `faculty-api.ts` and `institution-api.ts` key-for-key, so

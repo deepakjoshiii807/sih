@@ -783,6 +783,32 @@ class LearningResourceListView(APIView):
 
 
 # ---------------------------------------------------------------------------
+# Health / readiness probe (used by Docker healthcheck + load balancers)
+# ---------------------------------------------------------------------------
+
+
+class HealthView(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        """200 when the app + database are reachable, 503 otherwise."""
+        from django.db import connection
+
+        db_ok = True
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1")
+        except Exception:  # noqa: BLE001 - report any failure as unhealthy
+            db_ok = False
+        if not db_ok:
+            return Response(
+                {"status": "degraded", "database": "error"},
+                status=503,
+            )
+        return Response({"status": "ok", "database": "ok"})
+
+
+# ---------------------------------------------------------------------------
 # Generic settings endpoint (best-effort patch for dashboards' Settings tabs)
 # ---------------------------------------------------------------------------
 

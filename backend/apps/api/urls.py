@@ -6,6 +6,8 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from . import views
 
 urlpatterns = [
+    # ---- Health probe ---------------------------------------------------
+    path("health", views.HealthView.as_view()),
     # ---- Auth -----------------------------------------------------------
     path("auth/register", auth_views.RegisterView.as_view()),
     path("auth/token", auth_views.EmailTokenObtainPairView.as_view()),
