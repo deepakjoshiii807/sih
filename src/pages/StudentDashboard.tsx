@@ -43,16 +43,16 @@ const bestMatch = {
 };
 
 const opportunities = [
-  { id: 1, title: "Clinical Research Intern", org: "AIIA · Research Division", location: "New Delhi", duration: "3 Months", match: 92, skills: ["Python", "Research", "Data Analysis"], status: "recommended" },
-  { id: 2, title: "Research Data Assistant", org: "CCRAS · New Delhi", location: "New Delhi", duration: "6 Months", match: 85, skills: ["Python", "Data Analysis", "Machine Learning"], status: "open" },
-  { id: 3, title: "AYUSH Research Internship", org: "NIA · Jaipur", location: "Jaipur", duration: "2 Months", match: 78, skills: ["Research", "Clinical Research"], status: "open" },
-  { id: 4, title: "Public Health Analyst Intern", org: "MoHFW · Delhi", location: "New Delhi", duration: "4 Months", match: 72, skills: ["Data Analysis", "Statistical Analysis"], status: "open" },
+  { id: 1, title: "Clinical Research Intern", org: "AIIA / Research Division", location: "New Delhi", duration: "3 Months", match: 92, skills: ["Python", "Research", "Data Analysis"], status: "recommended" },
+  { id: 2, title: "Research Data Assistant", org: "CCRAS / New Delhi", location: "New Delhi", duration: "6 Months", match: 85, skills: ["Python", "Data Analysis", "Machine Learning"], status: "open" },
+  { id: 3, title: "AYUSH Research Internship", org: "NIA / Jaipur", location: "Jaipur", duration: "2 Months", match: 78, skills: ["Research", "Clinical Research"], status: "open" },
+  { id: 4, title: "Public Health Analyst Intern", org: "MoHFW / Delhi", location: "New Delhi", duration: "4 Months", match: 72, skills: ["Data Analysis", "Statistical Analysis"], status: "open" },
 ];
 
 const applications = [
-  { id: 1, role: "Clinical Research Intern", org: "AIIA · Research Division", stage: "applied", label: "Applied", status: "Submitted 2 days ago", date: "Sept 3, 2025" },
-  { id: 2, role: "Research Data Assistant", org: "CCRAS · New Delhi", stage: "shortlisted", label: "Shortlisted", status: "Interview · Sept 8", date: "Sept 8, 2025" },
-  { id: 3, role: "AYUSH Research Internship", org: "NIA · Jaipur", stage: "offer", label: "Offer", status: "Respond by Sept 12", date: "Sept 12, 2025" },
+  { id: 1, role: "Clinical Research Intern", org: "AIIA / Research Division", stage: "applied", label: "Applied", status: "Submitted 2 days ago", date: "Sept 3, 2025" },
+  { id: 2, role: "Research Data Assistant", org: "CCRAS / New Delhi", stage: "shortlisted", label: "Shortlisted", status: "Interview / Sept 8", date: "Sept 8, 2025" },
+  { id: 3, role: "AYUSH Research Internship", org: "NIA / Jaipur", stage: "offer", label: "Offer", status: "Respond by Sept 12", date: "Sept 12, 2025" },
 ];
 
 const recommendations = [
@@ -208,7 +208,7 @@ function SidebarContent({ activeNav, setActiveNav }: { activeNav: string; setAct
               </div>
               <div className="min-w-0">
                 <div className="font-semibold text-sm truncate" style={{ color: "#171A18" }}>{student.name}</div>
-                <div className="text-xs font-mono" style={{ color: "#6B6F68" }}>{student.course} · {student.year}</div>
+                <div className="text-xs font-mono" style={{ color: "#6B6F68" }}>{student.course} / {student.year}</div>
               </div>
             </div>
             <div className="mt-2.5">
@@ -241,7 +241,7 @@ function OverviewSection() {
     <>
       {/* Hero */}
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-        className="col-span-12 rounded-[18px] p-7 overflow-hidden relative" style={{ background: "#244B35", color: "#F7F6F0" }}>
+        className="col-span-12 rounded-[20px] p-7 overflow-hidden relative" style={{ background: "linear-gradient(135deg, #244B35 0%, #1C3D2B 50%, #1A3626 100%)", color: "#F7F6F0", boxShadow: "0 4px 24px rgba(36,75,53,.15)" }}>
         <div className="absolute right-3.5 bottom-3.5 w-16 h-16 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(#DCE6D0 1px,transparent 1px)", backgroundSize: "8px 8px" }} />
         <div className="flex items-start gap-6">
           <div className="flex-1 min-w-0">
@@ -281,7 +281,7 @@ function OverviewSection() {
                   <span className="ml-2 font-bold text-lg" style={{ color: "#DCE6D0" }}>{student.skillConfidence}%</span>
                 </div>
                 <button className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:-translate-y-0.5" style={{ background: "#E8D36B", color: "#16301F" }}>
-                  Best match · {student.bestMatch}% <ChevronRight size={16} />
+                  Best match / {student.bestMatch}% <ChevronRight size={16} />
                 </button>
               </div>
             </div>
@@ -318,21 +318,21 @@ function OverviewSection() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
         className="col-span-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Profile Completion", value: `${student.profileCompletion}%`, color: "#171A18" },
-          { label: "Skill Confidence", value: `${student.skillConfidence}%`, color: "#6B6F68" },
-          { label: "Evidence Items", value: evidence.total, color: "#171A18" },
-          { label: "Applications", value: applications.length, color: "#171A18" },
+          { label: "Profile Completion", value: `${student.profileCompletion}%`, color: "#244B35", bg: "#DCE6D0" },
+          { label: "Skill Confidence", value: `${student.skillConfidence}%`, color: "#171A18", bg: "#EDEBE0" },
+          { label: "Evidence Items", value: evidence.total, color: "#8A6FB8", bg: "#EAE3F4" },
+          { label: "Applications", value: applications.length, color: "#C98B5F", bg: "#F0E8DD" },
         ].map((s) => (
-          <div key={s.label} className="text-center">
-            <div className="font-mono text-[10px] font-bold tracking-widest uppercase" style={{ color: "#9A9D94" }}>{s.label}</div>
-            <div className="font-bold text-3xl mt-1" style={{ color: s.color }}>{s.value}</div>
+          <div key={s.label} className="rounded-[14px] px-5 py-4 text-center" style={{ background: s.bg }}>
+            <div className="font-mono text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5" style={{ color: "#6B6F68" }}>{s.label}</div>
+            <div className="font-bold text-3xl tracking-tight leading-none" style={{ color: s.color }}>{s.value}</div>
           </div>
         ))}
       </motion.div>
 
       {/* Skill Snapshot */}
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }}
-        className="col-span-12 lg:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 lg:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Skill Snapshot</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Your Skill Snapshot</div>
         <div className="text-[13px] mb-4" style={{ color: "#6B6F68" }}>Verified vs self-declared</div>
@@ -351,11 +351,11 @@ function OverviewSection() {
 
       {/* Skill Gap */}
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
-        className="col-span-12 sm:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 sm:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow color="#B99A22">Skill Gap</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Your Biggest Skill Gaps</div>
         <div className="text-[13px] mb-4" style={{ color: "#6B6F68" }}>
-          Matched against your target role · <b style={{ color: "#171A18" }}>{student.targetRole}</b>
+          Matched against your target role / <b style={{ color: "#171A18" }}>{student.targetRole}</b>
         </div>
         {gaps.slice(0, 3).map((g) => (
           <div key={g.name} className="py-2.5 border-b last:border-b-0" style={{ borderColor: "#EDEBE0" }}>
@@ -375,7 +375,7 @@ function OverviewSection() {
 
       {/* Best Match */}
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.12 }}
-        className="col-span-12 sm:col-span-8 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 sm:col-span-8 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Best Match</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Best Match For You</div>
         <div className="flex flex-col sm:flex-row gap-5">
@@ -406,7 +406,7 @@ function OverviewSection() {
         </div>
         <div className="mt-4">
           <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "#9A9D94" }}>
-            Skills matched · {bestMatch.matched.length + bestMatch.missing.length} of 9
+            Skills matched / {bestMatch.matched.length + bestMatch.missing.length} of 9
           </div>
           <div className="flex flex-wrap gap-1.5">
             {bestMatch.matched.map((s) => (
@@ -433,7 +433,7 @@ function OverviewSection() {
 
       {/* Applications */}
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.14 }}
-        className="col-span-12 sm:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 sm:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Applications</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Application Journey</div>
         <div className="text-[13px] mb-4" style={{ color: "#6B6F68" }}>Quick status of your submissions</div>
@@ -460,7 +460,7 @@ function OverviewSection() {
 
       {/* Recommendations */}
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.16 }}
-        className="col-span-12 lg:col-span-7 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 lg:col-span-7 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow color="#8A6FB8">Recommendations</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Recommended For Your Skill Gaps</div>
         <div className="text-[13px] mb-4" style={{ color: "#6B6F68" }}>Not random — every pick maps to a gap you can close.</div>
@@ -482,7 +482,7 @@ function OverviewSection() {
 
       {/* Evidence Vault */}
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.18 }}
-        className="col-span-12 lg:col-span-5 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 lg:col-span-5 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Evidence Vault</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Evidence Vault</div>
         <div className="text-[13px] mb-4" style={{ color: "#6B6F68" }}>Proof that backs your skills</div>
@@ -524,7 +524,7 @@ function OverviewSection() {
 
       {/* Quick Actions */}
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
-        className="col-span-12 lg:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 lg:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Quick Actions</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-3">What do you want to do?</div>
         <div className="grid grid-cols-2 gap-2.5">
@@ -547,7 +547,7 @@ function OverviewSection() {
 
       {/* Portfolio */}
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.22 }}
-        className="col-span-12 lg:col-span-8 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 lg:col-span-8 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Portfolio</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-3">Your Verified Portfolio</div>
         <div className="flex flex-col gap-2 mb-3">
@@ -586,7 +586,7 @@ function ProfileSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 lg:col-span-8 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 lg:col-span-8 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>My Profile</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Student Profile</div>
         <div className="flex items-start gap-5 mb-6">
@@ -595,7 +595,7 @@ function ProfileSection() {
           </div>
           <div className="flex-1">
             <div className="font-bold text-xl tracking-tight">{student.name}</div>
-            <div className="font-mono text-xs mt-1" style={{ color: "#6B6F68" }}>{student.course} · {student.year}</div>
+            <div className="font-mono text-xs mt-1" style={{ color: "#6B6F68" }}>{student.course} / {student.year}</div>
             <div className="font-mono text-xs" style={{ color: "#6B6F68" }}>{student.institution}</div>
             <div className="mt-2"><Tag cls="verified">Target: {student.targetRole}</Tag></div>
           </div>
@@ -607,7 +607,7 @@ function ProfileSection() {
           {[
             { label: "Email", value: profile.email },
             { label: "Phone", value: profile.phone },
-            { label: "Course", value: `${profile.course} · ${profile.year}` },
+            { label: "Course", value: `${profile.course} / ${profile.year}` },
             { label: "Institution", value: profile.institution },
             { label: "Target Role", value: profile.targetRole },
             { label: "Profile Completion", value: `${profile.profileCompletion}%` },
@@ -620,7 +620,7 @@ function ProfileSection() {
         </div>
       </motion.section>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="col-span-12 lg:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 lg:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Quick Stats</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">At a Glance</div>
         <div className="flex flex-col gap-3">
@@ -652,12 +652,12 @@ function SkillsSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="flex items-center justify-between mb-5">
           <div>
             <Eyebrow>Skills</Eyebrow>
             <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">All Skills</div>
-            <div className="text-[13px]" style={{ color: "#6B6F68" }}>{verified.length} verified · {selfDeclared.length} self-declared</div>
+            <div className="text-[13px]" style={{ color: "#6B6F68" }}>{verified.length} verified / {selfDeclared.length} self-declared</div>
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -673,7 +673,7 @@ function SkillsSection() {
                   <span className="ml-auto font-mono font-bold text-sm">{sk.pct}<span className="text-[10px] font-normal" style={{ color: "#9A9D94" }}>%</span></span>
                 </div>
                 <PxBar pct={sk.pct} />
-                <div className="font-mono text-[11px] mt-1.5" style={{ color: "#9A9D94" }}>Source: {sk.source} · {sk.category}</div>
+                <div className="font-mono text-[11px] mt-1.5" style={{ color: "#9A9D94" }}>Source: {sk.source} / {sk.category}</div>
               </div>
             ))}
           </div>
@@ -689,7 +689,7 @@ function SkillsSection() {
                   <span className="ml-auto font-mono font-bold text-sm">{sk.pct}<span className="text-[10px] font-normal" style={{ color: "#9A9D94" }}>%</span></span>
                 </div>
                 <PxBar pct={sk.pct} yellow />
-                <div className="font-mono text-[11px] mt-1.5" style={{ color: "#9A9D94" }}>Source: {sk.source} · {sk.category}</div>
+                <div className="font-mono text-[11px] mt-1.5" style={{ color: "#9A9D94" }}>Source: {sk.source} / {sk.category}</div>
               </div>
             ))}
           </div>
@@ -706,11 +706,11 @@ function SkillGapSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow color="#B99A22">Skill Gap</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Skill Gap Analysis</div>
         <div className="text-[13px] mb-6" style={{ color: "#6B6F68" }}>
-          Matched against your target role · <b style={{ color: "#171A18" }}>{student.targetRole}</b>
+          Matched against your target role / <b style={{ color: "#171A18" }}>{student.targetRole}</b>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {gaps.map((g) => (
@@ -750,7 +750,7 @@ function OpportunitiesSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Opportunities</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Matched Opportunities</div>
         <div className="text-[13px] mb-5" style={{ color: "#6B6F68" }}>Based on your verified skills and target role</div>
@@ -802,7 +802,7 @@ function ApplicationsSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Applications</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Application Tracker</div>
         <div className="text-[13px] mb-5" style={{ color: "#6B6F68" }}>Track your application journey</div>
@@ -836,7 +836,7 @@ function ApplicationsSection() {
               </div>
               <div className="flex items-center gap-3 text-xs" style={{ color: "#6B6F68" }}>
                 <span className="inline-flex items-center gap-1"><Calendar size={12} /> {app.date}</span>
-                <span>·</span>
+                <span>/</span>
                 <span>{app.status}</span>
               </div>
             </div>
@@ -854,7 +854,7 @@ function RecommendationsSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow color="#8A6FB8">Recommendations</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Recommended For Your Skill Gaps</div>
         <div className="text-[13px] mb-5" style={{ color: "#6B6F68" }}>Not random — every pick maps to a gap you can close.</div>
@@ -865,7 +865,7 @@ function RecommendationsSection() {
               <div className="font-semibold text-[15px] mb-1">{r.title}</div>
               <div className="flex items-center gap-2 mb-2">
                 <Tag cls="lavender">{r.type}</Tag>
-                <span className="font-mono text-[10px]" style={{ color: "#9A9D94" }}>{r.provider} · {r.duration}</span>
+                <span className="font-mono text-[10px]" style={{ color: "#9A9D94" }}>{r.provider} / {r.duration}</span>
               </div>
               <p className="text-xs mb-3" style={{ color: "#6B6F68" }}>{r.why}</p>
               <div className="flex items-center justify-between">
@@ -889,7 +889,7 @@ function EvidenceSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="flex items-center justify-between mb-5">
           <div>
             <Eyebrow>Evidence Vault</Eyebrow>
@@ -921,7 +921,7 @@ function EvidenceSection() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-[13px] truncate">{ev.name}</div>
-                <div className="font-mono text-[11px]" style={{ color: "#9A9D94" }}>{ev.issuer} · {ev.date}</div>
+                <div className="font-mono text-[11px]" style={{ color: "#9A9D94" }}>{ev.issuer} / {ev.date}</div>
               </div>
               <span className={`font-mono text-[10px] font-bold tracking-widest uppercase px-2 py-[3px] rounded-md flex-none ${
                 ev.status === "verified" ? "bg-[#DCE6D0] text-[#16301F]"
@@ -945,7 +945,7 @@ function PortfolioSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7" }}>
+        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Portfolio</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Your Verified Portfolio</div>
         <div className="grid grid-cols-3 gap-3 mb-6">
@@ -1045,7 +1045,7 @@ export default function StudentDashboard() {
               )}
             </div>
             <div className="text-[13px]" style={{ color: "#6B6F68" }}>
-              {activeNav === "overview" ? "Here's what your skill journey looks like today." : `${student.name} · ${student.course} · ${student.year}`}
+              {activeNav === "overview" ? "Here's what your skill journey looks like today." : `${student.name} / ${student.course} / ${student.year}`}
             </div>
           </div>
           <div className="ml-auto flex items-center gap-2.5">
