@@ -92,7 +92,6 @@ const navLinks = [
   { id: "applications", label: "Applications", icon: <FileText size={18} /> },
   { id: "recommendations", label: "Learn", icon: <BookOpen size={18} /> },
   { id: "portfolio", label: "Portfolio", icon: <Grid3X3 size={18} /> },
-  { id: "settings", label: "Settings", icon: <Settings size={18} /> },
 ];
 
 /* ─── Helpers ─── */
