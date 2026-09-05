@@ -182,7 +182,7 @@ function OverviewSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#E6DDD5", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #E8C7AE, #F0E8DD)" }} />
         <Eyebrow color="#C98B5F">Critical Alert</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-1">Top Curriculum Gaps</div>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-1" style={{ color: "#171A18" }}>Top Curriculum Gaps</div>
         <p className="text-xs mb-4" style={{ color: "#6B6F68" }}>Skills with high industry demand but low curriculum coverage.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {departmentSkills.filter(s => s.gapSeverity === "Critical").slice(0, 4).map((sk) => (
@@ -201,7 +201,7 @@ function OverviewSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#DED6EC", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow color="#8A6FB8">Readiness</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Student Readiness Distribution</div>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4" style={{ color: "#171A18" }}>Student Readiness Distribution</div>
         <div className="flex items-end gap-6 h-[160px]">
           {[
             { label: "Beginning", count: analytics.readinessDistribution.beginning, color: "#D4956A" },
@@ -228,7 +228,7 @@ function SkillIntelSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow color="#244B35">Department Skill Intelligence</Eyebrow>
-        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Skill Gap Analysis</div>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1" style={{ color: "#171A18" }}>Skill Gap Analysis</div>
         <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Industry demand vs curriculum coverage across your department.</p>
 
         <div className="overflow-x-auto">
@@ -261,7 +261,7 @@ function SkillIntelSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#E6DDD5", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
         <Eyebrow color="#C98B5F">Warnings</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Insights</div>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4" style={{ color: "#171A18" }}>Insights</div>
         <div className="flex flex-col gap-3">
           {departmentSkills.filter(s => s.gapSeverity === "Critical").map((sk) => (
             <div key={sk.taxonomyId} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: "#FDF8F3" }}>
@@ -287,7 +287,7 @@ function DemandSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow color="#244B35">Industry Demand</Eyebrow>
-        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Skill Demand Trends</div>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1" style={{ color: "#171A18" }}>Skill Demand Trends</div>
         <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>What industry is requesting over the last 6 months.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -305,7 +305,7 @@ function DemandSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#DED6EC", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow color="#8A6FB8">Roles in Demand</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Industry Roles</div>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4" style={{ color: "#171A18" }}>Industry Roles</div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {industryRoles.map((role) => (
             <div key={role.title} className="rounded-xl border p-4 hover:shadow-md transition-shadow" style={{ borderColor: "#E6E3D7", background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5FC 100%)" }}>
@@ -330,7 +330,7 @@ function CurriculumSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow color="#244B35">Curriculum Feedback</Eyebrow>
-        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Department Report</div>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1" style={{ color: "#171A18" }}>Department Report</div>
         <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Aggregated, anonymized data for {curriculumReport.department} / {curriculumReport.generatedDate}</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
@@ -377,7 +377,7 @@ function CurriculumSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#DED6EC", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow color="#8A6FB8">Recommendations</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Suggested Interventions</div>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4" style={{ color: "#171A18" }}>Suggested Interventions</div>
         <div className="flex flex-col gap-2">
           {curriculumReport.recommendations.map((rec, i) => (
             <div key={i} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: "#F8F5FC" }}>
@@ -418,7 +418,7 @@ function VerificationSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow color="#244B35">Student Verification</Eyebrow>
-        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5">Verification Queue</div>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5" style={{ color: "#171A18" }}>Verification Queue</div>
 
         <div className="flex flex-col gap-4">
           {verifications.map((v) => (
@@ -457,7 +457,7 @@ function OpportunitiesSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#DED6EC", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow color="#8A6FB8">Opportunities</Eyebrow>
-        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5">Faculty & Collaboration Opportunities</div>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5" style={{ color: "#171A18" }}>Faculty & Collaboration Opportunities</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {opportunities.map((opp) => (
@@ -491,7 +491,7 @@ function CurriculumLoopSection() {
         className="rounded-[18px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #E8D36B, #8A6FB8)" }} />
         <Eyebrow color="#244B35">Curriculum Feedback Loop</Eyebrow>
-        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Closed-Loop Curriculum Improvement</div>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1" style={{ color: "#171A18" }}>Closed-Loop Curriculum Improvement</div>
         <p className="text-xs mb-8" style={{ color: "#6B6F68" }}>Industry Demand &rarr; Skill Gap &rarr; Department Report &rarr; Academic Intervention &rarr; Student Development &rarr; Reassessment</p>
 
         <div className="relative">
@@ -554,7 +554,7 @@ function AnalyticsSection() {
           className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#DED6EC", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
           <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
           <Eyebrow color="#8A6FB8">Skill Distribution</Eyebrow>
-          <div className="font-semibold text-[16px] tracking-tight mt-2 mb-4">Student Skill Coverage</div>
+          <div className="font-semibold text-[16px] tracking-tight mt-2 mb-4" style={{ color: "#171A18" }}>Student Skill Coverage</div>
           <div className="flex flex-col gap-3">
             {analytics.skillDistribution.map((sk) => (
               <div key={sk.name}><div className="flex items-center justify-between mb-1"><span className="text-sm font-medium" style={{ color: "#171A18" }}>{sk.name}</span><span className="font-mono text-xs font-bold" style={{ color: "#6B6F68" }}>{sk.count}/{analytics.totalStudents}</span></div>
@@ -567,7 +567,7 @@ function AnalyticsSection() {
           className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
           <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
           <Eyebrow color="#244B35">Department Comparison</Eyebrow>
-          <div className="font-semibold text-[16px] tracking-tight mt-2 mb-4">Cross-Department</div>
+          <div className="font-semibold text-[16px] tracking-tight mt-2 mb-4" style={{ color: "#171A18" }}>Cross-Department</div>
           <div className="flex flex-col gap-3">
             {analytics.departmentComparison.map((d) => (
               <div key={d.dept} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "#FAFCF7" }}>
@@ -584,7 +584,7 @@ function AnalyticsSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#E6DDD5", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
         <Eyebrow color="#C98B5F">Monthly Trend</Eyebrow>
-        <div className="font-semibold text-[16px] tracking-tight mt-2 mb-4">Verified Skills & Placements</div>
+        <div className="font-semibold text-[16px] tracking-tight mt-2 mb-4" style={{ color: "#171A18" }}>Verified Skills & Placements</div>
         <div className="flex items-end gap-4 h-[140px]">
           {analytics.monthlyTrend.map((m) => {
             const max = Math.max(...analytics.monthlyTrend.map(x => x.verified));
@@ -672,7 +672,7 @@ function SettingsSection() {
         className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow color="#244B35">Settings</Eyebrow>
-        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5">Account Settings</div>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5" style={{ color: "#171A18" }}>Account Settings</div>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           <div className="md:col-span-8">
             <div className="font-semibold text-sm mb-3" style={{ color: "#171A18" }}>Profile Information</div>
