@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router";
 
 interface Links {
   label: string;
@@ -15,7 +16,9 @@ interface SidebarContextProps {
   animate: boolean;
 }
 
-const SidebarContext = createContext<SidebarContextProps | undefined>(undefined);
+const SidebarContext = createContext<SidebarContextProps | undefined>(
+  undefined
+);
 
 export const useSidebar = () => {
   const context = useContext(SidebarContext);
@@ -37,8 +40,10 @@ export const SidebarProvider = ({
   animate?: boolean;
 }) => {
   const [openState, setOpenState] = useState(false);
+
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
+
   return (
     <SidebarContext.Provider value={{ open, setOpen, animate }}>
       {children}
@@ -64,17 +69,11 @@ export const Sidebar = ({
   );
 };
 
-export const SidebarBody = ({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) => {
+export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   return (
     <>
-      <DesktopSidebar className={className}>{children}</DesktopSidebar>
-      <MobileSidebar className={className}>{children}</MobileSidebar>
+      <DesktopSidebar {...props} />
+      <MobileSidebar {...(props as React.ComponentProps<"div">)} />
     </>
   );
 };
@@ -82,22 +81,21 @@ export const SidebarBody = ({
 export const DesktopSidebar = ({
   className,
   children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) => {
+  ...props
+}: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col flex-shrink-0 overflow-hidden",
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
         className
       )}
       animate={{
-        width: animate ? (open ? "260px" : "60px") : "260px",
+        width: animate ? (open ? "300px" : "60px") : "300px",
       }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
+      {...props}
     >
       {children}
     </motion.div>
@@ -107,58 +105,49 @@ export const DesktopSidebar = ({
 export const MobileSidebar = ({
   className,
   children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) => {
+  ...props
+}: React.ComponentProps<"div">) => {
   const { open, setOpen } = useSidebar();
   return (
     <>
-      <div className="md:hidden flex items-center justify-end w-full">
-        <button
-          onClick={() => setOpen(true)}
-          className="w-10 h-10 rounded-xl flex items-center justify-center"
-          style={{ border: "1px solid var(--line)", background: "var(--card)" }}
-        >
-          <Menu size={18} style={{ color: "var(--ink)" }} />
-        </button>
-      </div>
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="md:hidden fixed inset-0 z-[90]"
-              style={{ background: "rgba(23,26,24,.45)" }}
-              onClick={() => setOpen(false)}
-            />
+      <div
+        className={cn(
+          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full",
+        )}
+        {...props}
+      >
+        <div className="flex justify-end z-20 w-full">
+          <Menu
+            className="text-neutral-800 dark:text-neutral-200 cursor-pointer"
+            onClick={() => setOpen(!open)}
+          />
+        </div>
+        <AnimatePresence>
+          {open && (
             <motion.div
               initial={{ x: "-100%", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-100%", opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              transition={{
+                duration: 0.3,
+                ease: "easeInOut",
+              }}
               className={cn(
-                "md:hidden fixed inset-y-0 left-0 z-[100] flex flex-col p-4 overflow-y-auto w-[280px]",
+                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
                 className
               )}
             >
-              <div className="flex justify-end mb-2">
-                <button
-                  onClick={() => setOpen(false)}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ color: "rgba(220,230,208,.7)" }}
-                >
-                  <X size={18} />
-                </button>
+              <div
+                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200 cursor-pointer"
+                onClick={() => setOpen(!open)}
+              >
+                <X />
               </div>
               {children}
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </div>
     </>
   );
 };
@@ -166,38 +155,31 @@ export const MobileSidebar = ({
 export const SidebarLink = ({
   link,
   className,
-  active,
-  onClick,
+  ...props
 }: {
   link: Links;
   className?: string;
-  active?: boolean;
-  onClick?: () => void;
 }) => {
   const { open, animate } = useSidebar();
   return (
-    <button
-      onClick={onClick}
+    <Link
+      to={link.href}
       className={cn(
-        "flex items-center justify-start gap-3 py-2 w-full text-left rounded-xl transition-colors duration-150",
-        active
-          ? "bg-[var(--sage)] text-[var(--forest-ink)] font-semibold"
-          : "text-[rgba(220,230,208,.75)] hover:bg-[rgba(220,230,208,.08)] hover:text-[#F7F6F0]",
+        "flex items-center justify-start gap-2 group/sidebar py-2",
         className
       )}
+      {...props}
     >
-      <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
-        {link.icon}
-      </span>
+      {link.icon}
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-sm whitespace-pre"
+        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
       >
         {link.label}
       </motion.span>
-    </button>
+    </Link>
   );
 };
