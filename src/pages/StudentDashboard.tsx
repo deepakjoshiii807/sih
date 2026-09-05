@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Sidebar, SidebarBody, SidebarLink, Logo, LogoIcon, useSidebar } from "@/components/ui/sidebar";
+import { Sidebar, SidebarBody, Logo, LogoIcon, useSidebar } from "@/components/ui/sidebar";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, UserCog, Shield, Target, Zap, Briefcase,
@@ -7,1183 +7,854 @@ import {
   Upload, TrendingUp, ChevronRight, BookOpen, Award, Check,
   Calendar, MapPin, Clock, ExternalLink, Edit3, Camera,
   Lock, Globe, Eye, EyeOff, Mail, Key, BellRing, Trash2,
-  Save, Download, Smartphone, Moon, Sun, User,
+  Save, Download, Smartphone, Lightbulb, FlaskConical, Link2,
+  Share2, Copy, Sparkles,
 } from "lucide-react";
 
+import type {
+  Student, SkillPassportItem, SkillGap, RoleReadinessProfile,
+  SimulatorAction, RecommendedProject, Opportunity, Application,
+  LearningRecommendation, PortfolioProject, EvidenceItem,
+} from "@/lib/student-api";
+import { studentApi } from "@/lib/student-api";
 
-/* ─── Mock Data (swap for: const { student, skills, ... } = await studentApi.getDashboard()) ─── */
-const student = {
-  name: "Aarav Sharma", initials: "AS", course: "BAMS", year: "3rd Year",
-  institution: "All India Institute of Ayurveda", targetRole: "Clinical Research Intern",
-  profileCompletion: 82, skillConfidence: 78, bestMatch: 92,
-  email: "aarav.sharma@aiia.ac.in", phone: "+91 98765 43210",
-  bio: "Third-year BAMS student with a strong interest in clinical research and evidence-based medicine. Experienced in Python-based data analysis and research methodology.",
-};
+/* ─── Mock Data ─── */
+const student: Student = { id: "st-1", name: "Aarav Sharma", initials: "AS", email: "aarav.sharma@aiia.ac.in", phone: "+91 98765 43210", bio: "Third-year BAMS student with a strong interest in clinical research and evidence-based medicine.", institution: "All India Institute of Ayurveda", course: "BAMS", department: "Ayurveda Medicine", year: "3rd Year", graduationYear: 2027, location: "New Delhi", targetRole: "Clinical Research Intern", profileCompletion: 82 };
 
-const skills = [
-  { name: "Python", pct: 92, verified: true, source: "NPTEL Certificate", category: "Technical" },
-  { name: "Machine Learning", pct: 86, verified: true, source: "Research Project", category: "Technical" },
-  { name: "Research", pct: 81, verified: true, source: "Academic Transcript", category: "Research" },
-  { name: "Data Analysis", pct: 76, verified: true, source: "Project Work", category: "Technical" },
-  { name: "Clinical Research", pct: 68, verified: false, source: "Self-assessed", category: "Domain" },
-  { name: "Scientific Writing", pct: 64, verified: false, source: "Self-assessed", category: "Communication" },
-  { name: "Documentation", pct: 72, verified: false, source: "Self-assessed", category: "Communication" },
+const skillPassport = { verifiedCount: 5, selfDeclaredCount: 3, totalEvidence: 12, verifiedEvidence: 8, items: [
+  { id: "sp-1", name: "Python", taxonomyId: "TC-PY-01", origin: "evidence" as const, confidence: 92, category: "Technical", evidence: { id: "ev-1", title: "Python for Research Certificate", kind: "Certificate" as const, issuer: "NPTEL", date: "Jul 2025", status: "verified" as const } },
+  { id: "sp-2", name: "Machine Learning", taxonomyId: "TC-ML-01", origin: "evidence" as const, confidence: 86, category: "Technical", evidence: { id: "ev-2", title: "CVD Risk Prediction Model", kind: "Project" as const, issuer: "AIIA", date: "Jun 2025", status: "verified" as const } },
+  { id: "sp-3", name: "Research Methodology", taxonomyId: "TC-RM-04", origin: "evidence" as const, confidence: 81, category: "Research", evidence: { id: "ev-3", title: "Academic Transcript", kind: "Transcript" as const, issuer: "AIIA", date: "Aug 2025", status: "verified" as const } },
+  { id: "sp-4", name: "Data Analysis", taxonomyId: "TC-DA-02", origin: "evidence" as const, confidence: 76, category: "Technical", evidence: { id: "ev-4", title: "Rural Health Data Survey", kind: "Project" as const, issuer: "AIIA", date: "May 2025", status: "verified" as const } },
+  { id: "sp-5", name: "Clinical Research", taxonomyId: "TC-CR-03", origin: "evidence" as const, confidence: 68, category: "Domain", evidence: { id: "ev-5", title: "Clinical Posting Record", kind: "Log" as const, issuer: "AIIA OPD", date: "Jul 2025", status: "verified" as const } },
+  { id: "sp-6", name: "Scientific Writing", taxonomyId: "TC-SW-02", origin: "self-declared" as const, confidence: 64, category: "Communication" },
+  { id: "sp-7", name: "Documentation", taxonomyId: "TC-DC-01", origin: "self-declared" as const, confidence: 72, category: "Communication" },
+  { id: "sp-8", name: "Statistical Analysis", taxonomyId: "TC-SA-01", origin: "self-declared" as const, confidence: 45, category: "Technical" },
+] };
+
+const roleReadiness: RoleReadinessProfile = { targetRole: "Clinical Research Intern", readiness: "Developing", readinessScore: 74, matchedSkills: 5, totalRequired: 8, strongSkills: ["Python", "Machine Learning", "Research Methodology"], missingSkills: ["Statistical Analysis"], weakSkills: ["Scientific Writing", "Clinical Research"], explanation: "You are Developing toward this role. Your Python and research skills are strong, but Statistical Analysis is missing and Scientific Writing needs improvement.", factors: [
+  { label: "Verified skills match", value: "5 of 8 required skills verified", positive: true },
+  { label: "Strong technical foundation", value: "Python 92%, ML 86%", positive: true },
+  { label: "Missing critical skill", value: "Statistical Analysis not demonstrated", positive: false },
+  { label: "Weak areas need attention", value: "Scientific Writing at 64%", positive: false },
+  { label: "Evidence-backed", value: "74% of skills have supporting evidence", positive: true },
+] };
+
+const gaps: SkillGap[] = [
+  { id: "gp-1", taxonomyId: "TC-SA-01", name: "Statistical Analysis", current: 45, required: 75, severity: "High", evidenceNeeded: true },
+  { id: "gp-2", taxonomyId: "TC-SW-02", name: "Scientific Writing", current: 64, required: 80, severity: "Medium", evidenceNeeded: false },
+  { id: "gp-3", taxonomyId: "TC-CT-05", name: "Clinical Trial Documentation", current: 55, required: 75, severity: "Medium", evidenceNeeded: true },
 ];
 
-const gaps = [
-  { name: "Research Methodology", current: 78, required: 85, severity: "Medium" as const },
-  { name: "Statistical Analysis", current: 61, required: 80, severity: "High" as const },
-  { name: "Scientific Writing", current: 69, required: 85, severity: "Medium" as const },
-  { name: "Clinical Trial Documentation", current: 55, required: 75, severity: "High" as const },
+const simulatorActions: SimulatorAction[] = [
+  { type: "course", name: "Statistics for Health Research", description: "Complete NPTEL course on statistical methods", skillsImproved: [{ skill: "Statistical Analysis", currentConfidence: 45, projectedConfidence: 72 }], readinessChange: { from: 74, to: 83, fromLabel: "Developing", toLabel: "Developing" } },
+  { type: "project", name: "Clinical Data Analysis Project", description: "Analyze real clinical trial dataset using Python and statistical methods", skillsImproved: [{ skill: "Statistical Analysis", currentConfidence: 45, projectedConfidence: 78 }, { skill: "Data Analysis", currentConfidence: 76, projectedConfidence: 84 }], readinessChange: { from: 74, to: 88, fromLabel: "Developing", toLabel: "Job-Ready" } },
+  { type: "certification", name: "GCP Certification", description: "Obtain Good Clinical Practice certification", skillsImproved: [{ skill: "Clinical Trial Documentation", currentConfidence: 55, projectedConfidence: 78 }], readinessChange: { from: 74, to: 81, fromLabel: "Developing", toLabel: "Developing" } },
 ];
 
-const bestMatch = {
-  title: "Clinical Research Intern", org: "AIIA", division: "Research Division",
-  location: "New Delhi", duration: "3 Months", match: 92,
-  matched: ["Python", "Research", "Data Analysis", "Documentation"],
-  missing: ["Statistical Analysis"],
-  explanation: "92% match because your profile strongly aligns with 8 of 9 required skills.",
-};
-
-const opportunities = [
-  { id: 1, title: "Clinical Research Intern", org: "AIIA / Research Division", location: "New Delhi", duration: "3 Months", match: 92, skills: ["Python", "Research", "Data Analysis"], status: "recommended" },
-  { id: 2, title: "Research Data Assistant", org: "CCRAS / New Delhi", location: "New Delhi", duration: "6 Months", match: 85, skills: ["Python", "Data Analysis", "Machine Learning"], status: "open" },
-  { id: 3, title: "AYUSH Research Internship", org: "NIA / Jaipur", location: "Jaipur", duration: "2 Months", match: 78, skills: ["Research", "Clinical Research"], status: "open" },
-  { id: 4, title: "Public Health Analyst Intern", org: "MoHFW / Delhi", location: "New Delhi", duration: "4 Months", match: 72, skills: ["Data Analysis", "Statistical Analysis"], status: "open" },
+const recommendedProjects: RecommendedProject[] = [
+  { id: "rp-1", title: "Clinical Data Statistical Analysis", description: "Analyze a provided clinical trial dataset. Apply appropriate statistical tests, create visualizations, and write a brief findings report.", targetSkill: "Statistical Analysis", skillGapId: "gp-1", difficulty: "Intermediate", estimatedDuration: "3 weeks", deliverables: ["Jupyter notebook", "Statistical test results", "Charts", "Findings report"], verificationCriteria: ["Correct methodology", "Reproducible code", "Clear visualizations"], submissionStatus: "not submitted" },
+  { id: "rp-2", title: "Herbal Drug Efficacy Literature Review", description: "Conduct a systematic literature review on the efficacy of a chosen Ayurvedic formulation.", targetSkill: "Scientific Writing", skillGapId: "gp-2", difficulty: "Beginner", estimatedDuration: "2 weeks", deliverables: ["Literature review", "Reference list", "Summary tables"], verificationCriteria: ["Proper citations", "Structured methodology"], submissionStatus: "not submitted" },
 ];
 
-const applications = [
-  { id: 1, role: "Clinical Research Intern", org: "AIIA / Research Division", stage: "applied", label: "Applied", status: "Submitted 2 days ago", date: "Sept 3, 2025" },
-  { id: 2, role: "Research Data Assistant", org: "CCRAS / New Delhi", stage: "shortlisted", label: "Shortlisted", status: "Interview / Sept 8", date: "Sept 8, 2025" },
-  { id: 3, role: "AYUSH Research Internship", org: "NIA / Jaipur", stage: "offer", label: "Offer", status: "Respond by Sept 12", date: "Sept 12, 2025" },
+const opportunities: Opportunity[] = [
+  { id: "op-1", title: "Clinical Research Intern", type: "Internship", org: "AIIA / Research Division", location: "New Delhi", duration: "3 Months", stipend: "₹12,000/month", deadline: "Sept 30, 2025", match: 92, matchedSkills: ["Python", "Research Methodology", "Data Analysis"], missingSkills: ["Statistical Analysis"], requiredSkills: ["Python", "Research Methodology", "Data Analysis", "Statistical Analysis"], description: "Work on ongoing clinical trials in Ayurvedic pharmacology.", workArrangement: "On-site", openings: 4 },
+  { id: "op-2", title: "Research Data Assistant", type: "Part-time", org: "CCRAS / New Delhi", location: "New Delhi", duration: "6 Months", stipend: "₹15,000/month", deadline: "Oct 15, 2025", match: 85, matchedSkills: ["Python", "Data Analysis", "Machine Learning"], missingSkills: [], requiredSkills: ["Python", "Data Analysis", "Statistical Analysis"], description: "Assist in cleaning and analyzing clinical trial data.", workArrangement: "Hybrid", openings: 2 },
+  { id: "op-3", title: "AYUSH Research Internship", type: "Internship", org: "NIA / Jaipur", location: "Jaipur", duration: "2 Months", stipend: "₹8,000/month", deadline: "Sept 20, 2025", match: 78, matchedSkills: ["Research Methodology", "Clinical Research"], missingSkills: ["Statistical Analysis"], requiredSkills: ["Research", "Data Analysis", "Clinical Research"], description: "Support field research on AYUSH healthcare delivery.", workArrangement: "On-site", openings: 3 },
 ];
 
-const recommendations = [
-  { gap: "Statistical Analysis", title: "Statistics for Health Research", type: "Course", provider: "NPTEL", why: "Helps close your Statistical Analysis gap.", duration: "8 weeks", rating: 4.6 },
-  { gap: "Scientific Writing", title: "Scientific Writing Fundamentals", type: "Course", provider: "Coursera", why: "Helps close your Scientific Writing gap.", duration: "4 weeks", rating: 4.8 },
-  { gap: "Research Methodology", title: "Research Methods in Healthcare", type: "Course", provider: "edX", why: "Strengthens your research methodology skills.", duration: "6 weeks", rating: 4.5 },
-  { gap: "Clinical Trial Documentation", title: "GCP & Clinical Trial Basics", type: "Workshop", provider: "AIIA", why: "Hands-on clinical trial documentation training.", duration: "2 days", rating: 4.7 },
+const applications: Application[] = [
+  { id: "ap-1", opportunityId: "op-1", role: "Clinical Research Intern", org: "AIIA Research Division", stage: "shortlisted", stageLabel: "Shortlisted", status: "Interview scheduled", nextStep: "Interview: Sept 10", match: 92, appliedDate: "Sept 3, 2025" },
+  { id: "ap-2", opportunityId: "op-2", role: "Research Data Assistant", org: "CCRAS", stage: "interviewed", stageLabel: "Interviewed", status: "Awaiting decision", match: 88, appliedDate: "Aug 25, 2025" },
+  { id: "ap-3", opportunityId: "op-3", role: "AYUSH Research Internship", org: "NIA Jaipur", stage: "applied", stageLabel: "Applied", status: "Submitted 2 days ago", match: 78, appliedDate: "Sept 4, 2025" },
 ];
 
-const evidence = {
-  total: 12, verified: 8, processing: 3, review: 1,
-  items: [
-    { id: 1, name: "Academic Transcript", issuer: "AIIA", status: "verified", date: "Aug 2025", type: "Transcript" },
-    { id: 2, name: "Python Certificate", issuer: "NPTEL", status: "verified", date: "Jul 2025", type: "Certificate" },
-    { id: 3, name: "Research Project Report", issuer: "AIIA", status: "verified", date: "Jun 2025", type: "Project" },
-    { id: 4, name: "Internship Certificate", issuer: "CCRAS", status: "processing", date: "Aug 2025", type: "Certificate" },
-    { id: 5, name: "ML Workshop Certificate", issuer: "IIT Delhi", status: "verified", date: "May 2025", type: "Certificate" },
-    { id: 6, name: "Data Analysis Portfolio", issuer: "Self", status: "review", date: "Aug 2025", type: "Portfolio" },
-    { id: 7, name: "Clinical Posting Record", issuer: "AIIA", status: "verified", date: "Jul 2025", type: "Transcript" },
-    { id: 8, name: "Publications List", issuer: "Self", status: "processing", date: "Aug 2025", type: "Document" },
-  ],
-};
+const recommendations: LearningRecommendation[] = [
+  { id: "rc-1", closesGap: "Statistical Analysis", title: "Statistics for Health Research", type: "Course", provider: "NPTEL", duration: "8 weeks", rating: 4.6, why: "Directly addresses your Statistical Analysis gap.", projectedImprovement: 27 },
+  { id: "rc-2", closesGap: "Scientific Writing", title: "Scientific Writing Fundamentals", type: "Course", provider: "Coursera", duration: "4 weeks", rating: 4.8, why: "Builds the writing skills your target role lists as required.", projectedImprovement: 18 },
+  { id: "rc-3", closesGap: "Clinical Trial Documentation", title: "GCP & Clinical Trial Basics", type: "Workshop", provider: "AIIA", duration: "2 days", rating: 4.7, why: "Hands-on practice with trial documentation.", projectedImprovement: 23 },
+];
 
-const portfolio = {
-  projects: 4, certificates: 6, verifiedSkills: 18,
-  featured: [
-    { title: "Rural Health Data Survey", desc: "Analyzed health data from 500+ rural households using Python", skills: ["Python", "Data Analysis"] },
-    { title: "CVD Risk Prediction Model", desc: "ML model predicting cardiovascular risk from Ayurvedic markers", skills: ["Machine Learning", "Python"] },
-    { title: "Herbal Safety Database", desc: "Built a searchable database of 200+ herb-drug interactions", skills: ["Data Analysis", "Documentation"] },
-  ],
-};
-
-const profile = {
-  ...student,
-  skillsCount: skills.length,
-  verifiedCount: skills.filter(s => s.verified).length,
-  matchCount: bestMatch.matched.length,
-  portfolioProjects: portfolio.projects,
-  evidenceItems: evidence.total,
-};
+const portfolioData = { projects: 4, certificates: 6, verifiedSkills: 18, internshipHours: 240, achievements: 3, featured: [
+  { id: "pf-1", title: "Rural Health Data Survey", description: "Analyzed health data from 500+ rural households", skills: ["Python", "Data Analysis"], date: "May 2025" },
+  { id: "pf-2", title: "CVD Risk Prediction Model", description: "ML model predicting cardiovascular risk from Ayurvedic markers", skills: ["Machine Learning", "Python"], date: "Jun 2025" },
+  { id: "pf-3", title: "Herbal Safety Database", description: "Searchable database of 200+ herb-drug interactions", skills: ["Data Analysis", "Documentation"], date: "Apr 2025" },
+] };
 
 const navLinks = [
   { id: "overview", label: "Overview", icon: <LayoutDashboard size={18} /> },
   { id: "profile", label: "My Profile", icon: <UserCog size={18} /> },
-  { id: "evidence", label: "Evidence Vault", icon: <Shield size={18} />, count: 12 },
-  { id: "skills", label: "Skills", icon: <Target size={18} /> },
+  { id: "passport", label: "Skill Passport", icon: <Shield size={18} /> },
   { id: "gaps", label: "Skill Gap", icon: <Zap size={18} /> },
+  { id: "simulator", label: "Simulator", icon: <FlaskConical size={18} /> },
+  { id: "projects", label: "Projects", icon: <Lightbulb size={18} /> },
   { id: "opportunities", label: "Opportunities", icon: <Briefcase size={18} />, count: 3 },
   { id: "applications", label: "Applications", icon: <FileText size={18} /> },
-  { id: "recommendations", label: "Recommendations", icon: <Star size={18} /> },
+  { id: "recommendations", label: "Learn", icon: <BookOpen size={18} /> },
   { id: "portfolio", label: "Portfolio", icon: <Grid3X3 size={18} /> },
+  { id: "settings", label: "Settings", icon: <Settings size={18} /> },
 ];
 
-/* ─── Pixel Bar ─── */
-function PxBar({ pct, segments = 18, yellow = false }: { pct: number; segments?: number; yellow?: boolean }) {
+/* ─── Helpers ─── */
+function PxBar({ pct, segments = 18, color = "#244B35" }: { pct: number; segments?: number; color?: string }) {
   const filled = Math.round((pct / 100) * segments);
-  return (
-    <div className="flex gap-[3px] flex-wrap">
-      {Array.from({ length: segments }, (_, i) => (
-        <span key={i} className={`w-[7px] h-[13px] ${i < filled ? (yellow ? "bg-[#B99A22]" : "bg-[#244B35]") : "bg-[#EDEBE0]"}`} />
-      ))}
-    </div>
-  );
+  return <div className="flex gap-[3px] flex-wrap">{Array.from({ length: segments }, (_, i) => <span key={i} className={`w-[7px] h-[13px] ${i < filled ? "" : "bg-[#EDEBE0]"}`} style={i < filled ? { background: color } : undefined} />)}</div>;
 }
+const tagCls: Record<string, string> = { verified: "bg-[#DCE6D0] text-[#16301F]", "self-declared": "bg-[#EDEBE0] text-[#6B6F68]", high: "bg-[#E8C7AE] text-[#7a3f1a]", medium: "bg-[#E8D36B] text-[#5c4a08]", low: "bg-[#DCE6D0] text-[#16301F]", lavender: "bg-[#C8B5DE] text-[#4d3a74]", "Job-Ready": "bg-[#DCE6D0] text-[#16301F]", Developing: "bg-[#E8D36B] text-[#5c4a08]", Beginning: "bg-[#E8C7AE] text-[#7a3f1a]", applied: "bg-[#EDEBE0] text-[#6B6F68]", shortlisted: "bg-[#E8D36B] text-[#5c4a08]", interviewed: "bg-[#C8B5DE] text-[#4d3a74]", offered: "bg-[#DCE6D0] text-[#16301F]", evidence: "bg-[#DCE6D0] text-[#16301F]", "self-declared-tag": "bg-[#EDEBE0] text-[#6B6F68]" };
+function Tag({ cls, children }: { cls: string; children: React.ReactNode }) { return <span className={`inline-flex items-center gap-1 font-mono text-[10px] font-bold tracking-widest uppercase px-2 py-[3px] rounded-md whitespace-nowrap ${tagCls[cls] || cls}`}>{children}</span>; }
+function Eyebrow({ color, children }: { color?: string; children: React.ReactNode }) { return <span className="font-mono text-[11px] font-bold tracking-[0.16em] uppercase inline-flex items-center gap-2" style={{ color: color || "#9A9D94" }}><span className="w-[7px] h-[7px] bg-[#171A18] opacity-85" style={{ boxShadow: "0 7px 0 -2px #F7F6F0" }} />{children}</span>; }
+function LinkMore({ onClick, children }: { onClick?: () => void; children: React.ReactNode }) { return <button onClick={onClick} className="font-mono text-xs font-bold text-[#244B35] tracking-wide inline-flex items-center gap-1.5 hover:gap-3 transition-all mt-3">{children}</button>; }
 
-/* ─── Tags ─── */
-const tagCls: Record<string, string> = {
-  verified: "bg-[#DCE6D0] text-[#16301F]",
-  self: "bg-[#EDEBE0] text-[#6B6F68]",
-  high: "bg-[#E8C7AE] text-[#7a3f1a]",
-  medium: "bg-[#E8D36B] text-[#5c4a08]",
-  lavender: "bg-[#C8B5DE] text-[#4d3a74]",
-  processing: "bg-[#E3E9F6] text-[#3d5790]",
-  review: "bg-[#E8C7AE] text-[#7a3f1a]",
-  open: "bg-[#DCE6D0] text-[#16301F]",
-  recommended: "bg-[#E8D36B] text-[#5c4a08]",
-};
-
-function Tag({ cls, children }: { cls: string; children: React.ReactNode }) {
-  return (
-    <span className={`inline-flex items-center gap-1 font-mono text-[10px] font-bold tracking-widest uppercase px-2 py-[3px] rounded-md whitespace-nowrap ${tagCls[cls] || cls}`}>
-      {children}
-    </span>
-  );
-}
-
-/* ─── Eye Brow ─── */
-function Eyebrow({ color, children }: { color?: string; children: React.ReactNode }) {
-  return (
-    <span className="font-mono text-[11px] font-bold tracking-[0.16em] uppercase inline-flex items-center gap-2" style={{ color: color || "#9A9D94" }}>
-      <span className="w-[7px] h-[7px] bg-[#171A18] opacity-85" style={{ boxShadow: "0 7px 0 -2px #F7F6F0" }} />
-      {children}
-    </span>
-  );
-}
-
-/* ─── Link More ─── */
-function LinkMore({ onClick, children }: { onClick?: () => void; children: React.ReactNode }) {
-  return (
-    <button onClick={onClick} className="font-mono text-xs font-bold text-[#244B35] tracking-wide inline-flex items-center gap-1.5 hover:gap-3 transition-all mt-3">
-      {children}
-    </button>
-  );
-}
-
-/* ─── Sidebar Content ─── */
+/* ─── Sidebar ─── */
 function SidebarContent({ activeNav, setActiveNav }: { activeNav: string; setActiveNav: (id: string) => void }) {
   const { open } = useSidebar();
   return (
     <>
       <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <div className={open ? "" : "flex justify-center"}>
-          {open ? <Logo /> : <LogoIcon />}
-        </div>
+        <div className={open ? "" : "flex justify-center"}>{open ? <Logo /> : <LogoIcon />}</div>
         <div className="mt-8 flex flex-col gap-[2px]">
           {navLinks.map((link) => (
-            <button
-              key={link.id}
-              onClick={() => setActiveNav(link.id)}
-              className={`flex items-center gap-3 w-full text-left rounded-xl text-sm font-medium transition-colors ${
-                open ? "px-3 py-2.5" : "px-0 py-2.5 justify-center"
-              } ${
-                activeNav === link.id
-                  ? "bg-[#244B35] text-white font-semibold"
-                  : "text-[#6B6F68] hover:bg-[#EDEBE0] hover:text-[#171A18]"
-              }`}
-            >
+            <button key={link.id} onClick={() => setActiveNav(link.id)} className={`flex items-center gap-3 w-full text-left rounded-xl text-sm font-medium transition-colors ${open ? "px-3 py-2.5" : "px-0 py-2.5 justify-center"} ${activeNav === link.id ? "bg-[#244B35] text-white font-semibold" : "text-[#6B6F68] hover:bg-[#EDEBE0] hover:text-[#171A18]"}`}>
               <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 18, height: 18 }}>{link.icon}</span>
               {open && <span className="text-sm whitespace-pre">{link.label}</span>}
-              {open && link.count !== undefined && (
-                <span className={`ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded-md ${
-                  activeNav === link.id ? "bg-white/20 text-white" : "bg-[#EDEBE0] text-[#6B6F68]"
-                }`}>
-                  {link.count}
-                </span>
-              )}
+              {open && link.count !== undefined && <span className={`ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded-md ${activeNav === link.id ? "bg-white/20 text-white" : "bg-[#EDEBE0] text-[#6B6F68]"}`}>{link.count}</span>}
             </button>
           ))}
         </div>
       </div>
       <div className="border-t pt-3 mt-2" style={{ borderColor: open ? "#E6E3D7" : "transparent" }}>
-        <button onClick={() => setActiveNav("settings")} className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}>
-          <Settings size={16} /> {open && "Settings"}
-        </button>
-        <button className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}>
-          <LogOut size={16} /> {open && "Log out"}
-        </button>
-        {open && (
-          <div className="mt-3 p-3 rounded-xl border" style={{ background: "#F7F6F0", borderColor: "#E6E3D7" }}>
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0" style={{ background: "#244B35", color: "#DCE6D0" }}>
-                {student.initials}
-              </div>
-              <div className="min-w-0">
-                <div className="font-semibold text-sm truncate" style={{ color: "#171A18" }}>{student.name}</div>
-                <div className="text-xs font-mono" style={{ color: "#6B6F68" }}>{student.course} / {student.year}</div>
-              </div>
-            </div>
-            <div className="mt-2.5">
-              <div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "#6B6F68" }}>
-                <span>Profile {student.profileCompletion}% complete</span>
-              </div>
-              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}>
-                <div className="h-full rounded-full" style={{ width: `${student.profileCompletion}%`, background: "#244B35" }} />
-              </div>
-            </div>
-          </div>
-        )}
-        {!open && (
-          <div className="flex justify-center mt-3">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs" style={{ background: "#244B35", color: "#DCE6D0" }}>
-              {student.initials}
-            </div>
-          </div>
-        )}
+        <button onClick={() => setActiveNav("settings")} className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}><Settings size={16} /> {open && "Settings"}</button>
+        <button className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}><LogOut size={16} /> {open && "Log out"}</button>
+        {open && <div className="mt-3 p-3 rounded-xl border" style={{ background: "#F7F6F0", borderColor: "#E6E3D7" }}><div className="flex items-center gap-2.5"><div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0" style={{ background: "#244B35", color: "#DCE6D0" }}>{student.initials}</div><div className="min-w-0"><div className="font-semibold text-sm truncate" style={{ color: "#171A18" }}>{student.name}</div><div className="text-[11px] font-mono" style={{ color: "#6B6F68" }}>{student.course} / {student.year}</div></div></div><div className="mt-2.5"><div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "#6B6F68" }}><span>Profile {student.profileCompletion}%</span></div><div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}><div className="h-full rounded-full" style={{ width: `${student.profileCompletion}%`, background: "#244B35" }} /></div></div></div>}
+        {!open && <div className="flex justify-center mt-3"><div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs" style={{ background: "#244B35", color: "#DCE6D0" }}>{student.initials}</div></div>}
       </div>
     </>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SECTION: Overview
+   OVERVIEW SECTION
    ═══════════════════════════════════════════════════════ */
 function OverviewSection() {
+  const [animateRing, setAnimateRing] = useState(0);
+  useEffect(() => { let f = 0; const id = setInterval(() => { f += 2; setAnimateRing(Math.min(f, student.profileCompletion)); if (f >= student.profileCompletion) clearInterval(id); }, 12); return () => clearInterval(id); }, []);
+
+  const skillJourney = [
+    { label: "Evidence", done: true }, { label: "Skills", done: true },
+    { label: "Skill Gap", active: true }, { label: "Match" }, { label: "Opportunity" },
+  ];
+
+  const bestMatch = opportunities[0];
+
   return (
-    <>
+    <div className="flex flex-col gap-5">
       {/* Hero */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-        className="col-span-12 rounded-[20px] p-7 overflow-hidden relative" style={{ background: "linear-gradient(135deg, #244B35 0%, #1C3D2B 50%, #1A3626 100%)", color: "#F7F6F0", boxShadow: "0 4px 24px rgba(36,75,53,.15)" }}>
-        <div className="absolute right-3.5 bottom-3.5 w-16 h-16 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(#DCE6D0 1px,transparent 1px)", backgroundSize: "8px 8px" }} />
-        <div className="flex items-start gap-6">
+      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+        className="rounded-[18px] p-7 md:p-9 text-white relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #244B35 0%, #1C3D2B 50%, #1A3626 100%)", boxShadow: "0 4px 24px rgba(36,75,53,.15)" }}>
+        <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 min-w-0">
-            <span className="font-mono text-[11px] font-bold tracking-[0.16em] uppercase" style={{ color: "#DCE6D0" }}>
-              <span className="inline-block w-[7px] h-[7px] bg-[#DCE6D0] mr-2 opacity-85" style={{ boxShadow: "0 7px 0 -2px #244B35" }} />
-              Personal Progress
-            </span>
-            <h2 className="font-bold text-[clamp(24px,3vw,36px)] tracking-tight leading-tight mt-4 mb-3">
-              Your next opportunity <em className="not-italic" style={{ color: "#E8D36B" }}>starts with your skills.</em>
-            </h2>
-            <p className="text-[14px] max-w-[42ch] mb-6" style={{ color: "rgba(220,230,208,.75)" }}>
-              You've built a strong foundation. Close a few skill gaps to unlock better matches.
-            </p>
-            <div className="flex items-center gap-6 flex-wrap">
-              <div className="relative w-[100px] h-[100px]">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(220,230,208,.15)" strokeWidth="8" />
-                  <motion.circle cx="50" cy="50" r="42" fill="none" stroke="#DCE6D0" strokeWidth="8" strokeLinecap="round"
-                    strokeDasharray={2 * Math.PI * 42}
-                    initial={{ strokeDashoffset: 2 * Math.PI * 42 }}
-                    animate={{ strokeDashoffset: 2 * Math.PI * 42 * (1 - student.profileCompletion / 100) }}
-                    transition={{ duration: 1.2, ease: "easeOut" }} />
-                </svg>
-                <div className="absolute inset-0 grid place-items-center">
-                  <div className="text-center">
-                    <div className="font-bold text-2xl leading-none" style={{ color: "#DCE6D0" }}>{student.profileCompletion}%</div>
-                    <div className="font-mono text-[9px] tracking-widest uppercase mt-0.5" style={{ color: "rgba(220,230,208,.55)" }}>Profile</div>
-                  </div>
+            <Eyebrow color="#DCE6D0">Personal Progress</Eyebrow>
+            <div className="font-semibold text-[26px] md:text-[30px] tracking-tight mt-3 mb-1" style={{ color: "#fff" }}>Your next opportunity starts with your skills.</div>
+            <p className="text-[14px] mb-6" style={{ color: "rgba(255,255,255,.7)" }}>You have built a strong foundation. Close a few skill gaps to unlock better matches.</p>
+            <div className="flex flex-col sm:flex-row gap-6 mb-5">
+              <div className="flex items-center gap-4">
+                <div className="relative w-16 h-16">
+                  <svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="5" /><circle cx="32" cy="32" r="28" fill="none" stroke="#DCE6D0" strokeWidth="5" strokeDasharray={2 * Math.PI * 28} strokeDashoffset={2 * Math.PI * 28 * (1 - animateRing / 100)} strokeLinecap="round" transform="rotate(-90 32 32)" /></svg>
+                  <div className="absolute inset-0 flex items-center justify-center font-bold text-sm" style={{ color: "#DCE6D0" }}>{animateRing}%</div>
                 </div>
+                <div><div className="font-mono text-[10px] font-bold tracking-widest uppercase" style={{ color: "rgba(255,255,255,.5)" }}>Profile</div><div className="font-semibold text-lg" style={{ color: "#fff" }}>{student.profileCompletion}%</div></div>
               </div>
-              <div>
-                <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "rgba(220,230,208,.55)" }}>Skill Confidence</div>
-                <div className="flex gap-[3px] mb-2">
-                  {Array.from({ length: 12 }, (_, i) => (
-                    <span key={i} className="w-[10px] h-[14px]" style={{ background: i < Math.round(student.skillConfidence / 100 * 12) ? "#DCE6D0" : "rgba(220,230,208,.15)" }} />
-                  ))}
-                  <span className="ml-2 font-bold text-lg" style={{ color: "#DCE6D0" }}>{student.skillConfidence}%</span>
+              <div className="flex-1 min-w-0">
+                <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "rgba(255,255,255,.5)" }}>Skill Confidence</div>
+                <PxBar pct={roleReadiness.readinessScore} color="#DCE6D0" />
+                <div className="mt-2 flex items-center gap-3">
+                  <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: "rgba(232,211,107,.25)", color: "#E8D36B" }}>Best match {bestMatch.match}%</span>
                 </div>
-                <button className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:-translate-y-0.5" style={{ background: "#E8D36B", color: "#16301F" }}>
-                  Best match / {student.bestMatch}% <ChevronRight size={16} />
-                </button>
               </div>
             </div>
           </div>
-          <div className="hidden lg:flex flex-col flex-shrink-0 w-[180px]">
-            <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-4" style={{ color: "rgba(220,230,208,.55)" }}>Your Skill Journey</div>
-            {[
-              { label: "Evidence", done: true },
-              { label: "Skills", done: true },
-              { label: "Skill Gap", active: true, badge: "HERE" },
-              { label: "Match" },
-              { label: "Opportunity" },
-            ].map((step, i) => (
-              <div key={step.label} className="relative flex items-center gap-2.5">
-                {i < 4 && <div className="absolute left-[10px] top-[20px] bottom-[-4px] w-[2px]" style={{ background: step.done ? "#DCE6D0" : "rgba(220,230,208,.2)" }} />}
-                <div className="relative z-10 w-5 h-5 flex-none rounded-md grid place-items-center border-2" style={{
-                  background: step.done ? "#DCE6D0" : step.active ? "#E8D36B" : "transparent",
-                  borderColor: step.done ? "#DCE6D0" : step.active ? "#E8D36B" : "rgba(220,230,208,.3)",
-                  color: step.done ? "#244B35" : step.active ? "#16301F" : "rgba(220,230,208,.4)",
-                }}>
-                  {step.done ? "✓" : "+"}
-                </div>
-                <span className="text-sm font-medium" style={{ color: step.active || step.done ? "#F7F6F0" : "rgba(220,230,208,.4)" }}>
-                  {step.label}
-                  {step.badge && <span className="ml-1.5 font-mono text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded" style={{ background: "#E8D36B", color: "#16301F" }}>{step.badge}</span>}
-                </span>
+          <div className="hidden md:flex flex-col gap-2 min-w-[160px]">
+            <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "rgba(255,255,255,.5)" }}>Your Skill Journey</div>
+            {skillJourney.map((s, i) => (
+              <div key={s.label} className="flex items-center gap-2">
+                <div className={`w-5 h-5 rounded-[5px] flex items-center justify-center text-[10px] font-bold border-2 ${s.done ? "bg-[#DCE6D0] border-[#DCE6D0] text-[#244B35]" : s.active ? "bg-[#E8D36B] border-[#B99A22] text-[#16301F]" : "bg-white/10 border-white/20 text-white/40"}`}>{s.done ? "\u2713" : i + 1}</div>
+                <span className={`text-xs font-medium ${s.done || s.active ? "text-white" : "text-white/40"}`}>{s.label}</span>
+                {i < skillJourney.length - 1 && <div className="absolute ml-[9px] mt-[20px] w-[2px] h-2" style={{ background: s.done ? "rgba(220,230,208,.4)" : "rgba(255,255,255,.1)" }} />}
               </div>
             ))}
           </div>
         </div>
-      </motion.section>
-
-      {/* Stat Cards */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-        className="col-span-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {[
-          { label: "Profile Completion", value: `${student.profileCompletion}%`, color: "#244B35", bg: "#DCE6D0" },
-          { label: "Skill Confidence", value: `${student.skillConfidence}%`, color: "#171A18", bg: "#EDEBE0" },
-          { label: "Evidence Items", value: evidence.total, color: "#8A6FB8", bg: "#EAE3F4" },
-          { label: "Applications", value: applications.length, color: "#C98B5F", bg: "#F0E8DD" },
-        ].map((s) => (
-          <div key={s.label} className="rounded-[14px] px-5 py-4 text-center" style={{ background: s.bg }}>
-            <div className="font-mono text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5" style={{ color: "#6B6F68" }}>{s.label}</div>
-            <div className="font-bold text-3xl tracking-tight leading-none" style={{ color: s.color }}>{s.value}</div>
-          </div>
-        ))}
       </motion.div>
 
-      {/* Skill Snapshot */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }}
-        className="col-span-12 lg:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Skill Snapshot</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Your Skill Snapshot</div>
-        <div className="text-[13px] mb-4" style={{ color: "#6B6F68" }}>Verified vs self-declared</div>
-        {skills.slice(0, 5).map((sk) => (
-          <div key={sk.name} className="py-2.5 border-b last:border-b-0" style={{ borderColor: "#EDEBE0" }}>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="font-semibold text-sm">{sk.name}</span>
-              <Tag cls={sk.verified ? "verified" : "self"}>{sk.verified ? "✓ Evidence" : "Self-declared"}</Tag>
-              <span className="ml-auto font-mono font-bold text-xs">{sk.pct}<span className="text-[10px] font-normal" style={{ color: "#9A9D94" }}>%</span></span>
-            </div>
-            <PxBar pct={sk.pct} yellow={!sk.verified} />
-          </div>
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Profile Completion", value: `${student.profileCompletion}%`, color: "#244B35", bg: "#DCE6D0" },
+          { label: "Skill Confidence", value: `${roleReadiness.readinessScore}%`, color: "#171A18", bg: "#EDEBE0" },
+          { label: "Evidence Items", value: `${skillPassport.totalEvidence}`, color: "#4d3a74", bg: "#EAE3F4" },
+          { label: "Applications", value: `${applications.length}`, color: "#7a3f1a", bg: "#F0E8DD" },
+        ].map((s) => (
+          <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}
+            className="rounded-[14px] p-5 text-center border" style={{ background: s.bg, borderColor: "#E6E3D7" }}>
+            <div className="font-mono text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5" style={{ color: "#6B6F68" }}>{s.label}</div>
+            <div className="font-bold text-3xl tracking-tight" style={{ color: s.color }}>{s.value}</div>
+          </motion.div>
         ))}
-        <LinkMore>View all skills →</LinkMore>
-      </motion.section>
+      </div>
 
-      {/* Skill Gap */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
-        className="col-span-12 sm:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow color="#B99A22">Skill Gap</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Your Biggest Skill Gaps</div>
-        <div className="text-[13px] mb-4" style={{ color: "#6B6F68" }}>
-          Matched against your target role / <b style={{ color: "#171A18" }}>{student.targetRole}</b>
-        </div>
-        {gaps.slice(0, 3).map((g) => (
-          <div key={g.name} className="py-2.5 border-b last:border-b-0" style={{ borderColor: "#EDEBE0" }}>
-            <div className="flex items-baseline justify-between mb-1.5">
-              <span className="font-semibold text-sm">{g.name}</span>
-              <span className="font-mono font-bold text-xs">{g.current}%</span>
-            </div>
-            <PxBar pct={g.current} segments={16} yellow />
-            <div className="flex items-center gap-2.5 mt-2">
-              <Tag cls={g.severity === "High" ? "high" : "medium"}>Gap: {g.severity}</Tag>
-              <span className="font-mono text-[11px]" style={{ color: "#9A9D94" }}>Target {g.required}%+</span>
-            </div>
+      {/* Skill Snapshot + Skill Gap */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4 }}
+          className="md:col-span-7 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+          <Eyebrow color="#244B35">Skill Snapshot</Eyebrow>
+          <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Your Skill Snapshot</div>
+          <div className="flex flex-col gap-3">
+            {skillPassport.items.slice(0, 5).map((sk) => (
+              <div key={sk.id}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium" style={{ color: "#171A18" }}>{sk.name}</span>
+                  <Tag cls={sk.origin === "evidence" ? "verified" : "self-declared"}>{sk.origin === "evidence" ? "\u2713 Verified" : "Self-declared"}</Tag>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}><div className="h-full rounded-full" style={{ width: `${sk.confidence}%`, background: sk.origin === "evidence" ? "#244B35" : "#E8D36B" }} /></div>
+                  <span className="font-mono text-xs font-bold" style={{ color: "#6B6F68" }}>{sk.confidence}%</span>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-        <LinkMore>Close these gaps →</LinkMore>
-      </motion.section>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.4 }}
+          className="md:col-span-5 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+          <Eyebrow color="#E8C7AE">Skill Gap</Eyebrow>
+          <div className="font-semibold text-[19px] tracking-tight mt-2 mb-1">Your Biggest Skill Gaps</div>
+          <p className="text-xs mb-4" style={{ color: "#6B6F68" }}>Matched against your target role requirements.</p>
+          <div className="flex flex-col gap-4">
+            {gaps.map((g) => (
+              <div key={g.id}>
+                <div className="flex items-center justify-between mb-1"><span className="text-sm font-medium" style={{ color: "#171A18" }}>{g.name}</span><Tag cls={g.severity.toLowerCase()}>{g.severity}</Tag></div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}><div className="h-full rounded-full" style={{ width: `${g.current}%`, background: g.severity === "High" ? "#E8C7AE" : "#E8D36B" }} /></div>
+                  <span className="font-mono text-[11px] font-bold" style={{ color: "#6B6F68" }}>{g.current}/{g.required}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
 
       {/* Best Match */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.12 }}
-        className="col-span-12 sm:col-span-8 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Best Match</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Best Match For You</div>
-        <div className="flex flex-col sm:flex-row gap-5">
-          <div className="relative flex-shrink-0 w-[116px] h-[116px]">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="52" fill="none" stroke="#EDEBE0" strokeWidth="11" />
-              <motion.circle cx="60" cy="60" r="52" fill="none" stroke="#C98B5F" strokeWidth="11" strokeLinecap="round"
-                strokeDasharray={326.7} initial={{ strokeDashoffset: 326.7 }}
-                animate={{ strokeDashoffset: 326.7 * (1 - bestMatch.match / 100) }}
-                transition={{ duration: 1.2, ease: "easeOut" }} />
-            </svg>
-            <div className="absolute inset-0 grid place-items-center font-bold text-[26px]" style={{ color: "#C98B5F" }}>
-              {bestMatch.match}<small className="text-xs font-semibold" style={{ color: "#6B6F68" }}>%</small>
-            </div>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.4 }}
+        className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#C98B5F">Best Match For You</Eyebrow>
+        <div className="flex flex-col md:flex-row gap-6 mt-3">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "#DCE6D0", border: "3px solid #244B35" }}>
+            <span className="font-bold text-xl" style={{ color: "#244B35" }}>{bestMatch.match}%</span>
           </div>
-          <div className="flex-1">
-            <div className="font-bold text-xl tracking-tight leading-snug">{bestMatch.title}</div>
-            <div className="font-mono text-xs mt-1" style={{ color: "#6B6F68" }}>{bestMatch.org} / {bestMatch.division}</div>
-            <div className="flex gap-1.5 mt-2.5 flex-wrap">
-              <span className="font-mono text-[10.5px] font-bold border rounded-md px-2 py-[3px] inline-flex items-center gap-1.5" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>
-                <span className="text-[8px]" style={{ color: "#C98B5F" }}>●</span> {bestMatch.location}
-              </span>
-              <span className="font-mono text-[10.5px] font-bold border rounded-md px-2 py-[3px] inline-flex items-center gap-1.5" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>
-                <span className="text-[8px]" style={{ color: "#C98B5F" }}>▮</span> {bestMatch.duration}
-              </span>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-[18px]" style={{ color: "#171A18" }}>{bestMatch.title}</div>
+            <div className="text-sm mb-2" style={{ color: "#6B6F68" }}>{bestMatch.org}</div>
+            <div className="flex flex-wrap gap-3 font-mono text-[11px] mb-3" style={{ color: "#6B6F68" }}>
+              <span className="inline-flex items-center gap-1"><MapPin size={11} /> {bestMatch.location}</span>
+              <span className="inline-flex items-center gap-1"><Clock size={11} /> {bestMatch.duration}</span>
+              <span className="inline-flex items-center gap-1"><Briefcase size={11} /> {bestMatch.stipend}</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {bestMatch.matchedSkills.map((sk) => <Tag key={sk} cls="verified">{sk}</Tag>)}
+              {bestMatch.missingSkills.map((sk) => <Tag key={sk} cls="high">{sk}</Tag>)}
+            </div>
+            <p className="text-xs mb-3" style={{ color: "#6B6F68" }}>{bestMatch.match}% match because your profile strongly aligns with {bestMatch.matchedSkills.length} of {bestMatch.requiredSkills.length} required skills.</p>
+            <div className="flex gap-3">
+              <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white" style={{ background: "#244B35" }}>View opportunity</button>
+              <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg border" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>See all opportunities</button>
             </div>
           </div>
         </div>
-        <div className="mt-4">
-          <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "#9A9D94" }}>
-            Skills matched / {bestMatch.matched.length + bestMatch.missing.length} of 9
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {bestMatch.matched.map((s) => (
-              <span key={s} className="text-[11.5px] font-medium rounded-md px-2.5 py-1 bg-[#DCE6D0] text-[#16301F]">✓ {s}</span>
-            ))}
-            {bestMatch.missing.map((s) => (
-              <span key={s} className="text-[11.5px] font-medium rounded-md px-2.5 py-1 bg-[#EDEBE0] text-[#6B6F68] line-through">{s}</span>
-            ))}
-          </div>
-        </div>
-        <div className="flex items-start gap-2 mt-3.5 pt-3.5 border-t border-dashed" style={{ borderColor: "#E6E3D7" }}>
-          <TrendingUp size={15} className="flex-shrink-0 mt-0.5" style={{ color: "#C98B5F" }} />
-          <span className="text-xs leading-relaxed" style={{ color: "#6B6F68" }}>{bestMatch.explanation}</span>
-        </div>
-        <div className="flex gap-2.5 mt-4 flex-wrap">
-          <button className="inline-flex items-center gap-2 font-semibold text-sm px-4 py-2.5 rounded-[10px] border transition-all hover:-translate-y-0.5" style={{ background: "#E8C7AE", borderColor: "#E8C7AE", color: "#5a2f12" }}>
-            View opportunity <ChevronRight size={16} />
-          </button>
-          <button className="inline-flex items-center gap-2 font-semibold text-sm px-4 py-2.5 rounded-[10px] border bg-white transition-all hover:-translate-y-0.5" style={{ borderColor: "#E6E3D7" }}>
-            See all opportunities
-          </button>
-        </div>
-      </motion.section>
+      </motion.div>
 
       {/* Applications */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.14 }}
-        className="col-span-12 sm:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Applications</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Application Journey</div>
-        <div className="text-[13px] mb-4" style={{ color: "#6B6F68" }}>Quick status of your submissions</div>
-        {applications.map((app) => (
-          <div key={app.role} className="relative pl-7 pb-5 last:pb-0">
-            <div className="absolute left-[6px] top-4 bottom-1 w-0.5" style={{ background: "#E6E3D7" }} />
-            <div className={`absolute left-0 top-1 w-3.5 h-3.5 rounded-[5px] border-2 border-white ${app.stage === "applied" ? "bg-[#244B35]" : app.stage === "shortlisted" ? "bg-[#E8D36B]" : "bg-[#C98B5F]"}`} style={{ boxShadow: `0 0 0 1px #E6E3D7, ${app.stage === "applied" ? "0 0 0 3px rgba(36,75,53,.18)" : app.stage === "shortlisted" ? "0 0 0 3px rgba(232,211,107,.25)" : "0 0 0 3px rgba(201,139,95,.25)"}` }} />
-            <div className="font-semibold text-[14.5px]">{app.role}</div>
-            <div className="font-mono text-[11px] mt-0.5" style={{ color: "#6B6F68" }}>{app.org}</div>
-            <div className="flex items-center gap-2 mt-1.5 text-xs" style={{ color: "#6B6F68" }}>
-              <span className={`font-mono font-bold text-[11px] px-1.5 py-[2px] rounded-md ${app.stage === "applied" ? "bg-[#DCE6D0] text-[#16301F]" : app.stage === "shortlisted" ? "bg-[#E8D36B] text-[#5c4a08]" : "bg-[#E8C7AE] text-[#5a2f12]"}`}>{app.label}</span>
-              <span>{app.status}</span>
-            </div>
-          </div>
-        ))}
-        <LinkMore>View all applications →</LinkMore>
-      </motion.section>
-
-      {/* Recommendations */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.16 }}
-        className="col-span-12 lg:col-span-7 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow color="#8A6FB8">Recommendations</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Recommended For Your Skill Gaps</div>
-        <div className="text-[13px] mb-4" style={{ color: "#6B6F68" }}>Not random — every pick maps to a gap you can close.</div>
-        {recommendations.slice(0, 2).map((r) => (
-          <div key={r.title} className="flex gap-3 py-3.5 border-b last:border-b-0" style={{ borderColor: "#EDEBE0" }}>
-            <div className="w-9 h-9 flex-none rounded-[10px] grid place-items-center" style={{ background: "#C8B5DE", color: "#4d3a74" }}>
-              <BookOpen size={17} />
-            </div>
-            <div>
-              <div className="font-mono text-[10px] font-bold tracking-widest uppercase" style={{ color: "#8A6FB8" }}>{r.gap}</div>
-              <div className="font-semibold text-[14.5px] mt-0.5">{r.title}</div>
-              <Tag cls="lavender">{r.type}</Tag>
-              <p className="text-xs mt-1" style={{ color: "#6B6F68" }}>{r.why}</p>
-            </div>
-          </div>
-        ))}
-        <LinkMore>Explore learning paths →</LinkMore>
-      </motion.section>
-
-      {/* Evidence Vault */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.18 }}
-        className="col-span-12 lg:col-span-5 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Evidence Vault</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Evidence Vault</div>
-        <div className="text-[13px] mb-4" style={{ color: "#6B6F68" }}>Proof that backs your skills</div>
-        <div className="grid grid-cols-2 gap-2.5 mb-4">
-          {[
-            { num: evidence.total, label: "Evidence items", cls: "" },
-            { num: evidence.verified, label: "Verified", cls: "text-[#244B35]" },
-            { num: evidence.processing, label: "Processing", cls: "text-[#8A6FB8]" },
-            { num: evidence.review, label: "Needs review", cls: "text-[#C98B5F]" },
-          ].map((s) => (
-            <div key={s.label} className="border rounded-[11px] p-2.5" style={{ borderColor: "#E6E3D7", background: "#EFEDE3" }}>
-              <div className={`font-bold text-lg flex items-center gap-1.5 ${s.cls}`}>{s.num}</div>
-              <div className="font-mono text-[10px]" style={{ color: "#6B6F68" }}>{s.label}</div>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.4 }}
+        className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#8A6FB8">Application Journey</Eyebrow>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Application Journey</div>
+        <div className="flex flex-col gap-4">
+          {applications.map((app) => (
+            <div key={app.id} className="relative pl-7 pb-5 last:pb-0">
+              <div className="absolute left-[6px] top-4 bottom-1 w-0.5" style={{ background: "#E6E3D7" }} />
+              <div className={`absolute left-0 top-1 w-3.5 h-3.5 rounded-[5px] border-2 border-white`} style={{ background: app.stage === "applied" ? "#244B35" : app.stage === "shortlisted" ? "#E8D36B" : "#C8B5DE", boxShadow: `0 0 0 1px #E6E3D7, 0 0 0 3px ${app.stage === "applied" ? "rgba(36,75,53,.18)" : app.stage === "shortlisted" ? "rgba(232,211,107,.25)" : "rgba(200,181,222,.25)"}` }} />
+              <div className="font-semibold text-[14.5px]" style={{ color: "#171A18" }}>{app.role}</div>
+              <div className="flex items-center gap-2 mt-0.5"><Tag cls={app.stage}>{app.stageLabel}</Tag><span className="text-xs" style={{ color: "#6B6F68" }}>{app.status}</span></div>
+              {app.nextStep && <div className="font-mono text-[11px] mt-1" style={{ color: "#6B6F68" }}>{app.nextStep}</div>}
             </div>
           ))}
         </div>
-        {evidence.items.slice(0, 3).map((ev) => (
-          <div key={ev.name} className="flex items-center gap-2.5 py-2 border-b last:border-b-0 text-[13px]" style={{ borderColor: "#EDEBE0" }}>
-            <div className="w-[26px] h-[30px] flex-none border rounded-[5px] relative bg-white" style={{ borderColor: "#E6E3D7" }}>
-              <div className="absolute -top-px -right-px w-[9px] h-[9px] bg-[#F7F6F0] rounded-bl-[4px] border" style={{ borderColor: "#E6E3D7", borderTop: "none", borderRight: "none" }} />
+      </motion.div>
+
+      {/* Recommendations */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.4 }}
+        className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#8A6FB8">Recommendations</Eyebrow>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Recommended For Your Skill Gaps</div>
+        <p className="text-xs mb-4" style={{ color: "#6B6F68" }}>Each recommendation is connected to a specific skill gap.</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {recommendations.map((rec) => (
+            <div key={rec.id} className="rounded-xl border p-4" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+              <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#8A6FB8" }}>{rec.closesGap}</div>
+              <div className="font-semibold text-sm mb-1" style={{ color: "#171A18" }}>{rec.title}</div>
+              <div className="text-xs mb-2" style={{ color: "#6B6F68" }}>{rec.type} / {rec.provider} / {rec.duration}</div>
+              <div className="flex items-center gap-1 mb-2"><Star size={12} style={{ color: "#E8D36B", fill: "#E8D36B" }} /><span className="font-mono text-xs font-bold" style={{ color: "#6B6F68" }}>{rec.rating}</span></div>
+              <p className="text-xs" style={{ color: "#6B6F68" }}>{rec.why}</p>
             </div>
-            <div>
-              <div className="font-medium">{ev.name}</div>
-              <div className="text-[11px] font-mono" style={{ color: "#9A9D94" }}>{ev.issuer}</div>
-            </div>
-            <span className={`ml-auto font-mono text-[10px] font-bold tracking-widest uppercase px-2 py-[3px] rounded-md ${
-              ev.status === "verified" ? "bg-[#DCE6D0] text-[#16301F]"
-              : ev.status === "processing" ? "bg-[#E3E9F6] text-[#3d5790]"
-              : "bg-[#E8C7AE] text-[#7a3f1a]"
-            }`}>
-              {ev.status === "verified" ? "✓ Verified" : ev.status === "processing" ? "… Processing" : "! Review"}
-            </span>
-          </div>
-        ))}
-        <button className="mt-3.5 w-full flex items-center justify-center gap-2 border-[1.5px] border-dashed rounded-[11px] font-semibold text-[13.5px] py-2.5 transition-all hover:bg-[#DCE6D0] hover:-translate-y-0.5" style={{ borderColor: "#244B35", color: "#244B35" }}>
-          <Upload size={15} /> Upload evidence
-        </button>
-      </motion.section>
+          ))}
+        </div>
+      </motion.div>
 
       {/* Quick Actions */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
-        className="col-span-12 lg:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.4 }}
+        className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <Eyebrow>Quick Actions</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-3">What do you want to do?</div>
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">What do you want to do?</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: "Upload Evidence", desc: "Back skills with proof", icon: <Shield size={17} />, bg: "#DCE6D0", fg: "#16301F" },
-            { label: "Opportunities", desc: "92% match waiting", icon: <Briefcase size={17} />, bg: "#E8C7AE", fg: "#7a3f1a" },
-            { label: "Skill Gaps", desc: "3 gaps to close", icon: <Zap size={17} />, bg: "#E8D36B", fg: "#5c4a08" },
-            { label: "Update Profile", desc: "82% complete", icon: <UserCog size={17} />, bg: "#C8B5DE", fg: "#4d3a74" },
+            { icon: <Upload size={16} />, label: "Upload Evidence", color: "#244B35" },
+            { icon: <Briefcase size={16} />, label: "Explore Opportunities", color: "#C98B5F" },
+            { icon: <Zap size={16} />, label: "Check Skill Gaps", color: "#E8D36B" },
+            { icon: <UserCog size={16} />, label: "Update Profile", color: "#8A6FB8" },
           ].map((a) => (
-            <button key={a.label} className="flex items-center gap-2.5 border rounded-xl p-3 bg-white text-left transition-all hover:-translate-y-0.5 hover:border-[#244B35]" style={{ borderColor: "#E6E3D7" }}>
-              <div className="w-[34px] h-[34px] flex-none rounded-[9px] grid place-items-center" style={{ background: a.bg, color: a.fg }}>{a.icon}</div>
-              <div>
-                <div className="font-semibold text-[13.5px] leading-tight">{a.label}</div>
-                <div className="text-[11px] font-mono" style={{ color: "#9A9D94" }}>{a.desc}</div>
-              </div>
+            <button key={a.label} className="flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all hover:shadow-sm" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: a.color + "18", color: a.color }}>{a.icon}</div>
+              <span className="text-xs font-medium" style={{ color: "#171A18" }}>{a.label}</span>
             </button>
           ))}
         </div>
-      </motion.section>
-
-      {/* Portfolio */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.22 }}
-        className="col-span-12 lg:col-span-8 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Portfolio</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-3">Your Verified Portfolio</div>
-        <div className="flex flex-col gap-2 mb-3">
-          {[
-            { label: "Projects", val: portfolio.projects },
-            { label: "Certificates", val: portfolio.certificates },
-            { label: "Verified Skills", val: portfolio.verifiedSkills },
-          ].map((s) => (
-            <div key={s.label} className="flex items-center justify-between text-[13px] border-b pb-2 last:border-b-0" style={{ borderColor: "#EDEBE0" }}>
-              <span style={{ color: "#6B6F68" }}>{s.label}</span>
-              <b className="font-bold text-[15px]">{s.val}</b>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          {portfolio.featured.map((p) => (
-            <div key={p.title} className="flex-1 border rounded-[9px] p-2" style={{ borderColor: "#E6E3D7", background: "#EFEDE3" }}>
-              <div className="w-[22px] h-[22px] rounded-md grid place-items-center mb-1.5" style={{ background: "#DCE6D0", color: "#16301F" }}>
-                <Award size={12} />
-              </div>
-              <div className="font-semibold text-[11px] leading-tight" style={{ color: "#171A18" }}>{p.title}</div>
-              <div className="text-[10px] font-mono mt-0.5" style={{ color: "#9A9D94" }}>{p.skills.length} skills</div>
-            </div>
-          ))}
-        </div>
-        <LinkMore>Open portfolio →</LinkMore>
-      </motion.section>
-    </>
+      </motion.div>
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SECTION: Profile
+   PROFILE SECTION
    ═══════════════════════════════════════════════════════ */
 function ProfileSection() {
   return (
-    <>
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 lg:col-span-8 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>My Profile</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Student Profile</div>
-        <div className="flex items-start gap-5 mb-6">
-          <div className="w-[72px] h-[72px] rounded-2xl grid place-items-center font-bold text-xl flex-shrink-0" style={{ background: "#244B35", color: "#DCE6D0" }}>
-            {student.initials}
-          </div>
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="w-20 h-20 rounded-xl flex items-center justify-center font-bold text-xl flex-shrink-0" style={{ background: "#244B35", color: "#DCE6D0" }}>{student.initials}</div>
           <div className="flex-1">
-            <div className="font-bold text-xl tracking-tight">{student.name}</div>
-            <div className="font-mono text-xs mt-1" style={{ color: "#6B6F68" }}>{student.course} / {student.year}</div>
-            <div className="font-mono text-xs" style={{ color: "#6B6F68" }}>{student.institution}</div>
-            <div className="mt-2"><Tag cls="verified">Target: {student.targetRole}</Tag></div>
+            <div className="font-semibold text-[22px] tracking-tight" style={{ color: "#171A18" }}>{student.name}</div>
+            <div className="text-sm mb-1" style={{ color: "#6B6F68" }}>{student.course} / {student.year} / {student.department}</div>
+            <div className="text-xs mb-3" style={{ color: "#6B6F68" }}>{student.institution}</div>
+            <Tag cls="verified">Target: {student.targetRole}</Tag>
           </div>
-          <button className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-all hover:bg-[#EFEDE3]" style={{ borderColor: "#E6E3D7" }}>
-            <Edit3 size={13} /> Edit profile
-          </button>
+          <div className="flex-shrink-0"><button className="font-mono text-xs font-bold px-4 py-2 rounded-lg border flex items-center gap-2" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}><Edit3 size={13} /> Edit</button></div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[
-            { label: "Email", value: profile.email },
-            { label: "Phone", value: profile.phone },
-            { label: "Course", value: `${profile.course} / ${profile.year}` },
-            { label: "Institution", value: profile.institution },
-            { label: "Target Role", value: profile.targetRole },
-            { label: "Profile Completion", value: `${profile.profileCompletion}%` },
-          ].map((f) => (
-            <div key={f.label} className="border rounded-xl p-3" style={{ borderColor: "#E6E3D7" }}>
-              <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#9A9D94" }}>{f.label}</div>
-              <div className="font-semibold text-sm">{f.value}</div>
-            </div>
-          ))}
-        </div>
-      </motion.section>
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="col-span-12 lg:col-span-4 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Quick Stats</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">At a Glance</div>
-        <div className="flex flex-col gap-3">
-          {[
-            { label: "Skills", val: profile.skillsCount, icon: <Target size={16} /> },
-            { label: "Verified", val: profile.verifiedCount, icon: <Check size={16} /> },
-            { label: "Best Match", val: `${student.bestMatch}%`, icon: <TrendingUp size={16} /> },
-            { label: "Evidence", val: profile.evidenceItems, icon: <Shield size={16} /> },
-            { label: "Applications", val: applications.length, icon: <FileText size={16} /> },
-          ].map((s) => (
-            <div key={s.label} className="flex items-center gap-3 p-3 rounded-xl border" style={{ borderColor: "#E6E3D7" }}>
-              <div className="w-8 h-8 rounded-lg grid place-items-center" style={{ background: "#DCE6D0", color: "#16301F" }}>{s.icon}</div>
-              <div className="flex-1 font-medium text-sm">{s.label}</div>
-              <div className="font-bold">{s.val}</div>
-            </div>
-          ))}
-        </div>
-      </motion.section>
-    </>
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="md:col-span-2 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+          <Eyebrow>Contact Information</Eyebrow>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+            {[
+              { icon: <Mail size={14} />, label: "Email", value: student.email },
+              { icon: <Smartphone size={14} />, label: "Phone", value: student.phone },
+              { icon: <MapPin size={14} />, label: "Location", value: student.location },
+              { icon: <Globe size={14} />, label: "Institution", value: student.institution },
+              { icon: <BookOpen size={14} />, label: "Course", value: `${student.course} - ${student.year}` },
+              { icon: <Calendar size={14} />, label: "Graduation", value: `Class of ${student.graduationYear}` },
+            ].map((f) => (
+              <div key={f.label} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: "#FAFAF7" }}>
+                <div className="mt-0.5" style={{ color: "#9A9D94" }}>{f.icon}</div>
+                <div><div className="font-mono text-[10px] font-bold tracking-widest uppercase" style={{ color: "#9A9D94" }}>{f.label}</div><div className="text-sm font-medium" style={{ color: "#171A18" }}>{f.value}</div></div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+          <Eyebrow>Quick Stats</Eyebrow>
+          <div className="flex flex-col gap-3 mt-3">
+            {[
+              { label: "Verified Skills", value: skillPassport.verifiedCount, color: "#244B35" },
+              { label: "Total Evidence", value: skillPassport.totalEvidence, color: "#8A6FB8" },
+              { label: "Applications", value: applications.length, color: "#C98B5F" },
+              { label: "Profile", value: `${student.profileCompletion}%`, color: "#171A18" },
+            ].map((s) => (
+              <div key={s.label} className="flex items-center justify-between p-3 rounded-lg" style={{ background: "#FAFAF7" }}>
+                <span className="text-xs font-medium" style={{ color: "#6B6F68" }}>{s.label}</span>
+                <span className="font-bold text-lg" style={{ color: s.color }}>{s.value}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SECTION: Skills
+   SKILL PASSPORT SECTION
    ═══════════════════════════════════════════════════════ */
-function SkillsSection() {
-  const verified = skills.filter(s => s.verified);
-  const selfDeclared = skills.filter(s => !s.verified);
+function SkillPassportSection() {
+  const verified = skillPassport.items.filter((i) => i.origin === "evidence");
+  const selfDeclared = skillPassport.items.filter((i) => i.origin === "self-declared");
+
   return (
-    <>
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <Eyebrow>Skills</Eyebrow>
-            <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">All Skills</div>
-            <div className="text-[13px]" style={{ color: "#6B6F68" }}>{verified.length} verified / {selfDeclared.length} self-declared</div>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <div className="font-mono text-[11px] font-bold tracking-[0.16em] uppercase mb-3 flex items-center gap-2" style={{ color: "#244B35" }}>
-              <span className="w-[7px] h-[7px] bg-[#244B35]" /> Verified Skills ({verified.length})
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#244B35">Skill Passport</Eyebrow>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Your Skill Passport</div>
+        <p className="text-xs mb-4" style={{ color: "#6B6F68" }}>Evidence-backed and self-declared skills, clearly distinguished.</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+          {[
+            { label: "Verified Skills", value: skillPassport.verifiedCount, bg: "#DCE6D0", color: "#244B35" },
+            { label: "Self-Declared", value: skillPassport.selfDeclaredCount, bg: "#EDEBE0", color: "#6B6F68" },
+            { label: "Total Evidence", value: skillPassport.totalEvidence, bg: "#EAE3F4", color: "#4d3a74" },
+            { label: "Verified Evidence", value: skillPassport.verifiedEvidence, bg: "#DCE6D0", color: "#244B35" },
+          ].map((s) => (
+            <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: s.bg }}>
+              <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#6B6F68" }}>{s.label}</div>
+              <div className="font-bold text-2xl" style={{ color: s.color }}>{s.value}</div>
             </div>
+          ))}
+        </div>
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+          <div className="flex items-center gap-2 mb-4"><div className="w-3 h-3 rounded-sm" style={{ background: "#244B35" }} /><div className="font-semibold text-[16px]" style={{ color: "#171A18" }}>Evidence-Derived Skills</div></div>
+          <div className="flex flex-col gap-3">
             {verified.map((sk) => (
-              <div key={sk.name} className="py-3 border-b last:border-b-0" style={{ borderColor: "#EDEBE0" }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-semibold text-[15px]">{sk.name}</span>
-                  <Tag cls="verified">✓ Evidence</Tag>
-                  <span className="ml-auto font-mono font-bold text-sm">{sk.pct}<span className="text-[10px] font-normal" style={{ color: "#9A9D94" }}>%</span></span>
+              <div key={sk.id} className="p-3 rounded-xl border" style={{ borderColor: "#DCE6D0", background: "#FAFCF7" }}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="font-semibold text-sm" style={{ color: "#171A18" }}>{sk.name}</span>
+                  <span className="font-mono text-xs font-bold" style={{ color: "#244B35" }}>{sk.confidence}%</span>
                 </div>
-                <PxBar pct={sk.pct} />
-                <div className="font-mono text-[11px] mt-1.5" style={{ color: "#9A9D94" }}>Source: {sk.source} / {sk.category}</div>
+                <PxBar pct={sk.confidence} color="#244B35" />
+                {sk.evidence && <div className="mt-2 font-mono text-[10px]" style={{ color: "#6B6F68" }}>{sk.evidence.title} / {sk.evidence.issuer} / {sk.evidence.date}</div>}
               </div>
             ))}
           </div>
-          <div>
-            <div className="font-mono text-[11px] font-bold tracking-[0.16em] uppercase mb-3 flex items-center gap-2" style={{ color: "#9A9D94" }}>
-              <span className="w-[7px] h-[7px] bg-[#9A9D94]" /> Self-Declared Skills ({selfDeclared.length})
-            </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+          <div className="flex items-center gap-2 mb-4"><div className="w-3 h-3 rounded-sm" style={{ background: "#E8D36B" }} /><div className="font-semibold text-[16px]" style={{ color: "#171A18" }}>Self-Declared Skills</div></div>
+          <div className="flex flex-col gap-3">
             {selfDeclared.map((sk) => (
-              <div key={sk.name} className="py-3 border-b last:border-b-0" style={{ borderColor: "#EDEBE0" }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-semibold text-[15px]">{sk.name}</span>
-                  <Tag cls="self">Self-declared</Tag>
-                  <span className="ml-auto font-mono font-bold text-sm">{sk.pct}<span className="text-[10px] font-normal" style={{ color: "#9A9D94" }}>%</span></span>
+              <div key={sk.id} className="p-3 rounded-xl border" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="font-semibold text-sm" style={{ color: "#171A18" }}>{sk.name}</span>
+                  <span className="font-mono text-xs font-bold" style={{ color: "#6B6F68" }}>{sk.confidence}%</span>
                 </div>
-                <PxBar pct={sk.pct} yellow />
-                <div className="font-mono text-[11px] mt-1.5" style={{ color: "#9A9D94" }}>Source: {sk.source} / {sk.category}</div>
+                <PxBar pct={sk.confidence} color="#E8D36B" />
+                <div className="mt-2 font-mono text-[10px]" style={{ color: "#9A9D94" }}>No evidence uploaded yet</div>
               </div>
             ))}
           </div>
+        </motion.div>
+      </div>
+
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#8A6FB8">Role Readiness</Eyebrow>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-1">Role Readiness: {roleReadiness.targetRole}</div>
+        <div className="flex items-center gap-3 mt-3 mb-4">
+          <Tag cls={roleReadiness.readiness}>{roleReadiness.readiness}</Tag>
+          <span className="font-mono text-xs font-bold" style={{ color: "#6B6F68" }}>{roleReadiness.readinessScore}/100</span>
+          <span className="text-xs" style={{ color: "#6B6F68" }}>{roleReadiness.matchedSkills}/{roleReadiness.totalRequired} skills matched</span>
         </div>
-      </motion.section>
-    </>
+        <p className="text-sm mb-4" style={{ color: "#6B6F68" }}>{roleReadiness.explanation}</p>
+        <div className="flex flex-col gap-2">
+          {roleReadiness.factors.map((f, i) => (
+            <div key={i} className="flex items-start gap-2 text-sm">
+              <span className="mt-0.5">{f.positive ? <Check size={14} style={{ color: "#244B35" }} /> : <Zap size={14} style={{ color: "#E8C7AE" }} />}</span>
+              <span><strong style={{ color: "#171A18" }}>{f.label}:</strong> <span style={{ color: "#6B6F68" }}>{f.value}</span></span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SECTION: Skill Gap
+   SKILL GAP SECTION
    ═══════════════════════════════════════════════════════ */
 function SkillGapSection() {
   return (
-    <>
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow color="#B99A22">Skill Gap</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Skill Gap Analysis</div>
-        <div className="text-[13px] mb-6" style={{ color: "#6B6F68" }}>
-          Matched against your target role / <b style={{ color: "#171A18" }}>{student.targetRole}</b>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#E8C7AE">Skill Gap Analysis</Eyebrow>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Your Skill Gaps</div>
+        <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Based on your target role: {roleReadiness.targetRole}</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {gaps.map((g) => (
-            <div key={g.name} className="border rounded-[14px] p-5" style={{ borderColor: "#E6E3D7" }}>
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-semibold text-[15px]">{g.name}</span>
-                <Tag cls={g.severity === "High" ? "high" : "medium"}>Gap: {g.severity}</Tag>
+            <div key={g.id} className="rounded-xl border p-5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-semibold text-sm" style={{ color: "#171A18" }}>{g.name}</span>
+                <Tag cls={g.severity.toLowerCase()}>{g.severity} Gap</Tag>
               </div>
-              <div className="mb-2">
-                <div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "#6B6F68" }}>
-                  <span>Your level</span><span>{g.current}%</span>
-                </div>
-                <PxBar pct={g.current} segments={16} yellow />
+              <div className="mb-3">
+                <div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "#6B6F68" }}><span>Current</span><span>{g.current}%</span></div>
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}><div className="h-full rounded-full" style={{ width: `${g.current}%`, background: g.severity === "High" ? "#E8C7AE" : "#E8D36B" }} /></div>
               </div>
-              <div>
-                <div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "#6B6F68" }}>
-                  <span>Required</span><span>{g.required}%</span>
-                </div>
-                <PxBar pct={g.required} segments={16} />
+              <div className="mb-3">
+                <div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "#6B6F68" }}><span>Required</span><span>{g.required}%</span></div>
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}><div className="h-full rounded-full" style={{ width: `${g.required}%`, background: "#244B35" }} /></div>
               </div>
-              <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{ borderColor: "#EDEBE0" }}>
-                <span className="font-mono text-[11px]" style={{ color: "#9A9D94" }}>Gap: {g.required - g.current}%</span>
-                <LinkMore>Close gap →</LinkMore>
-              </div>
+              {g.evidenceNeeded && <div className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-md inline-block" style={{ background: "#F0E8DD", color: "#7a3f1a" }}>Evidence needed</div>}
+              <button className="mt-3 font-mono text-xs font-bold text-[#244B35] inline-flex items-center gap-1 hover:gap-3 transition-all">Close gap <ChevronRight size={12} /></button>
             </div>
           ))}
         </div>
-      </motion.section>
-    </>
+      </motion.div>
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SECTION: Opportunities
+   SIMULATOR SECTION
+   ═══════════════════════════════════════════════════════ */
+function SimulatorSection() {
+  const [selected, setSelected] = useState(0);
+  const action = simulatorActions[selected];
+
+  return (
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#8A6FB8">Skill Gap Simulator</Eyebrow>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">See What Could Change</div>
+        <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Select an action to simulate its impact on your role readiness.</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+          <div className="md:col-span-5 flex flex-col gap-2">
+            {simulatorActions.map((a, i) => (
+              <button key={i} onClick={() => setSelected(i)} className={`text-left p-4 rounded-xl border transition-all ${selected === i ? "ring-2" : ""}`} style={{ borderColor: selected === i ? "#244B35" : "#E6E3D7", background: selected === i ? "#F0F5EC" : "#FAFAF7", boxShadow: selected === i ? "0 0 0 3px rgba(36,75,53,.12)" : undefined }}>
+                <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#9A9D94" }}>{a.type}</div>
+                <div className="font-semibold text-sm" style={{ color: "#171A18" }}>{a.name}</div>
+                <p className="text-xs mt-1" style={{ color: "#6B6F68" }}>{a.description}</p>
+              </button>
+            ))}
+          </div>
+
+          <div className="md:col-span-7 rounded-xl border p-5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+            <div className="font-semibold text-[16px] mb-4" style={{ color: "#171A18" }}>{action.name}</div>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="rounded-lg p-3 text-center" style={{ background: "#EDEBE0" }}>
+                <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#6B6F68" }}>Current</div>
+                <div className="font-bold text-2xl" style={{ color: "#171A18" }}>{action.readinessChange.from}</div>
+                <Tag cls={action.readinessChange.fromLabel}>{action.readinessChange.fromLabel}</Tag>
+              </div>
+              <div className="rounded-lg p-3 text-center" style={{ background: "#DCE6D0" }}>
+                <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#6B6F68" }}>Projected</div>
+                <div className="font-bold text-2xl" style={{ color: "#244B35" }}>{action.readinessChange.to}</div>
+                <Tag cls={action.readinessChange.toLabel}>{action.readinessChange.toLabel}</Tag>
+              </div>
+            </div>
+            <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "#6B6F68" }}>Skills Improved</div>
+            {action.skillsImproved.map((sk) => (
+              <div key={sk.skill} className="mb-3">
+                <div className="flex justify-between text-xs mb-1"><span className="font-medium" style={{ color: "#171A18" }}>{sk.skill}</span><span className="font-mono font-bold" style={{ color: "#244B35" }}>{sk.currentConfidence}% &rarr; {sk.projectedConfidence}%</span></div>
+                <div className="h-2 rounded-full overflow-hidden flex gap-0.5" style={{ background: "#E6E3D7" }}>
+                  <div className="h-full rounded-full" style={{ width: `${sk.currentConfidence}%`, background: "#E8D36B" }} />
+                  <div className="h-full rounded-full" style={{ width: `${sk.projectedConfidence - sk.currentConfidence}%`, background: "#244B35" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROJECTS SECTION (Skill-to-Project Loop)
+   ═══════════════════════════════════════════════════════ */
+function ProjectsSection() {
+  return (
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#C98B5F">Skill-to-Project Loop</Eyebrow>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Recommended Projects</div>
+        <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Each project targets a specific skill gap. Complete it to earn verified evidence.</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {recommendedProjects.map((proj) => (
+            <div key={proj.id} className="rounded-xl border p-5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+              <div className="flex items-center justify-between mb-2">
+                <Tag cls="lavender">{proj.targetSkill}</Tag>
+                <Tag cls={proj.difficulty === "Beginner" ? "low" : "medium"}>{proj.difficulty}</Tag>
+              </div>
+              <div className="font-semibold text-[16px] mb-1" style={{ color: "#171A18" }}>{proj.title}</div>
+              <p className="text-xs mb-3" style={{ color: "#6B6F68" }}>{proj.description}</p>
+              <div className="flex items-center gap-3 font-mono text-[11px] mb-3" style={{ color: "#6B6F68" }}>
+                <span className="inline-flex items-center gap-1"><Clock size={11} /> {proj.estimatedDuration}</span>
+                <span className="inline-flex items-center gap-1"><FileText size={11} /> {proj.deliverables.length} deliverables</span>
+              </div>
+              <div className="mb-3">
+                <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: "#9A9D94" }}>Deliverables</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {proj.deliverables.map((d) => <span key={d} className="text-[10px] font-medium px-2 py-0.5 rounded-md" style={{ background: "#EDEBE0", color: "#6B6F68" }}>{d}</span>)}
+                </div>
+              </div>
+              <div className="mb-3">
+                <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: "#9A9D94" }}>Verification Criteria</div>
+                <div className="flex flex-col gap-1">
+                  {proj.verificationCriteria.map((c) => <div key={c} className="flex items-center gap-1.5 text-xs" style={{ color: "#6B6F68" }}><Check size={11} style={{ color: "#244B35" }} /> {c}</div>)}
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <Tag cls={proj.submissionStatus === "not submitted" ? "applied" : "verified"}>{proj.submissionStatus === "not submitted" ? "Not submitted" : proj.submissionStatus}</Tag>
+                <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white" style={{ background: "#244B35" }}>Start project</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   OPPORTUNITIES SECTION
    ═══════════════════════════════════════════════════════ */
 function OpportunitiesSection() {
   return (
-    <>
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Opportunities</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Matched Opportunities</div>
-        <div className="text-[13px] mb-5" style={{ color: "#6B6F68" }}>Based on your verified skills and target role</div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="flex items-center justify-between mb-1">
+          <Eyebrow color="#C98B5F">Opportunities</Eyebrow>
+          <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-md" style={{ background: "#F0E8DD", color: "#7a3f1a" }}>{opportunities.length} matched</span>
+        </div>
+        <div className="font-semibold text-[22px] tracking-tight mb-5">Discover Opportunities</div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {opportunities.map((opp) => (
-            <div key={opp.id} className="border rounded-[14px] p-5 transition-all hover:-translate-y-0.5 hover:border-[#C98B5F]" style={{ borderColor: "#E6E3D7" }}>
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <div className="font-bold text-[15px] tracking-tight">{opp.title}</div>
-                  <div className="font-mono text-[11px] mt-0.5" style={{ color: "#6B6F68" }}>{opp.org}</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-xl" style={{ color: opp.match >= 90 ? "#244B35" : opp.match >= 80 ? "#C98B5F" : "#B99A22" }}>{opp.match}%</div>
-                  <div className="font-mono text-[9px] tracking-widest uppercase" style={{ color: "#9A9D94" }}>match</div>
-                </div>
+            <div key={opp.id} className="rounded-xl border p-5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+              <div className="flex items-center justify-between mb-2">
+                <Tag cls="evidence">{opp.type}</Tag>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm" style={{ background: "#DCE6D0", color: "#244B35" }}>{opp.match}%</div>
               </div>
-              <div className="flex gap-3 mb-3 font-mono text-[11px]" style={{ color: "#6B6F68" }}>
-                <span className="inline-flex items-center gap-1"><MapPin size={12} /> {opp.location}</span>
-                <span className="inline-flex items-center gap-1"><Clock size={12} /> {opp.duration}</span>
+              <div className="font-semibold text-[17px] mb-1" style={{ color: "#171A18" }}>{opp.title}</div>
+              <div className="text-sm mb-2" style={{ color: "#6B6F68" }}>{opp.org}</div>
+              <p className="text-xs mb-3" style={{ color: "#6B6F68" }}>{opp.description}</p>
+              <div className="flex flex-wrap gap-3 font-mono text-[11px] mb-3" style={{ color: "#6B6F68" }}>
+                <span className="inline-flex items-center gap-1"><MapPin size={11} /> {opp.location}</span>
+                <span className="inline-flex items-center gap-1"><Clock size={11} /> {opp.duration}</span>
+                <span className="inline-flex items-center gap-1"><Briefcase size={11} /> {opp.stipend}</span>
+                <span className="inline-flex items-center gap-1"><Target size={11} /> {opp.openings} openings</span>
               </div>
-              <div className="flex flex-wrap gap-1 mb-3">
-                {opp.skills.map((s) => (
-                  <span key={s} className={`text-[11px] font-medium rounded-md px-2 py-0.5 ${
-                    bestMatch.matched.includes(s) ? "bg-[#DCE6D0] text-[#16301F]" : "bg-[#E8C7AE] text-[#5a2f12]"
-                  }`}>{bestMatch.matched.includes(s) ? "✓ " : ""}{s}</span>
-                ))}
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {opp.matchedSkills.map((sk) => <Tag key={sk} cls="verified">{sk}</Tag>)}
+                {opp.missingSkills.map((sk) => <Tag key={sk} cls="high">{sk}</Tag>)}
               </div>
-              <div className="flex gap-2">
-                <button className="flex-1 inline-flex items-center justify-center gap-1.5 font-semibold text-[13px] px-3 py-2 rounded-xl transition-all hover:-translate-y-0.5" style={{ background: "#E8C7AE", color: "#5a2f12" }}>
-                  Apply <ChevronRight size={14} />
-                </button>
-                <button className="inline-flex items-center gap-1.5 font-medium text-[13px] px-3 py-2 rounded-xl border transition-all hover:bg-[#EFEDE3]" style={{ borderColor: "#E6E3D7" }}>
-                  <ExternalLink size={13} /> Details
-                </button>
+              <div className="font-mono text-[10px] mb-3" style={{ color: "#6B6F68" }}>Deadline: {opp.deadline}</div>
+              <div className="flex gap-3">
+                <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white" style={{ background: "#244B35" }}>Apply now</button>
+                <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg border" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>Details</button>
               </div>
             </div>
           ))}
         </div>
-      </motion.section>
-    </>
+      </motion.div>
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SECTION: Applications
+   APPLICATIONS SECTION
    ═══════════════════════════════════════════════════════ */
 function ApplicationsSection() {
-  const stages = ["Applied", "Shortlisted", "Interview", "Offer", "Joined"];
-  return (
-    <>
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Applications</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Application Tracker</div>
-        <div className="text-[13px] mb-5" style={{ color: "#6B6F68" }}>Track your application journey</div>
+  const stages = ["Applied", "Shortlisted", "Interviewed", "Offered", "Joined"];
 
-        {/* Pipeline */}
-        <div className="flex items-center gap-0 mb-8 px-4">
-          {stages.map((s, i) => (
-            <div key={s} className="flex items-center flex-1">
-              <div className="text-center flex-1">
-                <div className="w-8 h-8 mx-auto rounded-lg grid place-items-center font-bold text-xs mb-1"
-                  style={{ background: i <= 1 ? "#244B35" : "#EDEBE0", color: i <= 1 ? "#DCE6D0" : "#9A9D94" }}>
-                  {i < 2 ? "✓" : i + 1}
-                </div>
-                <div className="font-mono text-[10px] font-bold" style={{ color: i <= 1 ? "#244B35" : "#9A9D94" }}>{s}</div>
-              </div>
-              {i < stages.length - 1 && <div className="h-0.5 flex-1 -mt-4" style={{ background: i < 1 ? "#244B35" : "#E6E3D7" }} />}
+  return (
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#8A6FB8">Applications</Eyebrow>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5">Application Tracker</div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+          {stages.map((st, i) => (
+            <div key={st} className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center font-mono text-[10px] font-bold" style={{ background: "#EDEBE0", color: "#6B6F68" }}>{i + 1}</div>
+              <span className="text-xs font-medium" style={{ color: "#171A18" }}>{st}</span>
+              {i < stages.length - 1 && <div className="flex-1 h-[2px]" style={{ background: "#E6E3D7" }} />}
             </div>
           ))}
         </div>
 
-        {/* Application Cards */}
         <div className="flex flex-col gap-4">
           {applications.map((app) => (
-            <div key={app.id} className="border rounded-[14px] p-5" style={{ borderColor: "#E6E3D7" }}>
-              <div className="flex items-start justify-between mb-2">
+            <div key={app.id} className="rounded-xl border p-5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
                 <div>
-                  <div className="font-bold text-[15px]">{app.role}</div>
-                  <div className="font-mono text-[11px]" style={{ color: "#6B6F68" }}>{app.org}</div>
+                  <div className="font-semibold text-[16px]" style={{ color: "#171A18" }}>{app.role}</div>
+                  <div className="text-sm" style={{ color: "#6B6F68" }}>{app.org}</div>
                 </div>
-                <Tag cls={app.stage === "applied" ? "verified" : app.stage === "shortlisted" ? "recommended" : "review"}>{app.label}</Tag>
+                <div className="flex items-center gap-2">
+                  <Tag cls={app.stage}>{app.stageLabel}</Tag>
+                  <span className="font-mono text-xs font-bold" style={{ color: "#244B35" }}>{app.match}% match</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3 text-xs" style={{ color: "#6B6F68" }}>
-                <span className="inline-flex items-center gap-1"><Calendar size={12} /> {app.date}</span>
-                <span>/</span>
-                <span>{app.status}</span>
+              <div className="flex flex-wrap gap-4 text-xs" style={{ color: "#6B6F68" }}>
+                <span>Applied: {app.appliedDate}</span>
+                <span>Status: {app.status}</span>
+                {app.nextStep && <span className="font-medium" style={{ color: "#244B35" }}>{app.nextStep}</span>}
+              </div>
+              <div className="flex gap-2 mt-3 pt-3" style={{ borderTop: "1px solid #E6E3D7" }}>
+                {stages.map((st, i) => {
+                  const stKey = st.toLowerCase();
+                  const isCurrent = app.stage === stKey || (app.stage === "shortlisted" && i <= 1) || (app.stage === "interviewed" && i <= 2);
+                  return <div key={st} className="flex-1 h-1.5 rounded-full" style={{ background: isCurrent ? "#244B35" : "#E6E3D7" }} />;
+                })}
               </div>
             </div>
           ))}
         </div>
-      </motion.section>
-    </>
+      </motion.div>
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SECTION: Recommendations
+   RECOMMENDATIONS SECTION
    ═══════════════════════════════════════════════════════ */
 function RecommendationsSection() {
   return (
-    <>
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow color="#8A6FB8">Recommendations</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Recommended For Your Skill Gaps</div>
-        <div className="text-[13px] mb-5" style={{ color: "#6B6F68" }}>Not random — every pick maps to a gap you can close.</div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {recommendations.map((r) => (
-            <div key={r.title} className="border rounded-[14px] p-5 transition-all hover:-translate-y-0.5" style={{ borderColor: "#E6E3D7" }}>
-              <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#8A6FB8" }}>{r.gap}</div>
-              <div className="font-semibold text-[15px] mb-1">{r.title}</div>
-              <div className="flex items-center gap-2 mb-2">
-                <Tag cls="lavender">{r.type}</Tag>
-                <span className="font-mono text-[10px]" style={{ color: "#9A9D94" }}>{r.provider} / {r.duration}</span>
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#8A6FB8">Learning Recommendations</Eyebrow>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Recommended For Your Skill Gaps</div>
+        <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Each recommendation is directly connected to a specific skill gap.</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {recommendations.map((rec) => (
+            <div key={rec.id} className="rounded-xl border p-5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+              <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#8A6FB8" }}>{rec.closesGap}</div>
+              <div className="font-semibold text-[16px] mb-1" style={{ color: "#171A18" }}>{rec.title}</div>
+              <div className="text-xs mb-2" style={{ color: "#6B6F68" }}>{rec.type} / {rec.provider} / {rec.duration}</div>
+              <div className="flex items-center gap-1 mb-2">
+                <Star size={13} style={{ color: "#E8D36B", fill: "#E8D36B" }} />
+                <span className="font-mono text-xs font-bold" style={{ color: "#6B6F68" }}>{rec.rating}</span>
               </div>
-              <p className="text-xs mb-3" style={{ color: "#6B6F68" }}>{r.why}</p>
+              <p className="text-xs mb-3" style={{ color: "#6B6F68" }}>{rec.why}</p>
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[11px] font-bold" style={{ color: "#C98B5F" }}>★ {r.rating}</span>
-                <button className="font-semibold text-[13px] px-3 py-1.5 rounded-xl transition-all hover:-translate-y-0.5" style={{ background: "#C8B5DE", color: "#4d3a74" }}>
-                  Start learning
-                </button>
+                <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-md" style={{ background: "#DCE6D0", color: "#244B35" }}>+{rec.projectedImprovement}% improvement</span>
+                <button className="font-mono text-xs font-bold text-[#244B35] inline-flex items-center gap-1 hover:gap-3 transition-all">Start learning <ChevronRight size={12} /></button>
               </div>
             </div>
           ))}
         </div>
-      </motion.section>
-    </>
+      </motion.div>
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SECTION: Evidence Vault
-   ═══════════════════════════════════════════════════════ */
-function EvidenceSection() {
-  return (
-    <>
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <Eyebrow>Evidence Vault</Eyebrow>
-            <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Evidence Vault</div>
-            <div className="text-[13px]" style={{ color: "#6B6F68" }}>Proof that backs your skills</div>
-          </div>
-          <button className="inline-flex items-center gap-1.5 font-semibold text-[13px] px-4 py-2 rounded-xl transition-all hover:-translate-y-0.5" style={{ background: "#244B35", color: "#DCE6D0" }}>
-            <Upload size={14} /> Upload evidence
-          </button>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          {[
-            { num: evidence.total, label: "Total", cls: "", bg: "#EFEDE3" },
-            { num: evidence.verified, label: "Verified", cls: "text-[#244B35]", bg: "#DCE6D0" },
-            { num: evidence.processing, label: "Processing", cls: "text-[#3d5790]", bg: "#E3E9F6" },
-            { num: evidence.review, label: "Needs review", cls: "text-[#C98B5F]", bg: "#F0E8DD" },
-          ].map((s) => (
-            <div key={s.label} className="rounded-[11px] p-3" style={{ background: s.bg }}>
-              <div className={`font-bold text-xl ${s.cls}`}>{s.num}</div>
-              <div className="font-mono text-[10px]" style={{ color: "#6B6F68" }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {evidence.items.map((ev) => (
-            <div key={ev.id} className="flex items-center gap-3 p-3 rounded-xl border transition-all hover:border-[#244B35]" style={{ borderColor: "#E6E3D7" }}>
-              <div className="w-[30px] h-[36px] flex-none border rounded-[5px] relative bg-white" style={{ borderColor: "#E6E3D7" }}>
-                <div className="absolute -top-px -right-px w-[9px] h-[9px] bg-[#F7F6F0] rounded-bl-[4px] border" style={{ borderColor: "#E6E3D7", borderTop: "none", borderRight: "none" }} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-[13px] truncate">{ev.name}</div>
-                <div className="font-mono text-[11px]" style={{ color: "#9A9D94" }}>{ev.issuer} / {ev.date}</div>
-              </div>
-              <span className={`font-mono text-[10px] font-bold tracking-widest uppercase px-2 py-[3px] rounded-md flex-none ${
-                ev.status === "verified" ? "bg-[#DCE6D0] text-[#16301F]"
-                : ev.status === "processing" ? "bg-[#E3E9F6] text-[#3d5790]"
-                : "bg-[#E8C7AE] text-[#7a3f1a]"
-              }`}>
-                {ev.status === "verified" ? "✓ Verified" : ev.status === "processing" ? "… Processing" : "! Review"}
-              </span>
-            </div>
-          ))}
-        </div>
-      </motion.section>
-    </>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════
-   SECTION: Portfolio
+   PORTFOLIO SECTION
    ═══════════════════════════════════════════════════════ */
 function PortfolioSection() {
   return (
-    <>
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[18px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Portfolio</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Your Verified Portfolio</div>
-        <div className="grid grid-cols-3 gap-3 mb-6">
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#C98B5F">Verified Portfolio</Eyebrow>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-4">Your Verified Portfolio</div>
+
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
           {[
-            { label: "Projects", val: portfolio.projects, icon: <Briefcase size={18} /> },
-            { label: "Certificates", val: portfolio.certificates, icon: <Award size={18} /> },
-            { label: "Verified Skills", val: portfolio.verifiedSkills, icon: <Check size={18} /> },
+            { label: "Projects", value: portfolioData.projects, color: "#244B35" },
+            { label: "Certificates", value: portfolioData.certificates, color: "#8A6FB8" },
+            { label: "Verified Skills", value: portfolioData.verifiedSkills, color: "#244B35" },
+            { label: "Internship Hours", value: portfolioData.internshipHours, color: "#C98B5F" },
+            { label: "Achievements", value: portfolioData.achievements, color: "#E8D36B" },
           ].map((s) => (
-            <div key={s.label} className="border rounded-[14px] p-4 text-center" style={{ borderColor: "#E6E3D7", background: "#EFEDE3" }}>
-              <div className="w-10 h-10 mx-auto rounded-xl grid place-items-center mb-2" style={{ background: "#DCE6D0", color: "#16301F" }}>{s.icon}</div>
-              <div className="font-bold text-2xl">{s.val}</div>
-              <div className="font-mono text-[10px] tracking-widest uppercase" style={{ color: "#9A9D94" }}>{s.label}</div>
+            <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: "#FAFAF7", border: "1px solid #E6E3D7" }}>
+              <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#6B6F68" }}>{s.label}</div>
+              <div className="font-bold text-2xl" style={{ color: s.color }}>{s.value}</div>
             </div>
           ))}
         </div>
-        <div className="font-semibold text-[15px] mb-3">Featured Work</div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {portfolio.featured.map((p) => (
-            <div key={p.title} className="border rounded-[14px] p-4 transition-all hover:-translate-y-0.5 hover:border-[#244B35]" style={{ borderColor: "#E6E3D7" }}>
-              <div className="w-[28px] h-[28px] rounded-lg grid place-items-center mb-2" style={{ background: "#DCE6D0", color: "#16301F" }}>
-                <Award size={14} />
+
+        <div className="font-semibold text-[16px] mb-3" style={{ color: "#171A18" }}>Featured Work</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {portfolioData.featured.map((p) => (
+            <div key={p.id} className="rounded-xl border p-4" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+              <div className="font-semibold text-sm mb-1" style={{ color: "#171A18" }}>{p.title}</div>
+              <p className="text-xs mb-2" style={{ color: "#6B6F68" }}>{p.description}</p>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {p.skills.map((sk) => <Tag key={sk} cls="verified">{sk}</Tag>)}
               </div>
-              <div className="font-semibold text-[14px] mb-1">{p.title}</div>
-              <p className="text-xs mb-2" style={{ color: "#6B6F68" }}>{p.desc}</p>
-              <div className="flex flex-wrap gap-1">
-                {p.skills.map((s) => (
-                  <span key={s} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-[#EDEBE0] text-[#6B6F68]">{s}</span>
-                ))}
-              </div>
+              <div className="font-mono text-[10px]" style={{ color: "#9A9D94" }}>{p.date}</div>
             </div>
           ))}
         </div>
-      </motion.section>
-    </>
+      </motion.div>
+    </div>
   );
 }
 
-
 /* ═══════════════════════════════════════════════════════
-   SECTION: Settings
+   SETTINGS SECTION
    ═══════════════════════════════════════════════════════ */
 function SettingsSection() {
   const [name, setName] = useState(student.name);
   const [email, setEmail] = useState(student.email);
   const [phone, setPhone] = useState(student.phone);
-  const [course, setCourse] = useState(student.course);
-  const [year, setYear] = useState(student.year);
-  const [institution, setInstitution] = useState(student.institution);
-  const [targetRole, setTargetRole] = useState(student.targetRole);
   const [bio, setBio] = useState(student.bio);
-  const [notifEmail, setNotifEmail] = useState(true);
-  const [notifApp, setNotifApp] = useState(true);
-  const [notifUpdates, setNotifUpdates] = useState(false);
-  const [notifWeekly, setNotifWeekly] = useState(true);
-  const [profileVisibility, setProfileVisibility] = useState("institution");
-  const [showEmail, setShowEmail] = useState(false);
+  const [notifs, setNotifs] = useState({ email: true, push: true, opportunities: true, digest: false });
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
+    // TODO: POST to /api/student/settings with { name, email, phone, bio, notifications: notifs }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-    // TODO: POST /api/settings { name, email, phone, course, year, institution, targetRole, bio, notifEmail, notifApp, notifUpdates, notifWeekly, profileVisibility, showEmail }
   };
 
-  const inputCls = "w-full border rounded-xl px-4 py-3 text-sm font-medium outline-none transition-colors focus:border-[#244B35]";
-  const inputStyle = { borderColor: "#E6E3D7", background: "#FAF9F5", color: "#171A18" };
-  const labelCls = "font-mono text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5 block";
-
-  const Toggle = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
-    <button type="button" onClick={() => onChange(!checked)} className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0" style={{ background: checked ? "#244B35" : "#D9D6CC" }}>
-      <span className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform" style={{ transform: checked ? "translateX(20px)" : "translateX(0)" }} />
-    </button>
-  );
+  const inputCls = "w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors";
+  const inputStyle = { borderColor: "#E6E3D7", background: "#FAFAF7", color: "#171A18" };
 
   return (
-    <>
-      {/* Profile Information */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 lg:col-span-8 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Account</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Profile Information</div>
-        <div className="flex items-start gap-5 mb-6">
-          <div className="relative">
-            <div className="w-[72px] h-[72px] rounded-2xl grid place-items-center font-bold text-xl" style={{ background: "#244B35", color: "#DCE6D0" }}>
-              {name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
-            </div>
-            <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg grid place-items-center border bg-white" style={{ borderColor: "#E6E3D7" }}>
-              <Camera size={13} style={{ color: "#6B6F68" }} />
-            </button>
-          </div>
-          <div className="flex-1">
-            <div className="font-bold text-lg tracking-tight" style={{ color: "#171A18" }}>{name}</div>
-            <div className="font-mono text-xs" style={{ color: "#6B6F68" }}>{course} / {year}</div>
-            <div className="font-mono text-xs" style={{ color: "#9A9D94" }}>{institution}</div>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div>
-            <label className={labelCls} style={{ color: "#6B6F68" }}>Full Name</label>
-            <input className={inputCls} style={inputStyle} value={name} onChange={e => setName(e.target.value)} placeholder="Your full name" />
-          </div>
-          <div>
-            <label className={labelCls} style={{ color: "#6B6F68" }}>Email Address</label>
-            <input className={inputCls} style={inputStyle} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@institution.ac.in" />
-          </div>
-          <div>
-            <label className={labelCls} style={{ color: "#6B6F68" }}>Phone Number</label>
-            <input className={inputCls} style={inputStyle} type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 XXXXX XXXXX" />
-          </div>
-          <div>
-            <label className={labelCls} style={{ color: "#6B6F68" }}>Course / Program</label>
-            <input className={inputCls} style={inputStyle} value={course} onChange={e => setCourse(e.target.value)} placeholder="e.g. BAMS, MBBS, BSc" />
-          </div>
-          <div>
-            <label className={labelCls} style={{ color: "#6B6F68" }}>Year</label>
-            <select className={inputCls} style={inputStyle} value={year} onChange={e => setYear(e.target.value)}>
-              <option>1st Year</option>
-              <option>2nd Year</option>
-              <option>3rd Year</option>
-              <option>4th Year</option>
-              <option>Final Year</option>
-              <option>Intern</option>
-            </select>
-          </div>
-          <div>
-            <label className={labelCls} style={{ color: "#6B6F68" }}>Institution</label>
-            <input className={inputCls} style={inputStyle} value={institution} onChange={e => setInstitution(e.target.value)} placeholder="Your college / university" />
-          </div>
-          <div className="sm:col-span-2">
-            <label className={labelCls} style={{ color: "#6B6F68" }}>Target Role</label>
-            <input className={inputCls} style={inputStyle} value={targetRole} onChange={e => setTargetRole(e.target.value)} placeholder="e.g. Clinical Research Intern" />
-          </div>
-          <div className="sm:col-span-2">
-            <label className={labelCls} style={{ color: "#6B6F68" }}>Bio</label>
-            <textarea className={inputCls + " resize-none"} style={{ ...inputStyle, minHeight: 80 }} value={bio} onChange={e => setBio(e.target.value)} placeholder="Tell us about yourself and your career goals..." />
-          </div>
-        </div>
-      </motion.section>
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#244B35">Settings</Eyebrow>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5">Account Settings</div>
 
-      {/* Quick Actions */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="col-span-12 lg:col-span-4 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow>Quick Actions</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Account Actions</div>
-        <div className="flex flex-col gap-3">
-          {[
-            { label: "Download my data", desc: "Export all profile and skill data", icon: <Download size={16} />, color: "#244B35" },
-            { label: "Change password", desc: "Update your account password", icon: <Key size={16} />, color: "#8A6FB8" },
-            { label: "Connected accounts", desc: "Manage linked accounts", icon: <Globe size={16} />, color: "#C98B5F" },
-            { label: "DigiLocker / Aadhaar", desc: "Link government ID verification", icon: <Smartphone size={16} />, color: "#244B35" },
-          ].map((a) => (
-            <button key={a.label} className="flex items-center gap-3 p-3 rounded-xl border text-left transition-all hover:-translate-y-0.5 hover:border-[#244B35]" style={{ borderColor: "#E6E3D7" }}>
-              <div className="w-9 h-9 rounded-xl grid place-items-center flex-shrink-0" style={{ background: a.color + "15", color: a.color }}>{a.icon}</div>
-              <div>
-                <div className="font-semibold text-[13px]" style={{ color: "#171A18" }}>{a.label}</div>
-                <div className="text-[11px]" style={{ color: "#9A9D94" }}>{a.desc}</div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* Notifications */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="col-span-12 lg:col-span-6 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow color="#C98B5F">Notifications</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Notification Preferences</div>
-        <div className="flex flex-col gap-5">
-          {[
-            { label: "Email notifications", desc: "Receive updates about your applications via email", checked: notifEmail, onChange: setNotifEmail, icon: <Mail size={16} /> },
-            { label: "Push notifications", desc: "Get real-time alerts for new matches and updates", checked: notifApp, onChange: setNotifApp, icon: <BellRing size={16} /> },
-            { label: "New opportunity alerts", desc: "Notify when a new opportunity matches your skills", checked: notifUpdates, onChange: setNotifUpdates, icon: <Bell size={16} /> },
-            { label: "Weekly digest", desc: "Summary of your skill progress and new matches", checked: notifWeekly, onChange: setNotifWeekly, icon: <Star size={16} /> },
-          ].map((n) => (
-            <div key={n.label} className="flex items-center gap-4">
-              <div className="w-9 h-9 rounded-xl grid place-items-center flex-shrink-0" style={{ background: "#EFEDE3", color: "#6B6F68" }}>{n.icon}</div>
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-[13px]" style={{ color: "#171A18" }}>{n.label}</div>
-                <div className="text-[11px]" style={{ color: "#9A9D94" }}>{n.desc}</div>
-              </div>
-              <Toggle checked={n.checked} onChange={n.onChange} />
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div className="md:col-span-8">
+            <div className="font-semibold text-sm mb-3" style={{ color: "#171A18" }}>Profile Information</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              <div><label className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1 block" style={{ color: "#9A9D94" }}>Full Name</label><input className={inputCls} style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} /></div>
+              <div><label className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1 block" style={{ color: "#9A9D94" }}>Email</label><input className={inputCls} style={inputStyle} value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+              <div><label className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1 block" style={{ color: "#9A9D94" }}>Phone</label><input className={inputCls} style={inputStyle} value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+              <div><label className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1 block" style={{ color: "#9A9D94" }}>Course</label><input className={inputCls} style={inputStyle} value={student.course + " / " + student.year} readOnly /></div>
             </div>
-          ))}
-        </div>
-      </motion.section>
+            <div className="mb-4"><label className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1 block" style={{ color: "#9A9D94" }}>Bio</label><textarea className={inputCls} style={{ ...inputStyle, minHeight: 80 }} value={bio} onChange={(e) => setBio(e.target.value)} /></div>
+          </div>
 
-      {/* Privacy & Security */}
-      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-        className="col-span-12 lg:col-span-6 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
-        <Eyebrow color="#8A6FB8">Privacy</Eyebrow>
-        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Privacy & Security</div>
-        <div className="flex flex-col gap-5">
-          <div>
-            <label className={labelCls} style={{ color: "#6B6F68" }}>Profile Visibility</label>
-            <select className={inputCls} style={inputStyle} value={profileVisibility} onChange={e => setProfileVisibility(e.target.value)}>
-              <option value="public">Public - Visible to all employers</option>
-              <option value="institution">Institution only - Visible within your institution</option>
-              <option value="private">Private - Only visible to you</option>
-            </select>
-            <div className="text-[11px] mt-1.5" style={{ color: "#9A9D94" }}>Control who can see your skills and profile</div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="w-9 h-9 rounded-xl grid place-items-center flex-shrink-0" style={{ background: "#EFEDE3", color: "#6B6F68" }}>{showEmail ? <Eye size={16} /> : <EyeOff size={16} />}</div>
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold text-[13px]" style={{ color: "#171A18" }}>Show email to employers</div>
-              <div className="text-[11px]" style={{ color: "#9A9D94" }}>Allow matched employers to see your email</div>
-            </div>
-            <Toggle checked={showEmail} onChange={setShowEmail} />
-          </div>
-          <div className="border-t pt-4" style={{ borderColor: "#EDEBE0" }}>
-            <div className="font-semibold text-[13px] mb-2" style={{ color: "#171A18" }}>Account Security</div>
-            <div className="flex flex-col gap-2">
-              <button className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl border transition-all hover:bg-[#EFEDE3]" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>
-                <Lock size={14} /> Change password
-              </button>
-              <button className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl border transition-all hover:bg-[#EFEDE3]" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>
-                <Key size={14} /> Enable two-factor authentication
-              </button>
+          <div className="md:col-span-4">
+            <div className="font-semibold text-sm mb-3" style={{ color: "#171A18" }}>Notification Preferences</div>
+            <div className="flex flex-col gap-3">
+              {Object.entries({ email: "Email notifications", push: "Push notifications", opportunities: "Opportunity alerts", digest: "Weekly digest" }).map(([k, label]) => (
+                <label key={k} className="flex items-center justify-between cursor-pointer p-3 rounded-lg" style={{ background: "#FAFAF7", border: "1px solid #E6E3D7" }}>
+                  <span className="text-xs font-medium" style={{ color: "#171A18" }}>{label}</span>
+                  <div className={`w-9 h-5 rounded-full transition-colors relative ${notifs[k as keyof typeof notifs] ? "" : ""}`} style={{ background: notifs[k as keyof typeof notifs] ? "#244B35" : "#E6E3D7" }} onClick={() => setNotifs({ ...notifs, [k]: !notifs[k as keyof typeof notifs] })}>
+                    <div className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform" style={{ left: notifs[k as keyof typeof notifs] ? "18px" : "2px" }} />
+                  </div>
+                </label>
+              ))}
             </div>
           </div>
-          <div className="border-t pt-4" style={{ borderColor: "#EDEBE0" }}>
-            <div className="font-semibold text-[13px] mb-2" style={{ color: "#C98B5F" }}>Danger Zone</div>
-            <button className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl border transition-all hover:bg-red-50" style={{ borderColor: "#E6E3D7", color: "#B33A3A" }}>
-              <Trash2 size={14} /> Delete account
-            </button>
-            <div className="text-[11px] mt-1.5" style={{ color: "#9A9D94" }}>This action is irreversible. All your data will be permanently deleted.</div>
-          </div>
         </div>
-      </motion.section>
-
-      {/* Save Button */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-        className="col-span-12 flex items-center justify-between">
-        <div className="text-[12px] font-mono" style={{ color: "#9A9D94" }}>
-          All changes are saved locally. Connect a backend to persist settings.
-        </div>
-        <button onClick={handleSave} className="inline-flex items-center gap-2 font-semibold text-sm px-6 py-3 rounded-xl transition-all hover:-translate-y-0.5" style={{ background: saved ? "#DCE6D0" : "#244B35", color: saved ? "#16301F" : "#F7F6F0" }}>
-          {saved ? <><Check size={16} /> Saved!</> : <><Save size={16} /> Save all changes</>}
-        </button>
       </motion.div>
-    </>
+
+      <div className="flex items-center justify-end gap-3">
+        <span className="text-xs" style={{ color: "#9A9D94" }}>Changes are saved locally. Connect backend to persist.</span>
+        <button onClick={handleSave} className="font-mono text-xs font-bold px-5 py-2.5 rounded-lg text-white transition-colors" style={{ background: saved ? "#244B35" : "#244B35" }}>
+          {saved ? "\u2713 Saved" : "Save changes"}
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -1191,102 +862,61 @@ function SettingsSection() {
    MAIN DASHBOARD
    ═══════════════════════════════════════════════════════ */
 export default function StudentDashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("overview");
-  const [greeting, setGreeting] = useState("");
 
-  useEffect(() => {
-    const h = new Date().getHours();
-    setGreeting(h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening");
-  }, []);
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const titleMap: Record<string, string> = {
+    overview: "Overview", profile: "My Profile", passport: "Skill Passport",
+    gaps: "Skill Gap Analysis", simulator: "Skill Gap Simulator",
+    projects: "Projects", opportunities: "Opportunities",
+    applications: "Applications", recommendations: "Learning",
+    portfolio: "Portfolio", settings: "Settings",
+  };
 
   const renderSection = () => {
     switch (activeNav) {
       case "overview": return <OverviewSection />;
       case "profile": return <ProfileSection />;
-      case "skills": return <SkillsSection />;
+      case "passport": return <SkillPassportSection />;
       case "gaps": return <SkillGapSection />;
+      case "simulator": return <SimulatorSection />;
+      case "projects": return <ProjectsSection />;
       case "opportunities": return <OpportunitiesSection />;
       case "applications": return <ApplicationsSection />;
       case "recommendations": return <RecommendationsSection />;
-      case "evidence": return <EvidenceSection />;
       case "portfolio": return <PortfolioSection />;
       case "settings": return <SettingsSection />;
       default: return <OverviewSection />;
     }
   };
 
-  const pageTitle: Record<string, string> = {
-    overview: "Dashboard",
-    profile: "My Profile",
-    skills: "Skills",
-    gaps: "Skill Gap Analysis",
-    opportunities: "Opportunities",
-    applications: "Applications",
-    recommendations: "Recommendations",
-    evidence: "Evidence Vault",
-    portfolio: "Portfolio",
-    settings: "Settings",
-  };
-
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "#F7F6F0", color: "#171A18" }}>
-      {/* Sidebar */}
-      <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
+    <div className="min-h-screen flex" style={{ background: "#F7F6F0" }}>
+      <Sidebar open={undefined} setOpen={undefined}>
         <SidebarBody className="justify-between gap-10">
           <SidebarContent activeNav={activeNav} setActiveNav={setActiveNav} />
         </SidebarBody>
       </Sidebar>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Header */}
-        <header className="sticky top-0 z-40 flex items-center gap-4 px-7 py-5 border-b" style={{ background: "rgba(247,246,240,.86)", backdropFilter: "blur(10px)", borderColor: "#E6E3D7" }}>
-          <div>
-            <div className="font-bold text-[22px] tracking-tight">
-              {activeNav === "overview" ? (
-                <>{greeting}, <span style={{ color: "#244B35" }}>{student.name.split(" ")[0]}</span>.</>
-              ) : (
-                <span style={{ color: "#171A18" }}>{pageTitle[activeNav]}</span>
-              )}
-            </div>
-            <div className="text-[13px]" style={{ color: "#6B6F68" }}>
-              {activeNav === "overview" ? "Here's what your skill journey looks like today." : `${student.name} / ${student.course} / ${student.year}`}
-            </div>
-          </div>
-          <div className="ml-auto flex items-center gap-2.5">
-            <div className="hidden sm:flex items-center gap-2 border rounded-xl px-3 py-2.5 bg-white" style={{ borderColor: "#E6E3D7", width: 210 }}>
-              <Search size={16} style={{ color: "#9A9D94", flexShrink: 0 }} />
-              <input type="text" placeholder="Search skills, opportunities…" className="border-none outline-none bg-transparent flex-1 text-[13px]" />
-            </div>
-            <button className="relative w-10 h-10 rounded-xl border bg-white grid place-items-center hover:bg-[#EFEDE3] transition-colors" style={{ borderColor: "#E6E3D7" }}>
-              <Bell size={18} />
-              <span className="absolute top-2 right-2 w-[7px] h-[7px] rounded-full" style={{ background: "#C98B5F" }} />
-            </button>
-            <div className="w-10 h-10 rounded-xl grid place-items-center font-bold text-sm cursor-pointer" style={{ background: "#E8D36B", color: "#16301F" }}>
-              {student.initials}
-            </div>
-          </div>
-        </header>
+      <main className="flex-1 min-h-screen overflow-y-auto">
+        <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-6 md:py-8">
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+            <h1 className="font-semibold text-[22px] md:text-[26px] tracking-tight" style={{ color: "#171A18" }}>
+              {activeNav === "overview" ? `${greeting}, ${student.name.split(" ")[0]}.` : titleMap[activeNav]}
+            </h1>
+            {activeNav === "overview" && <p className="text-sm mt-0.5" style={{ color: "#6B6F68" }}>Here is what your skill journey looks like today.</p>}
+          </motion.div>
 
-        {/* Content */}
-        <main className="flex-1 overflow-y-auto p-7 pb-16">
-          <div className="grid grid-cols-12 gap-5 max-w-[1400px]">
+          <div className="mt-6">
             <AnimatePresence mode="wait">
-              <motion.div
-                key={activeNav}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="col-span-12 grid grid-cols-12 gap-5"
-              >
+              <motion.div key={activeNav} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
                 {renderSection()}
               </motion.div>
             </AnimatePresence>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
