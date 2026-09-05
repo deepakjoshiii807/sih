@@ -12,6 +12,7 @@ import AuthPage from "./pages/Auth.tsx";
 import LoginPage from "./pages/Login.tsx";
 import StudentDashboard from "./pages/StudentDashboard.tsx";
 import FacultyDashboard from "./pages/FacultyDashboard.tsx";
+import IndustryDashboard from "./pages/IndustryDashboard.tsx";
 
 class ToolbarErrorBoundary extends React.Component<
   { children: React.ReactNode }, { hasError: boolean }
@@ -35,6 +36,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<StudentDashboard />} />
         <Route path="/faculty" element={<FacultyDashboard />} />
+        <Route path="/industry" element={<IndustryDashboard />} />
 
         </Routes>
       </BrowserRouter>
