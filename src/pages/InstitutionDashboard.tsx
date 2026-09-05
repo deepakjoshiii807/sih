@@ -489,7 +489,7 @@ function AnomaliesSection() {
                 <span className="font-mono text-[11px]" style={{ color: "#9A9D94" }}>Flagged: {a.flaggedDate}</span>
                 {a.status === "flagged" && <div className="flex gap-2">
                   <button onClick={() => institutionApi.reviewAnomaly(a.id, "resolve")} className="font-semibold text-[11px] px-3 py-1.5 rounded-lg transition-all hover:shadow-sm" style={{ background: "#DCE6D0", color: "#16301F" }}>Mark Resolved</button>
-                  <button onClick={() => institutionApi.reviewAnomaly(a.id, "escalate")} className="font-semibold text-[11px] px-3 py-1.5 rounded-lg border transition-all hover:bg-[#FAFAF7]" style={{ borderColor: "#E6E3D7" }}>Escalate</button>
+                  <button onClick={() => institutionApi.reviewAnomaly(a.id, "escalate")} className="font-semibold text-[11px] px-3 py-1.5 rounded-lg border transition-all hover:bg-[#FAFAF7]" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>Escalate</button>
                 </div>}
               </div>
             </div>
