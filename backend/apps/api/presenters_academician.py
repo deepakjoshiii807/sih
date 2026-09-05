@@ -318,8 +318,14 @@ def _analytics_block(user, students) -> dict:
 
     dept_rows = []
     if dept and dept.institution_id:
-        for other in dept.institution.departments.all().prefetch_related("student_members"):
-            other_students = list(other.student_members.all())
+        for other in dept.institution.departments.all():
+            # `student_members` is the FK from StudentProfile — filter Users by
+            # profile department instead so compute_readiness gets User objects.
+            other_students = list(
+                User.objects.filter(role=Role.STUDENT, student_profile__department=other).select_related(
+                    "student_profile"
+                )
+            )
             other_readiness = [compute_readiness(s)["readinessScore"] for s in other_students]
             dept_rows.append(
                 {

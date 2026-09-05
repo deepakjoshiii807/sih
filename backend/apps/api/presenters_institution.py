@@ -209,7 +209,13 @@ def _analytics_block(institution, students, readiness_map, placements) -> dict:
         gap_by_skill[m.skill.name] += m.students_with_gap
         total_students = max(total_students, m.total_students)
 
-    partner_names = {c.name for c in Opportunity.objects.select_related("company__industry_profile").all() if c.company.industry_profile}
+    partner_names = set()
+    for c in Opportunity.objects.select_related("company__industry_profile").all():
+        # company FK → User; reverse one-to-one raises on missing profile, so
+        # guard with getattr (RelatedObjectDoesNotExist subclasses AttributeError).
+        profile = getattr(c.company, "industry_profile", None)
+        if profile is not None:
+            partner_names.add(profile.name)
     hired_by_company: Counter = Counter()
     for p in placements.filter(status=PlacementStatus.COMPLETED):
         hired_by_company[p.company_name] += 1
