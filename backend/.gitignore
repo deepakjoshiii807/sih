@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Django
+db.sqlite3
+*.sqlite3
+staticfiles/
+media/
+
+# Env
+.env
+.env.local
+
+# Tooling
+.mypy_cache/
+.pytest_cache/
+.coverage
