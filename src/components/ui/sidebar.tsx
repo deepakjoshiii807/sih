@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router";
 
 interface Links {
   label: string;
@@ -155,20 +154,20 @@ export const MobileSidebar = ({
 export const SidebarLink = ({
   link,
   className,
-  ...props
+  onClick,
 }: {
   link: Links;
   className?: string;
+  onClick?: () => void;
 }) => {
   const { open, animate } = useSidebar();
   return (
-    <Link
-      to={link.href}
+    <button
+      onClick={onClick}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2",
+        "flex items-center justify-start gap-2 group/sidebar py-2 w-full text-left",
         className
       )}
-      {...props}
     >
       {link.icon}
       <motion.span
@@ -180,6 +179,29 @@ export const SidebarLink = ({
       >
         {link.label}
       </motion.span>
-    </Link>
+    </button>
+  );
+};
+
+export const Logo = () => {
+  return (
+    <div className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20">
+      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="font-medium text-black dark:text-white whitespace-pre"
+      >
+        L2L
+      </motion.span>
+    </div>
+  );
+};
+
+export const LogoIcon = () => {
+  return (
+    <div className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20">
+      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+    </div>
   );
 };
