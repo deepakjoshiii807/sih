@@ -124,7 +124,7 @@ function SidebarContent({ activeNav, setActiveNav }: { activeNav: string; setAct
         </div>
       </div>
       <div className="border-t pt-3 mt-2" style={{ borderColor: open ? "#E6E3D7" : "transparent" }}>
-        <button onClick={() => setActiveNav("profile")} className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}><Settings size={16} /> {open && "Settings"}</button>
+        <button onClick={() => setActiveNav("settings")} className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}><Settings size={16} /> {open && "Settings"}</button>
         <button className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}><LogOut size={16} /> {open && "Log out"}</button>
         {open && <div className="mt-3 p-3 rounded-xl border" style={{ background: "#F7F6F0", borderColor: "#E6E3D7" }}><div className="flex items-center gap-2.5"><div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0" style={{ background: "#8A6FB8", color: "#F0EAF8" }}>{academician.initials}</div><div className="min-w-0"><div className="font-semibold text-sm truncate" style={{ color: "#171A18" }}>{academician.name}</div><div className="text-[11px] font-mono" style={{ color: "#6B6F68" }}>{academician.department}</div></div></div></div>}
         {!open && <div className="flex justify-center mt-3"><div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs" style={{ background: "#8A6FB8", color: "#F0EAF8" }}>{academician.initials}</div></div>}
@@ -716,7 +716,7 @@ export default function FacultyDashboard() {
   const titleMap: Record<string, string> = {
     overview: "Overview", "skill-intel": "Department Skill Intelligence", demand: "Industry Demand Trends",
     curriculum: "Curriculum Feedback", verification: "Student Verification", opportunities: "Opportunities",
-    "curriculum-loop": "Curriculum Loop", analytics: "Analytics", profile: "My Profile",
+    "curriculum-loop": "Curriculum Loop", analytics: "Analytics", profile: "My Profile", settings: "Settings",
   };
 
   const renderSection = () => {
@@ -730,6 +730,7 @@ export default function FacultyDashboard() {
       case "curriculum-loop": return <CurriculumLoopSection />;
       case "analytics": return <AnalyticsSection />;
       case "profile": return <ProfileSection />;
+      case "settings": return <SettingsSection />;
       default: return <OverviewSection />;
     }
   };
