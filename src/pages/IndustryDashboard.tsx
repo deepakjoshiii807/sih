@@ -142,7 +142,9 @@ function OverviewSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 rounded-[20px] p-7 overflow-hidden relative" style={{ background: "linear-gradient(135deg, #244B35 0%, #1C3D2B 50%, #1A3626 100%)", color: "#F7F6F0", boxShadow: "0 4px 24px rgba(36,75,53,.15)" }}>
+        className="col-span-12 rounded-[20px] p-7 overflow-hidden relative" style={{ background: "linear-gradient(135deg, #244B35 0%, #1C3D2B 40%, #1A3626 100%)", color: "#F7F6F0", boxShadow: "0 8px 32px rgba(36,75,53,.18), inset 0 1px 0 rgba(220,230,208,.12)" }}>
+        <div className="absolute top-4 right-4 opacity-[0.06] pointer-events-none"><div className="grid grid-cols-6 gap-[6px]">{Array.from({length:36},(_,i)=><div key={i} className="w-[5px] h-[5px] bg-white rounded-[1px]" />)}</div></div>
+        <div className="absolute bottom-4 left-4 opacity-[0.04] pointer-events-none"><div className="grid grid-cols-4 gap-[5px]">{Array.from({length:16},(_,i)=><div key={i} className="w-[4px] h-[4px] bg-[#E8D36B] rounded-[1px]" />)}</div></div>
         <div className="absolute right-3.5 bottom-3.5 w-16 h-16 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(#DCE6D0 1px,transparent 1px)", backgroundSize: "8px 8px" }} />
         <div className="flex items-start gap-6">
           <div className="flex-1 min-w-0">
@@ -165,12 +167,13 @@ function OverviewSection() {
       </motion.section>
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         className="col-span-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {[{ label: "Opportunities", value: analytics.totalOpportunities, color: "#244B35", bg: "#DCE6D0" }, { label: "Applicants", value: analytics.totalApplicants, color: "#C98B5F", bg: "#F0E8DD" }, { label: "Shortlisting Rate", value: `${analytics.shortlistingRate}%`, color: "#171A18", bg: "#EDEBE0" }, { label: "Avg Time to Hire", value: `${analytics.avgTimeToHire}d`, color: "#8A6FB8", bg: "#EAE3F4" }].map((s) => (
-          <div key={s.label} className="rounded-[14px] px-5 py-4 text-center" style={{ background: s.bg }}><div className="font-mono text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5" style={{ color: "#6B6F68" }}>{s.label}</div><div className="font-bold text-3xl tracking-tight leading-none" style={{ color: s.color }}>{s.value}</div></div>
+        {[{ label: "Opportunities", value: analytics.totalOpportunities, color: "#244B35", bg: "#DCE6D0", accent: "#244B35" }, { label: "Applicants", value: analytics.totalApplicants, color: "#C98B5F", bg: "#F0E8DD", accent: "#C98B5F" }, { label: "Shortlisting Rate", value: `${analytics.shortlistingRate}%`, color: "#171A18", bg: "#EDEBE0", accent: "#C98B5F" }, { label: "Avg Time to Hire", value: `${analytics.avgTimeToHire}d`, color: "#8A6FB8", bg: "#EAE3F4", accent: "#8A6FB8" }].map((s) => (
+          <div key={s.label} className="rounded-[14px] px-5 py-4 text-center border-l-[3px] hover:shadow-md transition-shadow" style={{ background: s.bg, borderLeftColor: s.accent }}><div className="font-mono text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5" style={{ color: "#6B6F68" }}>{s.label}</div><div className="font-bold text-3xl tracking-tight leading-none" style={{ color: s.color }}>{s.value}</div></div>
         ))}
       </motion.div>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="col-span-12 lg:col-span-8 rounded-[20px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="col-span-12 lg:col-span-8 rounded-[20px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow>Applications</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Recent Applications</div>
         {applications.slice(0, 3).map((app) => (
@@ -184,7 +187,8 @@ function OverviewSection() {
         <LinkMore>View all applications</LinkMore>
       </motion.section>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="col-span-12 lg:col-span-4 rounded-[20px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="col-span-12 lg:col-span-4 rounded-[20px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#E6DDD5", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
         <Eyebrow color="#C98B5F">SLA Alerts</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Response Deadlines</div>
         {slaTrackers.length === 0 ? <div className="text-[13px]" style={{ color: "#9A9D94" }}>No pending SLA alerts</div> : slaTrackers.map((sla) => (
@@ -207,7 +211,8 @@ function ProfileSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 lg:col-span-8 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="col-span-12 lg:col-span-8 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow>Company</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Organization Profile</div>
         <div className="flex items-start gap-5 mb-6">
@@ -226,7 +231,8 @@ function ProfileSection() {
         </div>
       </motion.section>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="col-span-12 lg:col-span-4 rounded-[20px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="col-span-12 lg:col-span-4 rounded-[20px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow>Recruitment</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Recruitment Stats</div>
         <div className="flex flex-col gap-3">
@@ -245,14 +251,15 @@ function ProfileSection() {
 function OpportunitiesSection() {
   return (
     <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-      className="col-span-12 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      className="col-span-12 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#E6DDD5", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
       <div className="flex items-center justify-between mb-5">
         <div><Eyebrow>Opportunities</Eyebrow><div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Manage Opportunities</div><div className="text-[13px]" style={{ color: "#6B6F68" }}>{opportunities.length} total / {opportunities.filter(o => o.status === "active").length} active</div></div>
-        <button className="inline-flex items-center gap-1.5 font-semibold text-[13px] px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5" style={{ background: "#244B35", color: "#F7F6F0" }}><Plus size={14} /> Post opportunity</button>
+        <button className="inline-flex items-center gap-1.5 font-semibold text-[13px] px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)", color: "#F7F6F0" }}><Plus size={14} /> Post opportunity</button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {opportunities.map((opp) => (
-          <div key={opp.id} className="border rounded-[14px] p-5 transition-all hover:-translate-y-0.5" style={{ borderColor: opp.status === "active" ? "#244B35" : "#E6E3D7" }}>
+          <div key={opp.id} className="border rounded-[14px] p-5 transition-all hover:shadow-md hover:-translate-y-0.5" style={{ borderColor: opp.status === "active" ? "#244B35" : "#E6E3D7" }}>
             <div className="flex items-start justify-between mb-2">
               <div><div className="font-bold text-[15px] tracking-tight">{opp.title}</div><div className="font-mono text-[11px] mt-0.5" style={{ color: "#6B6F68" }}>{opp.type} / {opp.workArrangement}</div></div>
               <Tag cls={opp.status}>{opp.status}</Tag>
@@ -286,7 +293,8 @@ function ApplicationsSection() {
   const stageColors: Record<string, string> = { applied: "#6B6F68", shortlisted: "#B99A22", interviewed: "#8A6FB8", offered: "#244B35", joined: "#244B35" };
   return (
     <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-      className="col-span-12 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      className="col-span-12 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#DED6EC", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
       <Eyebrow>Applications</Eyebrow>
       <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Application Pipeline</div>
       <div className="flex items-center gap-0 mb-6 px-2">
@@ -340,13 +348,14 @@ function MatchingSection() {
   const sorted = [...applications].sort((a, b) => b.matchScore - a.matchScore);
   return (
     <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-      className="col-span-12 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      className="col-span-12 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
       <Eyebrow>Matching</Eyebrow>
       <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Ranked Candidate Recommendations</div>
       <div className="text-[13px] mb-5" style={{ color: "#6B6F68" }}>Sorted by semantic skill-to-role match score</div>
       <div className="flex flex-col gap-4">
         {sorted.map((app, idx) => (
-          <div key={app.id} className="border rounded-[14px] p-5 transition-all hover:-translate-y-0.5" style={{ borderColor: idx === 0 ? "#244B35" : "#E6E3D7", boxShadow: idx === 0 ? "0 2px 8px rgba(36,75,53,.08)" : undefined }}>
+          <div key={app.id} className="border rounded-[14px] p-5 transition-all hover:shadow-md hover:-translate-y-0.5" style={{ borderColor: idx === 0 ? "#244B35" : "#E6E3D7", boxShadow: idx === 0 ? "0 2px 8px rgba(36,75,53,.08)" : undefined }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl grid place-items-center font-bold text-sm" style={{ background: idx === 0 ? "#244B35" : "#EDEBE0", color: idx === 0 ? "#DCE6D0" : "#171A18" }}>{app.candidate.initials}</div>
               <div className="flex-1 min-w-0"><div className="font-bold text-[15px]">{app.candidate.name}</div><div className="font-mono text-[11px]" style={{ color: "#6B6F68" }}>{app.candidate.course} / {app.candidate.year} / {app.candidate.institution}</div></div>
@@ -380,7 +389,8 @@ function AnalyticsSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 lg:col-span-7 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="col-span-12 lg:col-span-7 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#DED6EC", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow>Pipeline</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Application Pipeline</div>
         <div className="flex items-end gap-3 h-[200px] mb-4">
@@ -392,7 +402,8 @@ function AnalyticsSection() {
         </div>
       </motion.section>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="col-span-12 lg:col-span-5 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="col-span-12 lg:col-span-5 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#E6DDD5", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
         <Eyebrow color="#B99A22">Skill Gaps</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Applicant Skill Gaps</div>
         {analytics.applicantSkillGaps.map((g) => (
@@ -404,7 +415,8 @@ function AnalyticsSection() {
         </div>
       </motion.section>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="col-span-12 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="col-span-12 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #E8D36B, #C98B5F, #8A6FB8)" }} />
         <Eyebrow>Performance</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Opportunity Performance</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -430,7 +442,8 @@ function AnalyticsSection() {
 function SLASection() {
   return (
     <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-      className="col-span-12 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      className="col-span-12 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#E6DDD5", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
       <Eyebrow color="#C98B5F">SLA Tracker</Eyebrow>
       <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Application Response SLA</div>
       <div className="text-[13px] mb-5" style={{ color: "#6B6F68" }}>Track response deadlines for pending applications</div>
@@ -464,7 +477,8 @@ function SLASection() {
 function RatingsSection() {
   return (
     <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-      className="col-span-12 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      className="col-span-12 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#DED6EC", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #E8D36B, #C98B5F)" }} />
       <Eyebrow>Ratings</Eyebrow>
       <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Two-Way Ratings & Feedback</div>
       <div className="text-[13px] mb-5" style={{ color: "#6B6F68" }}>Mutual feedback after internship completion</div>
@@ -512,7 +526,8 @@ function SettingsSection() {
   return (
     <>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-        className="col-span-12 lg:col-span-8 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="col-span-12 lg:col-span-8 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow>Account</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Company Information</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -526,7 +541,8 @@ function SettingsSection() {
         </div>
       </motion.section>
       <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="col-span-12 lg:col-span-4 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="col-span-12 lg:col-span-4 rounded-[20px] border p-7 bg-white relative overflow-hidden" style={{ borderColor: "#E6DDD5", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
         <Eyebrow color="#C98B5F">Notifications</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Alerts</div>
         <div className="flex flex-col gap-5">
@@ -537,7 +553,7 @@ function SettingsSection() {
       </motion.section>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} className="col-span-12 flex items-center justify-between">
         <div className="text-[12px] font-mono" style={{ color: "#9A9D94" }}>Connect a backend to persist settings.</div>
-        <button onClick={handleSave} className="inline-flex items-center gap-2 font-semibold text-sm px-6 py-3 rounded-xl transition-all hover:-translate-y-0.5" style={{ background: saved ? "#DCE6D0" : "#244B35", color: saved ? "#16301F" : "#F7F6F0" }}>{saved ? <><Check size={16} /> Saved!</> : <><Save size={16} /> Save changes</>}</button>
+        <button onClick={handleSave} className="inline-flex items-center gap-2 font-semibold text-sm px-6 py-3 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md" style={{ background: saved ? "#DCE6D0" : "#244B35", color: saved ? "#16301F" : "#F7F6F0" }}>{saved ? <><Check size={16} /> Saved!</> : <><Save size={16} /> Save changes</>}</button>
       </motion.div>
     </>
   );
