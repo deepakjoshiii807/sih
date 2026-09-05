@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Sidebar, SidebarBody, SidebarLink, Logo, LogoIcon } from "@/components/ui/sidebar";
+import { Sidebar, SidebarBody, SidebarLink, Logo, LogoIcon, useSidebar } from "@/components/ui/sidebar";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard, UserCog, Shield, Target, Zap, Briefcase,
@@ -125,6 +125,81 @@ function LinkMore({ onClick, children }: { onClick?: () => void; children: React
   );
 }
 
+/* ─── Sidebar Content (uses context) ─── */
+function SidebarContent({ activeNav, setActiveNav }: { activeNav: string; setActiveNav: (id: string) => void }) {
+  const { open } = useSidebar();
+  return (
+    <>
+      <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+        <div className={open ? "" : "flex justify-center"}>
+          {open ? <Logo /> : <LogoIcon />}
+        </div>
+        <div className="mt-8 flex flex-col gap-[2px]">
+          {navLinks.map((link) => (
+            <button
+              key={link.id}
+              onClick={() => setActiveNav(link.id)}
+              className={`flex items-center gap-3 w-full text-left rounded-xl text-sm font-medium transition-colors ${
+                open ? "px-3 py-2.5" : "px-0 py-2.5 justify-center"
+              } ${
+                activeNav === link.id
+                  ? "bg-[#244B35] text-white font-semibold"
+                  : "text-[#6B6F68] hover:bg-[#EDEBE0] hover:text-[#171A18]"
+              }`}
+            >
+              <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 18, height: 18 }}>{link.icon}</span>
+              {open && <span className="text-sm whitespace-pre">{link.label}</span>}
+              {open && link.count !== undefined && (
+                <span className={`ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded-md ${
+                  activeNav === link.id ? "bg-white/20 text-white" : "bg-[#EDEBE0] text-[#6B6F68]"
+                }`}>
+                  {link.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="border-t pt-3 mt-2" style={{ borderColor: open ? "#E6E3D7" : "transparent" }}>
+        <button className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}>
+          <Settings size={16} /> {open && "Settings"}
+        </button>
+        <button className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}>
+          <LogOut size={16} /> {open && "Log out"}
+        </button>
+        {open && (
+          <div className="mt-3 p-3 rounded-xl border" style={{ background: "#F7F6F0", borderColor: "#E6E3D7" }}>
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0" style={{ background: "#244B35", color: "#DCE6D0" }}>
+                {student.initials}
+              </div>
+              <div className="min-w-0">
+                <div className="font-semibold text-sm truncate" style={{ color: "#171A18" }}>{student.name}</div>
+                <div className="text-xs font-mono" style={{ color: "#6B6F68" }}>{student.course} · {student.year}</div>
+              </div>
+            </div>
+            <div className="mt-2.5">
+              <div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "#6B6F68" }}>
+                <span>Profile {student.profileCompletion}% complete</span>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}>
+                <div className="h-full rounded-full" style={{ width: `${student.profileCompletion}%`, background: "#244B35" }} />
+              </div>
+            </div>
+          </div>
+        )}
+        {!open && (
+          <div className="flex justify-center mt-3">
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs" style={{ background: "#244B35", color: "#DCE6D0" }}>
+              {student.initials}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
 /* ─── Main Dashboard ─── */
 export default function StudentDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -141,63 +216,7 @@ export default function StudentDashboard() {
       {/* ─── Sidebar ─── */}
       <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
         <SidebarBody className="justify-between gap-10">
-          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            {sidebarOpen ? <Logo /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col gap-[2px]">
-              {navLinks.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => setActiveNav(link.id)}
-                  className={`flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                    activeNav === link.id
-                      ? "bg-[#244B35] text-white font-semibold"
-                      : "text-[#6B6F68] hover:bg-[#EDEBE0] hover:text-[#171A18]"
-                  }`}
-                >
-                  <span className="flex-shrink-0">{link.icon}</span>
-                  <SidebarLink
-                    link={{ label: link.label, href: "#", icon: <></> }}
-                    className={activeNav === link.id ? "text-[#16301F]" : ""}
-                    onClick={() => setActiveNav(link.id)}
-                  />
-                  {link.count !== undefined && (
-                    <span className={`ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded-md ${
-                      activeNav === link.id ? "bg-white/20 text-white" : "bg-[#EDEBE0] text-[#6B6F68]"
-                    }`}>
-                      {link.count}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="border-t border-[rgba(220,230,208,.12)] pt-3 mt-2">
-            <button className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors">
-              <Settings size={16} /> Settings
-            </button>
-            <button className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors">
-              <LogOut size={16} /> Log out
-            </button>
-            <div className="mt-3 p-3 rounded-xl border" style={{ background: "#F7F6F0", borderColor: "#E6E3D7" }}>
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0" style={{ background: "#244B35", color: "#DCE6D0" }}>
-                  {student.initials}
-                </div>
-                <div className="min-w-0">
-                  <div className="font-semibold text-sm truncate" style={{ color: "#171A18" }}>{student.name}</div>
-                  <div className="text-xs font-mono" style={{ color: "#6B6F68" }}>{student.course} · {student.year}</div>
-                </div>
-              </div>
-              <div className="mt-2.5">
-                <div className="flex justify-between text-xs mb-1 font-mono" style={{ color: "#6B6F68" }}>
-                  <span>Profile {student.profileCompletion}% complete</span>
-                </div>
-                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}>
-                  <div className="h-full rounded-full" style={{ width: `${student.profileCompletion}%`, background: "#244B35" }} />
-                </div>
-              </div>
-            </div>
-          </div>
+          <SidebarContent activeNav={activeNav} setActiveNav={setActiveNav} />
         </SidebarBody>
       </Sidebar>
 

@@ -68,11 +68,11 @@ export const Sidebar = ({
   );
 };
 
-export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
+export const SidebarBody = ({ className, children }: { className?: string; children: React.ReactNode }) => {
   return (
     <>
-      <DesktopSidebar {...props} />
-      <MobileSidebar {...(props as React.ComponentProps<"div">)} />
+      <DesktopSidebar className={className}>{children}</DesktopSidebar>
+      <MobileSidebar className={className}>{children}</MobileSidebar>
     </>
   );
 };
@@ -80,23 +80,26 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
 export const DesktopSidebar = ({
   className,
   children,
-  ...props
-}: React.ComponentProps<typeof motion.div>) => {
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) => {
   const { open, setOpen, animate } = useSidebar();
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col w-[264px] flex-shrink-0",
+        "h-full hidden md:flex md:flex-col w-[264px] flex-shrink-0 overflow-hidden",
         className
       )}
       animate={{
-        width: animate ? (open ? "300px" : "60px") : "300px",
+        width: animate ? (open ? "264px" : "60px") : "264px",
       }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
-      {...props}
     >
-      {children}
+      <div className="flex flex-col h-full overflow-y-auto overflow-x-hidden" style={{ width: open ? "264px" : "60px", padding: open ? "16px" : "16px 8px", transition: "all 0.3s ease" }}>
+        {children}
+      </div>
     </motion.div>
   );
 };
