@@ -150,7 +150,7 @@ function OverviewSection() {
       {/* Hero */}
       <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
         className="rounded-[18px] p-7 md:p-9 text-white relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #244B35 0%, #1C3D2B 50%, #1A3626 100%)", boxShadow: "0 4px 24px rgba(36,75,53,.15)" }}>
+        style={{ background: "linear-gradient(135deg, #244B35 0%, #1C3D2B 40%, #1A3626 100%)", boxShadow: "0 8px 32px rgba(36,75,53,.18), inset 0 1px 0 rgba(220,230,208,.12)" }}>
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 min-w-0">
             <Eyebrow color="#DCE6D0">Personal Progress</Eyebrow>
@@ -184,18 +184,22 @@ function OverviewSection() {
             ))}
           </div>
         </div>
+        {/* Decorative pixel dots */}
+        <div className="absolute top-4 right-4 opacity-[0.06] pointer-events-none"><div className="grid grid-cols-6 gap-[6px]">{Array.from({length:36},(_,i)=><div key={i} className="w-[5px] h-[5px] bg-white rounded-[1px]" />)}</div></div>
+        <div className="absolute bottom-4 left-4 opacity-[0.04] pointer-events-none"><div className="grid grid-cols-4 gap-[5px]">{Array.from({length:16},(_,i)=><div key={i} className="w-[4px] h-[4px] bg-[#E8D36B] rounded-[1px]" />)}</div></div>
       </motion.div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Profile Completion", value: `${student.profileCompletion}%`, color: "#244B35", bg: "#DCE6D0" },
-          { label: "Skill Confidence", value: `${roleReadiness.readinessScore}%`, color: "#171A18", bg: "#EDEBE0" },
-          { label: "Evidence Items", value: `${skillPassport.totalEvidence}`, color: "#4d3a74", bg: "#EAE3F4" },
-          { label: "Applications", value: `${applications.length}`, color: "#7a3f1a", bg: "#F0E8DD" },
+          { label: "Profile Completion", value: `${student.profileCompletion}%`, color: "#244B35", bg: "#DCE6D0", accent: "#244B35", icon: <Target size={16} /> },
+          { label: "Skill Confidence", value: `${roleReadiness.readinessScore}%`, color: "#171A18", bg: "#EDEBE0", accent: "#C98B5F", icon: <Sparkles size={16} /> },
+          { label: "Evidence Items", value: `${skillPassport.totalEvidence}`, color: "#4d3a74", bg: "#EAE3F4", accent: "#8A6FB8", icon: <Shield size={16} /> },
+          { label: "Applications", value: `${applications.length}`, color: "#7a3f1a", bg: "#F0E8DD", accent: "#C98B5F", icon: <Briefcase size={16} /> },
         ].map((s) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}
-            className="rounded-[14px] p-5 text-center border" style={{ background: s.bg, borderColor: "#E6E3D7" }}>
+            className="rounded-[14px] p-5 border relative overflow-hidden group hover:shadow-md transition-shadow" style={{ background: s.bg, borderColor: "#E6E3D7", borderLeft: `3px solid ${s.accent}` }}>
+            <div className="absolute top-3 right-3 opacity-10 group-hover:opacity-20 transition-opacity" style={{ color: s.color }}>{s.icon}</div>
             <div className="font-mono text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5" style={{ color: "#6B6F68" }}>{s.label}</div>
             <div className="font-bold text-3xl tracking-tight" style={{ color: s.color }}>{s.value}</div>
           </motion.div>
@@ -205,7 +209,8 @@ function OverviewSection() {
       {/* Skill Snapshot + Skill Gap */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4 }}
-          className="md:col-span-7 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+          className="md:col-span-7 rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+          <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
           <Eyebrow color="#244B35">Skill Snapshot</Eyebrow>
           <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Your Skill Snapshot</div>
           <div className="flex flex-col gap-3">
@@ -225,7 +230,8 @@ function OverviewSection() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.4 }}
-          className="md:col-span-5 rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+          className="md:col-span-5 rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#E6DDD5", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+          <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #E8C7AE, #F0E8DD)" }} />
           <Eyebrow color="#E8C7AE">Skill Gap</Eyebrow>
           <div className="font-semibold text-[19px] tracking-tight mt-2 mb-1">Your Biggest Skill Gaps</div>
           <p className="text-xs mb-4" style={{ color: "#6B6F68" }}>Matched against your target role requirements.</p>
@@ -245,10 +251,11 @@ function OverviewSection() {
 
       {/* Best Match */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.4 }}
-        className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#E6DDD5", boxShadow: "0 2px 8px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
         <Eyebrow color="#C98B5F">Best Match For You</Eyebrow>
         <div className="flex flex-col md:flex-row gap-6 mt-3">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "#DCE6D0", border: "3px solid #244B35" }}>
+          <div className="w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #DCE6D0, #C8DFBA)", border: "3px solid #244B35", boxShadow: "0 4px 12px rgba(36,75,53,.15)" }}>
             <span className="font-bold text-xl" style={{ color: "#244B35" }}>{bestMatch.match}%</span>
           </div>
           <div className="flex-1 min-w-0">
@@ -265,8 +272,8 @@ function OverviewSection() {
             </div>
             <p className="text-xs mb-3" style={{ color: "#6B6F68" }}>{bestMatch.match}% match because your profile strongly aligns with {bestMatch.matchedSkills.length} of {bestMatch.requiredSkills.length} required skills.</p>
             <div className="flex gap-3">
-              <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white" style={{ background: "#244B35" }}>View opportunity</button>
-              <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg border" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>See all opportunities</button>
+              <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white transition-all hover:shadow-md hover:scale-[1.02]" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)" }}>View opportunity</button>
+              <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg border transition-all hover:shadow-sm hover:bg-[#FAFAF7]" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>See all opportunities</button>
             </div>
           </div>
         </div>
@@ -274,7 +281,8 @@ function OverviewSection() {
 
       {/* Applications */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.4 }}
-        className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#DED6EC", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow color="#8A6FB8">Application Journey</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Application Journey</div>
         <div className="flex flex-col gap-4">
@@ -292,13 +300,14 @@ function OverviewSection() {
 
       {/* Recommendations */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.4 }}
-        className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#DED6EC", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C8B5DE, #EAE3F4)" }} />
         <Eyebrow color="#8A6FB8">Recommendations</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-0.5">Recommended For Your Skill Gaps</div>
         <p className="text-xs mb-4" style={{ color: "#6B6F68" }}>Each recommendation is connected to a specific skill gap.</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {recommendations.map((rec) => (
-            <div key={rec.id} className="rounded-xl border p-4" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+            <div key={rec.id} className="rounded-xl border p-4 hover:shadow-md transition-shadow" style={{ borderColor: "#DED6EC", background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5FC 100%)" }}>
               <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#8A6FB8" }}>{rec.closesGap}</div>
               <div className="font-semibold text-sm mb-1" style={{ color: "#171A18" }}>{rec.title}</div>
               <div className="text-xs mb-2" style={{ color: "#6B6F68" }}>{rec.type} / {rec.provider} / {rec.duration}</div>
@@ -311,7 +320,8 @@ function OverviewSection() {
 
       {/* Quick Actions */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.4 }}
-        className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #E8D36B, #C98B5F, #8A6FB8)" }} />
         <Eyebrow>Quick Actions</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">What do you want to do?</div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -321,9 +331,9 @@ function OverviewSection() {
             { icon: <Zap size={16} />, label: "Check Skill Gaps", color: "#E8D36B" },
             { icon: <UserCog size={16} />, label: "Update Profile", color: "#8A6FB8" },
           ].map((a) => (
-            <button key={a.label} className="flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all hover:shadow-sm" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: a.color + "18", color: a.color }}>{a.icon}</div>
-              <span className="text-xs font-medium" style={{ color: "#171A18" }}>{a.label}</span>
+            <button key={a.label} className="flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all hover:shadow-md hover:-translate-y-0.5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110" style={{ background: a.color + "15", color: a.color }}>{a.icon}</div>
+              <span className="text-xs font-semibold" style={{ color: "#171A18" }}>{a.label}</span>
             </button>
           ))}
         </div>
@@ -340,7 +350,7 @@ function ProfileSection() {
     <div className="flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-20 h-20 rounded-xl flex items-center justify-center font-bold text-xl flex-shrink-0" style={{ background: "#244B35", color: "#DCE6D0" }}>{student.initials}</div>
+          <div className="w-20 h-20 rounded-xl flex items-center justify-center font-bold text-xl flex-shrink-0" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)", color: "#DCE6D0", boxShadow: "0 4px 12px rgba(36,75,53,.15)" }}>{student.initials}</div>
           <div className="flex-1">
             <div className="font-semibold text-[22px] tracking-tight" style={{ color: "#171A18" }}>{student.name}</div>
             <div className="text-sm mb-1" style={{ color: "#6B6F68" }}>{student.course} / {student.year} / {student.department}</div>
@@ -402,6 +412,7 @@ function SkillPassportSection() {
   return (
     <div className="flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow color="#244B35">Skill Passport</Eyebrow>
         <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Your Skill Passport</div>
         <p className="text-xs mb-4" style={{ color: "#6B6F68" }}>Evidence-backed and self-declared skills, clearly distinguished.</p>
@@ -412,7 +423,7 @@ function SkillPassportSection() {
             { label: "Total Evidence", value: skillPassport.totalEvidence, bg: "#EAE3F4", color: "#4d3a74" },
             { label: "Verified Evidence", value: skillPassport.verifiedEvidence, bg: "#DCE6D0", color: "#244B35" },
           ].map((s) => (
-            <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: s.bg }}>
+            <div key={s.label} className="rounded-xl p-4 text-center hover:shadow-sm transition-shadow" style={{ background: s.bg, border: "1px solid rgba(0,0,0,.04)" }}>
               <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#6B6F68" }}>{s.label}</div>
               <div className="font-bold text-2xl" style={{ color: s.color }}>{s.value}</div>
             </div>
@@ -425,7 +436,7 @@ function SkillPassportSection() {
           <div className="flex items-center gap-2 mb-4"><div className="w-3 h-3 rounded-sm" style={{ background: "#244B35" }} /><div className="font-semibold text-[16px]" style={{ color: "#171A18" }}>Evidence-Derived Skills</div></div>
           <div className="flex flex-col gap-3">
             {verified.map((sk) => (
-              <div key={sk.id} className="p-3 rounded-xl border" style={{ borderColor: "#DCE6D0", background: "#FAFCF7" }}>
+              <div key={sk.id} className="p-3 rounded-xl border hover:shadow-sm transition-shadow" style={{ borderColor: "#D6E3CE", background: "linear-gradient(135deg, #FAFCF7, #F4F9F0)" }}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="font-semibold text-sm" style={{ color: "#171A18" }}>{sk.name}</span>
                   <span className="font-mono text-xs font-bold" style={{ color: "#244B35" }}>{sk.confidence}%</span>
@@ -441,7 +452,7 @@ function SkillPassportSection() {
           <div className="flex items-center gap-2 mb-4"><div className="w-3 h-3 rounded-sm" style={{ background: "#E8D36B" }} /><div className="font-semibold text-[16px]" style={{ color: "#171A18" }}>Self-Declared Skills</div></div>
           <div className="flex flex-col gap-3">
             {selfDeclared.map((sk) => (
-              <div key={sk.id} className="p-3 rounded-xl border" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+              <div key={sk.id} className="p-3 rounded-xl border hover:shadow-sm transition-shadow" style={{ borderColor: "#E6DDD5", background: "linear-gradient(135deg, #FAFAF7, #FDF9F2)" }}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="font-semibold text-sm" style={{ color: "#171A18" }}>{sk.name}</span>
                   <span className="font-mono text-xs font-bold" style={{ color: "#6B6F68" }}>{sk.confidence}%</span>
@@ -455,6 +466,7 @@ function SkillPassportSection() {
       </div>
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow color="#8A6FB8">Role Readiness</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-1">Role Readiness: {roleReadiness.targetRole}</div>
         <div className="flex items-center gap-3 mt-3 mb-4">
@@ -483,12 +495,13 @@ function SkillGapSection() {
   return (
     <div className="flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #E8C7AE, #F0E8DD)" }} />
         <Eyebrow color="#E8C7AE">Skill Gap Analysis</Eyebrow>
         <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Your Skill Gaps</div>
         <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Based on your target role: {roleReadiness.targetRole}</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {gaps.map((g) => (
-            <div key={g.id} className="rounded-xl border p-5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+            <div key={g.id} className="rounded-xl border p-5 hover:shadow-md transition-shadow" style={{ borderColor: "#E6DDD5", background: "linear-gradient(180deg, #FDFCFA 0%, #FDF8F3 100%)" }}>
               <div className="flex items-center justify-between mb-2">
                 <span className="font-semibold text-sm" style={{ color: "#171A18" }}>{g.name}</span>
                 <Tag cls={g.severity.toLowerCase()}>{g.severity} Gap</Tag>
@@ -502,7 +515,7 @@ function SkillGapSection() {
                 <div className="h-2 rounded-full overflow-hidden" style={{ background: "#E6E3D7" }}><div className="h-full rounded-full" style={{ width: `${g.required}%`, background: "#244B35" }} /></div>
               </div>
               {g.evidenceNeeded && <div className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-md inline-block" style={{ background: "#F0E8DD", color: "#7a3f1a" }}>Evidence needed</div>}
-              <button className="mt-3 font-mono text-xs font-bold text-[#244B35] inline-flex items-center gap-1 hover:gap-3 transition-all">Close gap <ChevronRight size={12} /></button>
+              <button className="mt-3 font-mono text-xs font-bold text-[#244B35] inline-flex items-center gap-1.5 hover:gap-3 transition-all px-3 py-1.5 rounded-lg hover:bg-[#F0F5EC]">Close gap <ChevronRight size={12} /></button>
             </div>
           ))}
         </div>
@@ -521,6 +534,7 @@ function SimulatorSection() {
   return (
     <div className="flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow color="#8A6FB8">Skill Gap Simulator</Eyebrow>
         <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">See What Could Change</div>
         <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Select an action to simulate its impact on your role readiness.</p>
@@ -528,7 +542,7 @@ function SimulatorSection() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
           <div className="md:col-span-5 flex flex-col gap-2">
             {simulatorActions.map((a, i) => (
-              <button key={i} onClick={() => setSelected(i)} className={`text-left p-4 rounded-xl border transition-all ${selected === i ? "ring-2" : ""}`} style={{ borderColor: selected === i ? "#244B35" : "#E6E3D7", background: selected === i ? "#F0F5EC" : "#FAFAF7", boxShadow: selected === i ? "0 0 0 3px rgba(36,75,53,.12)" : undefined }}>
+              <button key={i} onClick={() => setSelected(i)} className={`text-left p-4 rounded-xl border transition-all ${selected === i ? "ring-2" : "hover:shadow-sm"}`} style={{ borderColor: selected === i ? "#244B35" : "#E6E3D7", background: selected === i ? "linear-gradient(135deg, #F0F5EC, #E8F0E2)" : "#FAFAF7", boxShadow: selected === i ? "0 0 0 3px rgba(36,75,53,.12)" : undefined }}>
                 <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#9A9D94" }}>{a.type}</div>
                 <div className="font-semibold text-sm" style={{ color: "#171A18" }}>{a.name}</div>
                 <p className="text-xs mt-1" style={{ color: "#6B6F68" }}>{a.description}</p>
@@ -544,7 +558,7 @@ function SimulatorSection() {
                 <div className="font-bold text-2xl" style={{ color: "#171A18" }}>{action.readinessChange.from}</div>
                 <Tag cls={action.readinessChange.fromLabel}>{action.readinessChange.fromLabel}</Tag>
               </div>
-              <div className="rounded-lg p-3 text-center" style={{ background: "#DCE6D0" }}>
+              <div className="rounded-lg p-3 text-center" style={{ background: "linear-gradient(135deg, #DCE6D0, #C8DFBA)" }}>
                 <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#6B6F68" }}>Projected</div>
                 <div className="font-bold text-2xl" style={{ color: "#244B35" }}>{action.readinessChange.to}</div>
                 <Tag cls={action.readinessChange.toLabel}>{action.readinessChange.toLabel}</Tag>
@@ -574,13 +588,14 @@ function ProjectsSection() {
   return (
     <div className="flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
         <Eyebrow color="#C98B5F">Skill-to-Project Loop</Eyebrow>
         <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Recommended Projects</div>
         <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Each project targets a specific skill gap. Complete it to earn verified evidence.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {recommendedProjects.map((proj) => (
-            <div key={proj.id} className="rounded-xl border p-5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+            <div key={proj.id} className="rounded-xl border p-5 hover:shadow-md transition-shadow" style={{ borderColor: "#DED6EC", background: "linear-gradient(180deg, #FDFCFA 0%, #FAF8FD 100%)" }}>
               <div className="flex items-center justify-between mb-2">
                 <Tag cls="lavender">{proj.targetSkill}</Tag>
                 <Tag cls={proj.difficulty === "Beginner" ? "low" : "medium"}>{proj.difficulty}</Tag>
@@ -605,7 +620,7 @@ function ProjectsSection() {
               </div>
               <div className="flex items-center justify-between">
                 <Tag cls={proj.submissionStatus === "not submitted" ? "applied" : "verified"}>{proj.submissionStatus === "not submitted" ? "Not submitted" : proj.submissionStatus}</Tag>
-                <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white" style={{ background: "#244B35" }}>Start project</button>
+                <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white transition-all hover:shadow-md hover:scale-[1.02]" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)" }}>Start project</button>
               </div>
             </div>
           ))}
@@ -623,14 +638,15 @@ function OpportunitiesSection() {
     <div className="flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="flex items-center justify-between mb-1">
-          <Eyebrow color="#C98B5F">Opportunities</Eyebrow>
+          <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
+        <Eyebrow color="#C98B5F">Opportunities</Eyebrow>
           <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-md" style={{ background: "#F0E8DD", color: "#7a3f1a" }}>{opportunities.length} matched</span>
         </div>
         <div className="font-semibold text-[22px] tracking-tight mb-5">Discover Opportunities</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {opportunities.map((opp) => (
-            <div key={opp.id} className="rounded-xl border p-5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+            <div key={opp.id} className="rounded-xl border p-5 hover:shadow-md transition-shadow" style={{ borderColor: "#E6DDD5", background: "linear-gradient(180deg, #FDFCFA 0%, #FDF9F2 100%)" }}>
               <div className="flex items-center justify-between mb-2">
                 <Tag cls="evidence">{opp.type}</Tag>
                 <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm" style={{ background: "#DCE6D0", color: "#244B35" }}>{opp.match}%</div>
@@ -650,7 +666,7 @@ function OpportunitiesSection() {
               </div>
               <div className="font-mono text-[10px] mb-3" style={{ color: "#6B6F68" }}>Deadline: {opp.deadline}</div>
               <div className="flex gap-3">
-                <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white" style={{ background: "#244B35" }}>Apply now</button>
+                <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white transition-all hover:shadow-md hover:scale-[1.02]" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)" }}>Apply now</button>
                 <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg border" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>Details</button>
               </div>
             </div>
@@ -670,6 +686,7 @@ function ApplicationsSection() {
   return (
     <div className="flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow color="#8A6FB8">Applications</Eyebrow>
         <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5">Application Tracker</div>
 
@@ -685,7 +702,7 @@ function ApplicationsSection() {
 
         <div className="flex flex-col gap-4">
           {applications.map((app) => (
-            <div key={app.id} className="rounded-xl border p-5" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+            <div key={app.id} className="rounded-xl border p-5 hover:shadow-md transition-shadow" style={{ borderColor: "#DED6EC", background: "linear-gradient(180deg, #FDFCFA 0%, #FBF8FE 100%)" }}>
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
                 <div>
                   <div className="font-semibold text-[16px]" style={{ color: "#171A18" }}>{app.role}</div>
@@ -723,6 +740,7 @@ function RecommendationsSection() {
   return (
     <div className="flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow color="#8A6FB8">Learning Recommendations</Eyebrow>
         <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Recommended For Your Skill Gaps</div>
         <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Each recommendation is directly connected to a specific skill gap.</p>
@@ -740,7 +758,7 @@ function RecommendationsSection() {
               <p className="text-xs mb-3" style={{ color: "#6B6F68" }}>{rec.why}</p>
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-md" style={{ background: "#DCE6D0", color: "#244B35" }}>+{rec.projectedImprovement}% improvement</span>
-                <button className="font-mono text-xs font-bold text-[#244B35] inline-flex items-center gap-1 hover:gap-3 transition-all">Start learning <ChevronRight size={12} /></button>
+                <button className="font-mono text-xs font-bold text-[#244B35] inline-flex items-center gap-1.5 hover:gap-3 transition-all px-3 py-1.5 rounded-lg hover:bg-[#F0F5EC]">Start learning <ChevronRight size={12} /></button>
               </div>
             </div>
           ))}
@@ -757,6 +775,7 @@ function PortfolioSection() {
   return (
     <div className="flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
         <Eyebrow color="#C98B5F">Verified Portfolio</Eyebrow>
         <div className="font-semibold text-[22px] tracking-tight mt-2 mb-4">Your Verified Portfolio</div>
 
@@ -768,7 +787,7 @@ function PortfolioSection() {
             { label: "Internship Hours", value: portfolioData.internshipHours, color: "#C98B5F" },
             { label: "Achievements", value: portfolioData.achievements, color: "#E8D36B" },
           ].map((s) => (
-            <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: "#FAFAF7", border: "1px solid #E6E3D7" }}>
+            <div key={s.label} className="rounded-xl p-4 text-center hover:shadow-sm transition-shadow" style={{ background: "#FAFAF7", border: "1px solid #E6E3D7" }}>
               <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: "#6B6F68" }}>{s.label}</div>
               <div className="font-bold text-2xl" style={{ color: s.color }}>{s.value}</div>
             </div>
@@ -778,7 +797,7 @@ function PortfolioSection() {
         <div className="font-semibold text-[16px] mb-3" style={{ color: "#171A18" }}>Featured Work</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {portfolioData.featured.map((p) => (
-            <div key={p.id} className="rounded-xl border p-4" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+            <div key={p.id} className="rounded-xl border p-4 hover:shadow-md transition-shadow" style={{ borderColor: "#E6DDD5", background: "linear-gradient(180deg, #FDFCFA 0%, #FDF9F2 100%)" }}>
               <div className="font-semibold text-sm mb-1" style={{ color: "#171A18" }}>{p.title}</div>
               <p className="text-xs mb-2" style={{ color: "#6B6F68" }}>{p.description}</p>
               <div className="flex flex-wrap gap-1.5 mb-2">
@@ -816,6 +835,7 @@ function SettingsSection() {
   return (
     <div className="flex flex-col gap-5">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
         <Eyebrow color="#244B35">Settings</Eyebrow>
         <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5">Account Settings</div>
 
