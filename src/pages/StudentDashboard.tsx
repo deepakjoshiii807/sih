@@ -10,7 +10,8 @@ import {
   Save, Download, Smartphone, Moon, Sun, User,
 } from "lucide-react";
 
-/* ─── Mock Data (structured for REST API swap) ─── */
+
+/* ─── Mock Data (swap for: const { student, skills, ... } = await studentApi.getDashboard()) ─── */
 const student = {
   name: "Aarav Sharma", initials: "AS", course: "BAMS", year: "3rd Year",
   institution: "All India Institute of Ayurveda", targetRole: "Clinical Research Intern",

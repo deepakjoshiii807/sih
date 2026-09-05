@@ -10,64 +10,61 @@ import {
   Save, Mail, Key, Globe, Smartphone, Trash2, Lock, BellRing,
 } from "lucide-react";
 
-/* ─── Mock Data (structured for REST API swap) ─── */
-const faculty = {
+import type {
+  Faculty, FacultyStudent, PendingEvidence, PostedOpportunity,
+  ApplicationToReview, FacultyAnalytics, FacultyRecommendation,
+} from "@/lib/faculty-api";
+import { facultyApi } from "@/lib/faculty-api";
+
+/* ─── Mock Data (swap for: const { faculty, students, ... } = await facultyApi.getDashboard()) ─── */
+const faculty: Faculty = {
   name: "Dr. Priya Mehta", initials: "PM", title: "Professor of Ayurveda & Research",
   department: "Department of Ayurveda", institution: "All India Institute of Ayurveda",
   email: "priya.mehta@aiia.ac.in", phone: "+91 98765 12345",
-  bio: "Professor with 12 years of experience in clinical research, AYUSH studies, and mentorship. Specializing in evidence-based Ayurvedic research methodologies.",
+  bio: "Professor with 12 years of experience in clinical research, AYUSH studies, and mentorship.",
   studentsCount: 24, pendingReviews: 7, opportunitiesPosted: 3, verifiedStudents: 18,
 };
-
-const students = [
-  { id: 1, name: "Aarav Sharma", initials: "AS", course: "BAMS", year: "3rd Year", skills: 7, verified: 4, match: 92, status: "active" as const, lastActive: "2 hours ago" },
-  { id: 2, name: "Neha Gupta", initials: "NG", course: "BAMS", year: "2nd Year", skills: 5, verified: 3, match: 78, status: "active" as const, lastActive: "1 day ago" },
-  { id: 3, name: "Rohan Patel", initials: "RP", course: "BAMS", year: "4th Year", skills: 9, verified: 7, match: 88, status: "active" as const, lastActive: "5 hours ago" },
-  { id: 4, name: "Ananya Reddy", initials: "AR", course: "BAMS", year: "3rd Year", skills: 6, verified: 5, match: 85, status: "pending" as const, lastActive: "3 days ago" },
-  { id: 5, name: "Vikram Singh", initials: "VS", course: "BAMS", year: "2nd Year", skills: 4, verified: 2, match: 65, status: "active" as const, lastActive: "12 hours ago" },
-  { id: 6, name: "Meera Joshi", initials: "MJ", course: "BAMS", year: "Final Year", skills: 11, verified: 9, match: 95, status: "active" as const, lastActive: "30 min ago" },
+const students: FacultyStudent[] = [
+  { id: 1, name: "Aarav Sharma", initials: "AS", course: "BAMS", year: "3rd Year", skills: 7, verified: 4, match: 92, status: "active", lastActive: "2 hours ago" },
+  { id: 2, name: "Neha Gupta", initials: "NG", course: "BAMS", year: "2nd Year", skills: 5, verified: 3, match: 78, status: "active", lastActive: "1 day ago" },
+  { id: 3, name: "Rohan Patel", initials: "RP", course: "BAMS", year: "4th Year", skills: 9, verified: 7, match: 88, status: "active", lastActive: "5 hours ago" },
+  { id: 4, name: "Ananya Reddy", initials: "AR", course: "BAMS", year: "3rd Year", skills: 6, verified: 5, match: 85, status: "pending", lastActive: "3 days ago" },
+  { id: 5, name: "Vikram Singh", initials: "VS", course: "BAMS", year: "2nd Year", skills: 4, verified: 2, match: 65, status: "active", lastActive: "12 hours ago" },
+  { id: 6, name: "Meera Joshi", initials: "MJ", course: "BAMS", year: "Final Year", skills: 11, verified: 9, match: 95, status: "active", lastActive: "30 min ago" },
 ];
-
-const pendingEvidence = [
-  { id: 1, student: "Aarav Sharma", initials: "AS", name: "Research Project Report", type: "Project", submitted: "Sept 3, 2025", status: "pending" as const },
-  { id: 2, student: "Neha Gupta", initials: "NG", name: "Clinical Posting Certificate", type: "Certificate", submitted: "Sept 2, 2025", status: "pending" as const },
-  { id: 3, student: "Rohan Patel", initials: "RP", name: "NPTEL Course Certificate", type: "Certificate", submitted: "Sept 1, 2025", status: "pending" as const },
-  { id: 4, student: "Ananya Reddy", initials: "AR", name: "Academic Transcript", type: "Transcript", submitted: "Aug 30, 2025", status: "flagged" as const },
-  { id: 5, student: "Vikram Singh", initials: "VS", name: "Workshop Attendance", type: "Certificate", submitted: "Aug 28, 2025", status: "pending" as const },
+const pendingEvidence: PendingEvidence[] = [
+  { id: 1, student: "Aarav Sharma", initials: "AS", name: "Research Project Report", type: "Project", submitted: "Sept 3, 2025", status: "pending" },
+  { id: 2, student: "Neha Gupta", initials: "NG", name: "Clinical Posting Certificate", type: "Certificate", submitted: "Sept 2, 2025", status: "pending" },
+  { id: 3, student: "Rohan Patel", initials: "RP", name: "NPTEL Course Certificate", type: "Certificate", submitted: "Sept 1, 2025", status: "pending" },
+  { id: 4, student: "Ananya Reddy", initials: "AR", name: "Academic Transcript", type: "Transcript", submitted: "Aug 30, 2025", status: "flagged" },
+  { id: 5, student: "Vikram Singh", initials: "VS", name: "Workshop Attendance", type: "Certificate", submitted: "Aug 28, 2025", status: "pending" },
 ];
-
-const postedOpportunities = [
-  { id: 1, title: "Clinical Research Intern", org: "AIIA / Research Division", location: "New Delhi", duration: "3 Months", applicants: 12, match: 92, status: "active" as const },
-  { id: 2, title: "AYUSH Research Internship", org: "NIA / Jaipur", location: "Jaipur", duration: "2 Months", applicants: 8, match: 78, status: "active" as const },
-  { id: 3, title: "Public Health Analyst Intern", org: "MoHFW / Delhi", location: "New Delhi", duration: "4 Months", applicants: 5, match: 72, status: "closing" as const },
+const postedOpportunities: PostedOpportunity[] = [
+  { id: 1, title: "Clinical Research Intern", org: "AIIA / Research Division", location: "New Delhi", duration: "3 Months", applicants: 12, match: 92, status: "active" },
+  { id: 2, title: "AYUSH Research Internship", org: "NIA / Jaipur", location: "Jaipur", duration: "2 Months", applicants: 8, match: 78, status: "active" },
+  { id: 3, title: "Public Health Analyst Intern", org: "MoHFW / Delhi", location: "New Delhi", duration: "4 Months", applicants: 5, match: 72, status: "closing" },
 ];
-
-const applicationsToReview = [
-  { id: 1, student: "Aarav Sharma", initials: "AS", role: "Clinical Research Intern", org: "AIIA / Research Division", match: 92, applied: "Sept 3, 2025", status: "new" as const },
-  { id: 2, student: "Neha Gupta", initials: "NG", role: "AYUSH Research Internship", org: "NIA / Jaipur", match: 78, applied: "Sept 2, 2025", status: "reviewed" as const },
-  { id: 3, student: "Rohan Patel", initials: "RP", role: "Clinical Research Intern", org: "AIIA / Research Division", match: 88, applied: "Sept 1, 2025", status: "shortlisted" as const },
-  { id: 4, student: "Meera Joshi", initials: "MJ", role: "Public Health Analyst Intern", org: "MoHFW / Delhi", match: 95, applied: "Aug 30, 2025", status: "new" as const },
+const applicationsToReview: ApplicationToReview[] = [
+  { id: 1, student: "Aarav Sharma", initials: "AS", role: "Clinical Research Intern", org: "AIIA / Research Division", match: 92, applied: "Sept 3, 2025", status: "new" },
+  { id: 2, student: "Neha Gupta", initials: "NG", role: "AYUSH Research Internship", org: "NIA / Jaipur", match: 78, applied: "Sept 2, 2025", status: "reviewed" },
+  { id: 3, student: "Rohan Patel", initials: "RP", role: "Clinical Research Intern", org: "AIIA / Research Division", match: 88, applied: "Sept 1, 2025", status: "shortlisted" },
+  { id: 4, student: "Meera Joshi", initials: "MJ", role: "Public Health Analyst Intern", org: "MoHFW / Delhi", match: 95, applied: "Aug 30, 2025", status: "new" },
 ];
-
-const analytics = {
+const analytics: FacultyAnalytics = {
   avgSkills: 7.2, avgMatch: 83, topSkill: "Python", weakSkill: "Statistical Analysis",
   skillDistribution: [
-    { name: "Python", count: 18, pct: 75 },
-    { name: "Research", count: 16, pct: 67 },
-    { name: "Data Analysis", count: 14, pct: 58 },
-    { name: "Machine Learning", count: 10, pct: 42 },
-    { name: "Clinical Research", count: 8, pct: 33 },
-    { name: "Statistical Analysis", count: 6, pct: 25 },
+    { name: "Python", count: 18, pct: 75 }, { name: "Research", count: 16, pct: 67 },
+    { name: "Data Analysis", count: 14, pct: 58 }, { name: "Machine Learning", count: 10, pct: 42 },
+    { name: "Clinical Research", count: 8, pct: 33 }, { name: "Statistical Analysis", count: 6, pct: 25 },
     { name: "Scientific Writing", count: 9, pct: 38 },
   ],
   gapSeverity: { high: 3, medium: 5, low: 8 },
 };
-
-const recommendations = [
+const recommendations: FacultyRecommendation[] = [
   { title: "Statistics for Health Research", type: "Course", students: 5, gap: "Statistical Analysis", provider: "NPTEL" },
   { title: "Scientific Writing Fundamentals", type: "Course", students: 4, gap: "Scientific Writing", provider: "Coursera" },
   { title: "Research Methods in Healthcare", type: "Course", students: 3, gap: "Research Methodology", provider: "edX" },
-  { title: "GCP & Clinical Trial Basics", type: "Workshop", students: 6, gap: "Clinical Trial Docs", provider: "AIIA" },
+  { title: "GCP & Clinical Trial Basics", type: "Workshop", students: 6, gap: "Clinical Trial Documentation", provider: "AIIA" },
 ];
 
 const navLinks = [
