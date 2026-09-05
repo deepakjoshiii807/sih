@@ -6,6 +6,8 @@ import {
   FileText, Star, Grid3X3, Settings, LogOut, Search, Bell,
   Upload, TrendingUp, ChevronRight, BookOpen, Award, Check,
   Calendar, MapPin, Clock, ExternalLink, Edit3, Camera,
+  Lock, Globe, Eye, EyeOff, Mail, Key, BellRing, Trash2,
+  Save, Download, Smartphone, Moon, Sun, User,
 } from "lucide-react";
 
 /* ─── Mock Data (structured for REST API swap) ─── */
@@ -194,7 +196,7 @@ function SidebarContent({ activeNav, setActiveNav }: { activeNav: string; setAct
         </div>
       </div>
       <div className="border-t pt-3 mt-2" style={{ borderColor: open ? "#E6E3D7" : "transparent" }}>
-        <button className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}>
+        <button onClick={() => setActiveNav("settings")} className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}>
           <Settings size={16} /> {open && "Settings"}
         </button>
         <button className={`flex items-center gap-3 w-full rounded-xl text-[#6B6F68] text-xs font-medium hover:bg-[#EDEBE0] hover:text-[#171A18] transition-colors ${open ? "px-3 py-2" : "px-0 py-2 justify-center"}`}>
@@ -977,6 +979,213 @@ function PortfolioSection() {
   );
 }
 
+
+/* ═══════════════════════════════════════════════════════
+   SECTION: Settings
+   ═══════════════════════════════════════════════════════ */
+function SettingsSection() {
+  const [name, setName] = useState(student.name);
+  const [email, setEmail] = useState(student.email);
+  const [phone, setPhone] = useState(student.phone);
+  const [course, setCourse] = useState(student.course);
+  const [year, setYear] = useState(student.year);
+  const [institution, setInstitution] = useState(student.institution);
+  const [targetRole, setTargetRole] = useState(student.targetRole);
+  const [bio, setBio] = useState(student.bio);
+  const [notifEmail, setNotifEmail] = useState(true);
+  const [notifApp, setNotifApp] = useState(true);
+  const [notifUpdates, setNotifUpdates] = useState(false);
+  const [notifWeekly, setNotifWeekly] = useState(true);
+  const [profileVisibility, setProfileVisibility] = useState("institution");
+  const [showEmail, setShowEmail] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+    // TODO: POST /api/settings { name, email, phone, course, year, institution, targetRole, bio, notifEmail, notifApp, notifUpdates, notifWeekly, profileVisibility, showEmail }
+  };
+
+  const inputCls = "w-full border rounded-xl px-4 py-3 text-sm font-medium outline-none transition-colors focus:border-[#244B35]";
+  const inputStyle = { borderColor: "#E6E3D7", background: "#FAF9F5", color: "#171A18" };
+  const labelCls = "font-mono text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5 block";
+
+  const Toggle = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
+    <button type="button" onClick={() => onChange(!checked)} className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0" style={{ background: checked ? "#244B35" : "#D9D6CC" }}>
+      <span className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform" style={{ transform: checked ? "translateX(20px)" : "translateX(0)" }} />
+    </button>
+  );
+
+  return (
+    <>
+      {/* Profile Information */}
+      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
+        className="col-span-12 lg:col-span-8 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow>Account</Eyebrow>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Profile Information</div>
+        <div className="flex items-start gap-5 mb-6">
+          <div className="relative">
+            <div className="w-[72px] h-[72px] rounded-2xl grid place-items-center font-bold text-xl" style={{ background: "#244B35", color: "#DCE6D0" }}>
+              {name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+            </div>
+            <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg grid place-items-center border bg-white" style={{ borderColor: "#E6E3D7" }}>
+              <Camera size={13} style={{ color: "#6B6F68" }} />
+            </button>
+          </div>
+          <div className="flex-1">
+            <div className="font-bold text-lg tracking-tight" style={{ color: "#171A18" }}>{name}</div>
+            <div className="font-mono text-xs" style={{ color: "#6B6F68" }}>{course} / {year}</div>
+            <div className="font-mono text-xs" style={{ color: "#9A9D94" }}>{institution}</div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label className={labelCls} style={{ color: "#6B6F68" }}>Full Name</label>
+            <input className={inputCls} style={inputStyle} value={name} onChange={e => setName(e.target.value)} placeholder="Your full name" />
+          </div>
+          <div>
+            <label className={labelCls} style={{ color: "#6B6F68" }}>Email Address</label>
+            <input className={inputCls} style={inputStyle} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@institution.ac.in" />
+          </div>
+          <div>
+            <label className={labelCls} style={{ color: "#6B6F68" }}>Phone Number</label>
+            <input className={inputCls} style={inputStyle} type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 XXXXX XXXXX" />
+          </div>
+          <div>
+            <label className={labelCls} style={{ color: "#6B6F68" }}>Course / Program</label>
+            <input className={inputCls} style={inputStyle} value={course} onChange={e => setCourse(e.target.value)} placeholder="e.g. BAMS, MBBS, BSc" />
+          </div>
+          <div>
+            <label className={labelCls} style={{ color: "#6B6F68" }}>Year</label>
+            <select className={inputCls} style={inputStyle} value={year} onChange={e => setYear(e.target.value)}>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+              <option>Final Year</option>
+              <option>Intern</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelCls} style={{ color: "#6B6F68" }}>Institution</label>
+            <input className={inputCls} style={inputStyle} value={institution} onChange={e => setInstitution(e.target.value)} placeholder="Your college / university" />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={labelCls} style={{ color: "#6B6F68" }}>Target Role</label>
+            <input className={inputCls} style={inputStyle} value={targetRole} onChange={e => setTargetRole(e.target.value)} placeholder="e.g. Clinical Research Intern" />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={labelCls} style={{ color: "#6B6F68" }}>Bio</label>
+            <textarea className={inputCls + " resize-none"} style={{ ...inputStyle, minHeight: 80 }} value={bio} onChange={e => setBio(e.target.value)} placeholder="Tell us about yourself and your career goals..." />
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Quick Actions */}
+      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+        className="col-span-12 lg:col-span-4 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow>Quick Actions</Eyebrow>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Account Actions</div>
+        <div className="flex flex-col gap-3">
+          {[
+            { label: "Download my data", desc: "Export all profile and skill data", icon: <Download size={16} />, color: "#244B35" },
+            { label: "Change password", desc: "Update your account password", icon: <Key size={16} />, color: "#8A6FB8" },
+            { label: "Connected accounts", desc: "Manage linked accounts", icon: <Globe size={16} />, color: "#C98B5F" },
+            { label: "DigiLocker / Aadhaar", desc: "Link government ID verification", icon: <Smartphone size={16} />, color: "#244B35" },
+          ].map((a) => (
+            <button key={a.label} className="flex items-center gap-3 p-3 rounded-xl border text-left transition-all hover:-translate-y-0.5 hover:border-[#244B35]" style={{ borderColor: "#E6E3D7" }}>
+              <div className="w-9 h-9 rounded-xl grid place-items-center flex-shrink-0" style={{ background: a.color + "15", color: a.color }}>{a.icon}</div>
+              <div>
+                <div className="font-semibold text-[13px]" style={{ color: "#171A18" }}>{a.label}</div>
+                <div className="text-[11px]" style={{ color: "#9A9D94" }}>{a.desc}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* Notifications */}
+      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        className="col-span-12 lg:col-span-6 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#C98B5F">Notifications</Eyebrow>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Notification Preferences</div>
+        <div className="flex flex-col gap-5">
+          {[
+            { label: "Email notifications", desc: "Receive updates about your applications via email", checked: notifEmail, onChange: setNotifEmail, icon: <Mail size={16} /> },
+            { label: "Push notifications", desc: "Get real-time alerts for new matches and updates", checked: notifApp, onChange: setNotifApp, icon: <BellRing size={16} /> },
+            { label: "New opportunity alerts", desc: "Notify when a new opportunity matches your skills", checked: notifUpdates, onChange: setNotifUpdates, icon: <Bell size={16} /> },
+            { label: "Weekly digest", desc: "Summary of your skill progress and new matches", checked: notifWeekly, onChange: setNotifWeekly, icon: <Star size={16} /> },
+          ].map((n) => (
+            <div key={n.label} className="flex items-center gap-4">
+              <div className="w-9 h-9 rounded-xl grid place-items-center flex-shrink-0" style={{ background: "#EFEDE3", color: "#6B6F68" }}>{n.icon}</div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-[13px]" style={{ color: "#171A18" }}>{n.label}</div>
+                <div className="text-[11px]" style={{ color: "#9A9D94" }}>{n.desc}</div>
+              </div>
+              <Toggle checked={n.checked} onChange={n.onChange} />
+            </div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* Privacy & Security */}
+      <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+        className="col-span-12 lg:col-span-6 rounded-[20px] border p-7 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <Eyebrow color="#8A6FB8">Privacy</Eyebrow>
+        <div className="font-semibold text-[19px] tracking-tight mt-2 mb-5">Privacy & Security</div>
+        <div className="flex flex-col gap-5">
+          <div>
+            <label className={labelCls} style={{ color: "#6B6F68" }}>Profile Visibility</label>
+            <select className={inputCls} style={inputStyle} value={profileVisibility} onChange={e => setProfileVisibility(e.target.value)}>
+              <option value="public">Public - Visible to all employers</option>
+              <option value="institution">Institution only - Visible within your institution</option>
+              <option value="private">Private - Only visible to you</option>
+            </select>
+            <div className="text-[11px] mt-1.5" style={{ color: "#9A9D94" }}>Control who can see your skills and profile</div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-9 h-9 rounded-xl grid place-items-center flex-shrink-0" style={{ background: "#EFEDE3", color: "#6B6F68" }}>{showEmail ? <Eye size={16} /> : <EyeOff size={16} />}</div>
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-[13px]" style={{ color: "#171A18" }}>Show email to employers</div>
+              <div className="text-[11px]" style={{ color: "#9A9D94" }}>Allow matched employers to see your email</div>
+            </div>
+            <Toggle checked={showEmail} onChange={setShowEmail} />
+          </div>
+          <div className="border-t pt-4" style={{ borderColor: "#EDEBE0" }}>
+            <div className="font-semibold text-[13px] mb-2" style={{ color: "#171A18" }}>Account Security</div>
+            <div className="flex flex-col gap-2">
+              <button className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl border transition-all hover:bg-[#EFEDE3]" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>
+                <Lock size={14} /> Change password
+              </button>
+              <button className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl border transition-all hover:bg-[#EFEDE3]" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>
+                <Key size={14} /> Enable two-factor authentication
+              </button>
+            </div>
+          </div>
+          <div className="border-t pt-4" style={{ borderColor: "#EDEBE0" }}>
+            <div className="font-semibold text-[13px] mb-2" style={{ color: "#C98B5F" }}>Danger Zone</div>
+            <button className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl border transition-all hover:bg-red-50" style={{ borderColor: "#E6E3D7", color: "#B33A3A" }}>
+              <Trash2 size={14} /> Delete account
+            </button>
+            <div className="text-[11px] mt-1.5" style={{ color: "#9A9D94" }}>This action is irreversible. All your data will be permanently deleted.</div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Save Button */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+        className="col-span-12 flex items-center justify-between">
+        <div className="text-[12px] font-mono" style={{ color: "#9A9D94" }}>
+          All changes are saved locally. Connect a backend to persist settings.
+        </div>
+        <button onClick={handleSave} className="inline-flex items-center gap-2 font-semibold text-sm px-6 py-3 rounded-xl transition-all hover:-translate-y-0.5" style={{ background: saved ? "#DCE6D0" : "#244B35", color: saved ? "#16301F" : "#F7F6F0" }}>
+          {saved ? <><Check size={16} /> Saved!</> : <><Save size={16} /> Save all changes</>}
+        </button>
+      </motion.div>
+    </>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════
    MAIN DASHBOARD
    ═══════════════════════════════════════════════════════ */
@@ -1001,6 +1210,7 @@ export default function StudentDashboard() {
       case "recommendations": return <RecommendationsSection />;
       case "evidence": return <EvidenceSection />;
       case "portfolio": return <PortfolioSection />;
+      case "settings": return <SettingsSection />;
       default: return <OverviewSection />;
     }
   };
@@ -1015,6 +1225,7 @@ export default function StudentDashboard() {
     recommendations: "Recommendations",
     evidence: "Evidence Vault",
     portfolio: "Portfolio",
+    settings: "Settings",
   };
 
   return (
