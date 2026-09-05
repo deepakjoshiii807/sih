@@ -440,17 +440,11 @@ function OverviewSection() {
         {applications.map((app) => (
           <div key={app.role} className="relative pl-7 pb-5 last:pb-0">
             <div className="absolute left-[6px] top-4 bottom-1 w-0.5" style={{ background: "#E6E3D7" }} />
-            <div className={`absolute left-0 top-1 w-3.5 h-3.5 rounded-[5px] border-2 border-white ${
-              app.stage === "applied" ? "bg-[#244B35]" : app.stage === "shortlisted" ? "bg-[#E8D36B]" : "bg-[#C98B5F]"
-            }`} style={{ boxShadow: `0 0 0 1px #E6E3D7, ${app.stage === "applied" ? "0 0 0 3px rgba(36,75,53,.18)" : app.stage === "shortlisted" ? "0 0 0 3px rgba(232,211,107,.25)" : "0 0 0 3px rgba(201,139,95,.25)"}` }} />
+            <div className={`absolute left-0 top-1 w-3.5 h-3.5 rounded-[5px] border-2 border-white ${app.stage === "applied" ? "bg-[#244B35]" : app.stage === "shortlisted" ? "bg-[#E8D36B]" : "bg-[#C98B5F]"}`} style={{ boxShadow: `0 0 0 1px #E6E3D7, ${app.stage === "applied" ? "0 0 0 3px rgba(36,75,53,.18)" : app.stage === "shortlisted" ? "0 0 0 3px rgba(232,211,107,.25)" : "0 0 0 3px rgba(201,139,95,.25)"}` }} />
             <div className="font-semibold text-[14.5px]">{app.role}</div>
             <div className="font-mono text-[11px] mt-0.5" style={{ color: "#6B6F68" }}>{app.org}</div>
             <div className="flex items-center gap-2 mt-1.5 text-xs" style={{ color: "#6B6F68" }}>
-              <span className={`font-mono font-bold text-[11px] px-1.5 py-[2px] rounded-md ${
-                app.stage === "applied" ? "bg-[#DCE6D0] text-[#16301F]"
-                : app.stage === "shortlisted" ? "bg-[#E8D36B] text-[#5c4a08]"
-                : "bg-[#E8C7AE] text-[#5a2f12]"
-              }`}>{app.label}</span>
+              <span className={`font-mono font-bold text-[11px] px-1.5 py-[2px] rounded-md ${app.stage === "applied" ? "bg-[#DCE6D0] text-[#16301F]" : app.stage === "shortlisted" ? "bg-[#E8D36B] text-[#5c4a08]" : "bg-[#E8C7AE] text-[#5a2f12]"}`}>{app.label}</span>
               <span>{app.status}</span>
             </div>
           </div>
