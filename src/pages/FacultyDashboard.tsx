@@ -115,10 +115,12 @@ function SidebarContent({ activeNav, setActiveNav }: { activeNav: string; setAct
         <div className={open ? "" : "flex justify-center"}>{open ? <Logo /> : <LogoIcon />}</div>
         <div className="mt-8 flex flex-col gap-[2px]">
           {navLinks.map((link) => (
-            <button key={link.id} onClick={() => setActiveNav(link.id)} className={`flex items-center gap-3 w-full text-left rounded-xl text-sm font-medium transition-colors ${open ? "px-3 py-2.5" : "px-0 py-2.5 justify-center"} ${activeNav === link.id ? "bg-[#244B35] text-white font-semibold" : "text-[#6B6F68] hover:bg-[#EDEBE0] hover:text-[#171A18]"}`}>
-              <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 18, height: 18 }}>{link.icon}</span>
-              {open && <span className="text-sm whitespace-pre">{link.label}</span>}
-              {open && link.count !== undefined && <span className={`ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded-md ${activeNav === link.id ? "bg-white/20 text-white" : "bg-[#E8C7AE] text-[#7a3f1a]"}`}>{link.count}</span>}
+            <button key={link.id} onClick={() => setActiveNav(link.id)}
+              className={`flex items-center rounded-xl text-sm font-medium transition-colors relative ${open ? "gap-3 px-3 py-2.5" : "justify-center px-0 py-2.5"} ${activeNav === link.id ? "bg-[#244B35] text-white font-semibold" : "text-[#6B6F68] hover:bg-[#EDEBE0] hover:text-[#171A18]"}`}
+              title={!open ? link.label : undefined}>
+              <span className="flex-shrink-0 flex items-center justify-center" style={{ width: 20, height: 20 }}>{link.icon}</span>
+              {open && <span className="text-sm whitespace-pre flex-1 text-left">{link.label}</span>}
+              {open && link.count !== undefined && <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded-md ${activeNav === link.id ? "bg-white/20 text-white" : "bg-[#E8C7AE] text-[#7a3f1a]"}`}>{link.count}</span>}
             </button>
           ))}
         </div>
@@ -165,12 +167,12 @@ function OverviewSection() {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-1">
         {[{ label: "Students", value: academician.studentsCount, color: "#4A2D7A", bg: "#EAE3F4", accent: "#8A6FB8" }, { label: "Verified", value: academician.verifiedCount, color: "#244B35", bg: "#DCE6D0", accent: "#244B35" }, { label: "Pending Reviews", value: verifications.filter(v => v.status === "pending").length, color: "#7a3f1a", bg: "#F0E8DD", accent: "#C98B5F" }, { label: "Avg Match", value: `${analytics.avgMatch}%`, color: "#171A18", bg: "#EDEBE0", accent: "#C98B5F" }].map((s) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}
-            className="rounded-[14px] p-5 text-center border-l-[3px] hover:shadow-md transition-shadow" style={{ background: s.bg, borderLeftColor: s.accent }}>
+            className="rounded-[14px] p-5 text-center border-l-[3px] hover:shadow-md transition-shadow flex flex-col items-center justify-center" style={{ background: s.bg, borderLeftColor: s.accent }}>
             <div className="font-mono text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5" style={{ color: "#6B6F68" }}>{s.label}</div>
-            <div className="font-bold text-3xl tracking-tight" style={{ color: s.color }}>{s.value}</div>
+            <div className="font-bold text-[32px] tracking-tight leading-none" style={{ color: s.color }}>{s.value}</div>
           </motion.div>
         ))}
       </div>
@@ -184,7 +186,7 @@ function OverviewSection() {
         <p className="text-xs mb-4" style={{ color: "#6B6F68" }}>Skills with high industry demand but low curriculum coverage.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {departmentSkills.filter(s => s.gapSeverity === "Critical").slice(0, 4).map((sk) => (
-            <div key={sk.taxonomyId} className="flex items-center gap-3 p-3 rounded-xl border hover:shadow-sm transition-shadow" style={{ borderColor: "#E6DDD5", background: "linear-gradient(135deg, #FDFCFA, #FDF8F3)" }}>
+            <div key={sk.taxonomyId} className="flex items-center gap-3 p-4 rounded-xl border-l-[3px] hover:shadow-md transition-shadow" style={{ borderColor: "#E8C7AE", borderLeftColor: "#C98B5F", background: "linear-gradient(135deg, #FDFCFA, #FDF8F3)" }}>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1"><span className="font-semibold text-sm" style={{ color: "#171A18" }}>{sk.name}</span><Tag cls="Critical">{sk.gapSeverity}</Tag></div>
                 <div className="flex items-center gap-2"><span className="font-mono text-[10px]" style={{ color: "#6B6F68" }}>Coverage {sk.curriculumCoverage}%</span><span className="font-mono text-[10px]" style={{ color: "#C98B5F" }}>Demand {sk.industryDemand}</span></div>
@@ -200,15 +202,15 @@ function OverviewSection() {
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #8A6FB8, #C8B5DE)" }} />
         <Eyebrow color="#8A6FB8">Readiness</Eyebrow>
         <div className="font-semibold text-[19px] tracking-tight mt-2 mb-4">Student Readiness Distribution</div>
-        <div className="flex items-end gap-4 h-[120px]">
+        <div className="flex items-end gap-6 h-[160px]">
           {[
-            { label: "Beginning", count: analytics.readinessDistribution.beginning, color: "#E8C7AE" },
-            { label: "Developing", count: analytics.readinessDistribution.developing, color: "#E8D36B" },
+            { label: "Beginning", count: analytics.readinessDistribution.beginning, color: "#D4956A" },
+            { label: "Developing", count: analytics.readinessDistribution.developing, color: "#C9A82A" },
             { label: "Job-Ready", count: analytics.readinessDistribution.jobReady, color: "#244B35" },
           ].map((r) => {
             const max = Math.max(...Object.values(analytics.readinessDistribution));
             const h = (r.count / max) * 100;
-            return <div key={r.label} className="flex-1 flex flex-col items-center gap-1"><div className="w-full rounded-t-lg" style={{ height: `${h}%`, background: r.color }} /><div className="font-mono text-[10px] font-bold" style={{ color: "#6B6F68" }}>{r.label}</div><div className="font-bold text-lg" style={{ color: "#171A18" }}>{r.count}</div></div>;
+            return <div key={r.label} className="flex-1 flex flex-col items-center gap-2"><div className="w-full rounded-t-xl transition-all" style={{ height: `${h}%`, background: `linear-gradient(180deg, ${r.color}, ${r.color}CC)`, minHeight: 8 }} /><div className="font-mono text-[11px] font-bold" style={{ color: "#6B6F68" }}>{r.label}</div><div className="font-bold text-2xl" style={{ color: "#171A18" }}>{r.count}</div></div>;
           })}
         </div>
       </motion.div>
@@ -540,7 +542,7 @@ function AnalyticsSection() {
           { label: "Avg Match", value: `${analytics.avgMatch}%`, color: "#171A18", bg: "#EDEBE0" },
           { label: "Avg Readiness", value: `${analytics.avgReadiness}%`, color: "#C98B5F", bg: "#F0E8DD" },
         ].map((s) => (
-          <div key={s.label} className="rounded-[14px] p-5 text-center border-l-[3px] hover:shadow-md transition-shadow" style={{ background: s.bg, borderLeftColor: s.color }}>
+          <div key={s.label} className="rounded-[14px] p-5 text-center border-l-[3px] hover:shadow-md transition-shadow flex flex-col items-center justify-center" style={{ background: s.bg, borderLeftColor: s.color }}>
             <div className="font-mono text-[10px] font-bold tracking-[0.14em] uppercase mb-1.5" style={{ color: "#6B6F68" }}>{s.label}</div>
             <div className="font-bold text-3xl tracking-tight" style={{ color: s.color }}>{s.value}</div>
           </div>
@@ -736,14 +738,14 @@ export default function FacultyDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#F7F6F0" }}>
+    <div className="h-screen flex overflow-hidden" style={{ background: "#F7F6F0" }}>
       <Sidebar open={undefined} setOpen={undefined}>
         <SidebarBody className="justify-between gap-10">
           <SidebarContent activeNav={activeNav} setActiveNav={setActiveNav} />
         </SidebarBody>
       </Sidebar>
 
-      <main className="flex-1 min-h-screen overflow-y-auto">
+      <main className="flex-1 h-screen overflow-y-auto">
         <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-6 md:py-8">
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
             <h1 className="font-semibold text-[22px] md:text-[26px] tracking-tight" style={{ color: "#171A18" }}>
