@@ -13,14 +13,14 @@ import {
 import type {
   Academician, DepartmentSkill, DemandTrend, IndustryRole,
   CurriculumReport, VerificationRequest, AcademicanOpportunity,
-  CurriculumLoopStep, DepartmentAnalytics,
+  CurriculumLoopStep, DepartmentAnalytics, AcademicianDashboard,
 } from "@/lib/faculty-api";
 import { facultyApi } from "@/lib/faculty-api";
 
 /* ─── Mock Data ─── */
-const academician: Academician = { name: "Dr. Priya Mehta", initials: "PM", title: "Professor of Ayurveda & Research", department: "Department of Ayurveda", institution: "All India Institute of Ayurveda", email: "priya.mehta@aiia.ac.in", phone: "+91 98765 12345", bio: "Professor with 12 years of experience in clinical research, AYUSH studies, and curriculum development.", subjects: ["Clinical Research", "Pharmacology", "Research Methodology", "AYUSH Therapeutics"], researchInterests: ["Herbal Pharmacovigilance", "Clinical Trial Design", "AYUSH Healthcare Delivery"], experience: 12, studentsCount: 24, verifiedCount: 18 };
+let academician: Academician = { name: "Dr. Priya Mehta", initials: "PM", title: "Professor of Ayurveda & Research", department: "Department of Ayurveda", institution: "All India Institute of Ayurveda", email: "priya.mehta@aiia.ac.in", phone: "+91 98765 12345", bio: "Professor with 12 years of experience in clinical research, AYUSH studies, and curriculum development.", subjects: ["Clinical Research", "Pharmacology", "Research Methodology", "AYUSH Therapeutics"], researchInterests: ["Herbal Pharmacovigilance", "Clinical Trial Design", "AYUSH Healthcare Delivery"], experience: 12, studentsCount: 24, verifiedCount: 18 };
 
-const departmentSkills: DepartmentSkill[] = [
+let departmentSkills: DepartmentSkill[] = [
   { name: "Clinical Research", taxonomyId: "TC-CR-03", industryDemand: "High", curriculumCoverage: 32, studentProficiency: 45, gapSeverity: "Critical", trend: "increasing", studentsWithGap: 18, totalStudents: 24 },
   { name: "Statistical Analysis", taxonomyId: "TC-SA-01", industryDemand: "High", curriculumCoverage: 18, studentProficiency: 35, gapSeverity: "Critical", trend: "increasing", studentsWithGap: 20, totalStudents: 24 },
   { name: "Pharmacovigilance", taxonomyId: "TC-PV-02", industryDemand: "Medium", curriculumCoverage: 41, studentProficiency: 52, gapSeverity: "Moderate", trend: "stable", studentsWithGap: 12, totalStudents: 24 },
@@ -31,7 +31,7 @@ const departmentSkills: DepartmentSkill[] = [
   { name: "Machine Learning", taxonomyId: "TC-ML-01", industryDemand: "High", curriculumCoverage: 12, studentProficiency: 28, gapSeverity: "Critical", trend: "increasing", studentsWithGap: 19, totalStudents: 24 },
 ];
 
-const demandTrends: DemandTrend[] = [
+let demandTrends: DemandTrend[] = [
   { skill: "Clinical Research", direction: "up", demandLevel: "High", changePercent: 35, period: "Last 6 months" },
   { skill: "Data Analysis", direction: "up-strong", demandLevel: "High", changePercent: 52, period: "Last 6 months" },
   { skill: "Machine Learning", direction: "up-strong", demandLevel: "High", changePercent: 68, period: "Last 6 months" },
@@ -41,16 +41,16 @@ const demandTrends: DemandTrend[] = [
   { skill: "Ayurvedic Therapeutics", direction: "up", demandLevel: "Medium", changePercent: 18, period: "Last 6 months" },
 ];
 
-const industryRoles: IndustryRole[] = [
+let industryRoles: IndustryRole[] = [
   { title: "Clinical Research Intern", demandLevel: "High", openings: 45, avgMatch: 72, topSkills: ["Clinical Research", "Python", "Data Analysis"] },
   { title: "Research Data Analyst", demandLevel: "High", openings: 32, avgMatch: 68, topSkills: ["Python", "Statistical Analysis", "Data Analysis"] },
   { title: "AYUSH Public Health Intern", demandLevel: "Medium", openings: 18, avgMatch: 75, topSkills: ["Research Methodology", "Clinical Research"] },
   { title: "Pharmacovigilance Associate", demandLevel: "Medium", openings: 12, avgMatch: 65, topSkills: ["Pharmacovigilance", "Scientific Writing", "Clinical Research"] },
 ];
 
-const curriculumReport: CurriculumReport = { id: "rpt-1", department: "Department of Ayurveda", generatedDate: "Sept 2025", totalStudents: 24, avgReadiness: 68, readinessDistribution: { beginning: 6, developing: 12, jobReady: 6 }, topGaps: [{ skill: "Statistical Analysis", gapCount: 20, severity: "Critical" }, { skill: "Machine Learning", gapCount: 19, severity: "Critical" }, { skill: "Clinical Research", gapCount: 18, severity: "Critical" }, { skill: "Data Management", gapCount: 17, severity: "Critical" }], coverageGaps: [{ skill: "Machine Learning", coverage: 12, demand: "High" }, { skill: "Statistical Analysis", coverage: 18, demand: "High" }, { skill: "Data Management", coverage: 21, demand: "High" }, { skill: "Clinical Research", coverage: 32, demand: "High" }], recommendations: ["Introduce mandatory Statistical Analysis module in 2nd year", "Add Python for Healthcare elective in 3rd year", "Partner with industry for Clinical Research practical sessions", "Develop internal ML lab with real clinical datasets"] };
+let curriculumReport: CurriculumReport = { id: "rpt-1", department: "Department of Ayurveda", generatedDate: "Sept 2025", totalStudents: 24, avgReadiness: 68, readinessDistribution: { beginning: 6, developing: 12, jobReady: 6 }, topGaps: [{ skill: "Statistical Analysis", gapCount: 20, severity: "Critical" }, { skill: "Machine Learning", gapCount: 19, severity: "Critical" }, { skill: "Clinical Research", gapCount: 18, severity: "Critical" }, { skill: "Data Management", gapCount: 17, severity: "Critical" }], coverageGaps: [{ skill: "Machine Learning", coverage: 12, demand: "High" }, { skill: "Statistical Analysis", coverage: 18, demand: "High" }, { skill: "Data Management", coverage: 21, demand: "High" }, { skill: "Clinical Research", coverage: 32, demand: "High" }], recommendations: ["Introduce mandatory Statistical Analysis module in 2nd year", "Add Python for Healthcare elective in 3rd year", "Partner with industry for Clinical Research practical sessions", "Develop internal ML lab with real clinical datasets"] };
 
-const verifications: VerificationRequest[] = [
+let verifications: VerificationRequest[] = [
   { id: "v-1", studentName: "Aarav Sharma", studentInitials: "AS", title: "CVD Risk Prediction Model", type: "Project", submittedDate: "Sept 3, 2025", status: "pending", skillsClaimed: ["Python", "Machine Learning", "Data Analysis"], description: "ML model predicting cardiovascular risk from Ayurvedic markers." },
   { id: "v-2", studentName: "Neha Gupta", studentInitials: "NG", title: "Clinical Posting Certificate", type: "Certificate", submittedDate: "Sept 2, 2025", status: "pending", skillsClaimed: ["Clinical Research", "Patient Assessment"], description: "Certificate for 4-week clinical posting at AIIA OPD." },
   { id: "v-3", studentName: "Rohan Patel", studentInitials: "RP", title: "Herbal Drug Efficacy Study", type: "Project", submittedDate: "Sept 1, 2025", status: "pending", skillsClaimed: ["Research Methodology", "Data Analysis", "Scientific Writing"], description: "Literature review on Ashwagandha formulations." },
@@ -59,14 +59,14 @@ const verifications: VerificationRequest[] = [
   { id: "v-6", studentName: "Vikram Singh", studentInitials: "VS", title: "Pharmacognosy Lab Report", type: "Project", submittedDate: "Aug 25, 2025", status: "pending", skillsClaimed: ["Pharmacognosy", "Documentation"], description: "Lab report on medicinal plant identification." },
 ];
 
-const opportunities: AcademicanOpportunity[] = [
+let opportunities: AcademicanOpportunity[] = [
   { id: "ao-1", title: "FDP on AI in Healthcare", category: "FDP", organizer: "AICTE", location: "Online", duration: "2 weeks", deadline: "Oct 15, 2025", description: "Learn to integrate AI/ML into healthcare curriculum.", skillsRelevant: ["Machine Learning", "Data Analysis", "Python"], status: "open", interested: 8 },
   { id: "ao-2", title: "Industrial Training at CCRAS", category: "Industrial Training", organizer: "CCRAS", location: "New Delhi", duration: "1 month", deadline: "Sept 30, 2025", description: "Hands-on research training at CCRAS.", skillsRelevant: ["Research Methodology", "Clinical Research"], status: "open", interested: 5 },
   { id: "ao-3", title: "Curriculum Consultancy for BAMS", category: "Consultancy", organizer: "NCISM", location: "New Delhi", duration: "3 months", deadline: "Nov 1, 2025", description: "Faculty consultants for updating BAMS pharmacology curriculum.", skillsRelevant: ["Pharmacology", "Scientific Writing"], status: "open", interested: 3 },
   { id: "ao-4", title: "Joint Research: Herbal Drug Safety", category: "Research Collaboration", organizer: "AIIA + IIT Delhi", location: "New Delhi", duration: "6 months", deadline: "Oct 20, 2025", description: "Building a herb-drug interaction database.", skillsRelevant: ["Data Analysis", "Python", "Clinical Research"], status: "open", interested: 12 },
 ];
 
-const curriculumLoop: CurriculumLoopStep[] = [
+let curriculumLoop: CurriculumLoopStep[] = [
   { id: 1, label: "Industry Demand", description: "High demand for Statistical Analysis and ML", status: "completed", insight: "72% of roles require Statistical Analysis" },
   { id: 2, label: "Skill Gap Detection", description: "Statistical Analysis 18% coverage, ML 12%", status: "completed", insight: "20 of 24 students lack Statistical Analysis" },
   { id: 3, label: "Department Report", description: "Aggregated report generated", status: "completed", insight: "Report shared with HOD on Sept 1" },
@@ -75,7 +75,20 @@ const curriculumLoop: CurriculumLoopStep[] = [
   { id: 6, label: "Reassessment", description: "Skills reassessed", status: "upcoming", insight: "Scheduled for Jan 2026" },
 ];
 
-const analytics: DepartmentAnalytics = { totalStudents: 24, avgSkills: 7.2, avgMatch: 83, avgReadiness: 68, readinessDistribution: { beginning: 6, developing: 12, jobReady: 6 }, skillDistribution: [{ name: "Python", count: 18, pct: 75 }, { name: "Research", count: 16, pct: 67 }, { name: "Data Analysis", count: 14, pct: 58 }, { name: "ML", count: 10, pct: 42 }, { name: "Clinical Research", count: 8, pct: 33 }, { name: "Statistical Analysis", count: 6, pct: 25 }], monthlyTrend: [{ month: "May", verified: 12, placements: 2 }, { month: "Jun", verified: 15, placements: 3 }, { month: "Jul", verified: 18, placements: 4 }, { month: "Aug", verified: 22, placements: 5 }, { month: "Sep", verified: 25, placements: 3 }], departmentComparison: [{ dept: "Ayurveda", avgMatch: 83, avgReadiness: 68 }, { dept: "Surgery", avgMatch: 78, avgReadiness: 62 }, { dept: "Pharmacology", avgMatch: 88, avgReadiness: 75 }, { dept: "Kayachikitsa", avgMatch: 76, avgReadiness: 64 }] };
+let analytics: DepartmentAnalytics = { totalStudents: 24, avgSkills: 7.2, avgMatch: 83, avgReadiness: 68, readinessDistribution: { beginning: 6, developing: 12, jobReady: 6 }, skillDistribution: [{ name: "Python", count: 18, pct: 75 }, { name: "Research", count: 16, pct: 67 }, { name: "Data Analysis", count: 14, pct: 58 }, { name: "ML", count: 10, pct: 42 }, { name: "Clinical Research", count: 8, pct: 33 }, { name: "Statistical Analysis", count: 6, pct: 25 }], monthlyTrend: [{ month: "May", verified: 12, placements: 2 }, { month: "Jun", verified: 15, placements: 3 }, { month: "Jul", verified: 18, placements: 4 }, { month: "Aug", verified: 22, placements: 5 }, { month: "Sep", verified: 25, placements: 3 }], departmentComparison: [{ dept: "Ayurveda", avgMatch: 83, avgReadiness: 68 }, { dept: "Surgery", avgMatch: 78, avgReadiness: 62 }, { dept: "Pharmacology", avgMatch: 88, avgReadiness: 75 }, { dept: "Kayachikitsa", avgMatch: 76, avgReadiness: 64 }] };
+
+/** Server data entry point (called by the route-level LiveDashboard wrapper). */
+export function hydrateFacultyDashboard(payload: AcademicianDashboard) {
+  academician = payload.academician;
+  departmentSkills = payload.departmentSkills;
+  demandTrends = payload.demandTrends;
+  industryRoles = payload.industryRoles;
+  curriculumReport = payload.curriculumReport;
+  verifications = payload.verifications;
+  opportunities = payload.opportunities;
+  curriculumLoop = payload.curriculumLoop;
+  analytics = payload.analytics;
+}
 
 const navLinks = [
   { id: "overview", label: "Overview", icon: <LayoutDashboard size={18} /> },

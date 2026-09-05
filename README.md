@@ -29,6 +29,12 @@ The convex server has a separate set of environment variables that are accessibl
 
 Currently, these variables include auth-specific keys: JWKS, JWT_PRIVATE_KEY, and SITE_URL.
 
+> **Django backend wiring** — this app's real data layer is the Django + DRF API in `backend/` (see `backend/README.md`).
+> Set `VITE_API_URL` to your deployed API root, e.g. `VITE_API_URL=https://api.example.com/api` (local default: `http://localhost:8000/api`).
+> The four dashboards (`/student`, `/academician`, `/industry`, `/institution-admin`) fetch their data from Django
+> endpoints and sign in/up through Django JWT auth (`/api/auth/token`, `/api/auth/register`). No API URL configured
+> (or backend not running) shows a clear "can't reach server" state with the configured URL and a Retry button.
+
 
 # Using Authentication (Important!)
 

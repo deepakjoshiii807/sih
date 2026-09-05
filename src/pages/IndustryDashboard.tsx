@@ -12,12 +12,12 @@ import {
 
 import type {
   Company, Opportunity, Application, SLATracker,
-  IndustryAnalytics, Rating, ApplicationStage,
+  IndustryAnalytics, Rating, ApplicationStage, IndustryDashboard,
 } from "@/lib/industry-api";
 import { industryApi } from "@/lib/industry-api";
 
 /* ─── Mock Data (swap for: const { company, opportunities, ... } = await industryApi.getDashboard()) ─── */
-const company: Company = {
+let company: Company = {
   name: "AIIA Research Division", initials: "AR",
   description: "Research division of the All India Institute of Ayurveda, focused on clinical research, drug discovery, and evidence-based Ayurvedic medicine.",
   domain: "Healthcare / AYUSH Research", orgType: "Government Research Institute",
@@ -26,25 +26,25 @@ const company: Company = {
   verified: true, foundedYear: 2015, size: "200-500 employees",
 };
 
-const opportunities: Opportunity[] = [
+let opportunities: Opportunity[] = [
   { id: 1, title: "Clinical Research Intern", type: "Internship", description: "Work on ongoing clinical trials in Ayurvedic pharmacology.", openings: 4, location: "New Delhi", workArrangement: "On-site", duration: "3 Months", stipend: "₹12,000/month", deadline: "Sept 30, 2025", eligibility: { qualification: "BAMS / MBBS", courses: ["BAMS", "MBBS"], experience: "No prior experience required", otherCriteria: "" }, requiredSkills: [{ skill: "Python", required: "essential", minProficiency: 70 }, { skill: "Research Methodology", required: "essential", minProficiency: 60 }, { skill: "Data Analysis", required: "essential", minProficiency: 65 }, { skill: "Scientific Writing", required: "preferred", minProficiency: 50 }], status: "active", totalApplicants: 12, shortlistedCount: 3, createdAt: "Aug 15, 2025", blindShortlisting: true },
   { id: 2, title: "Research Data Assistant", type: "Part-time", description: "Assist in cleaning, analyzing, and visualizing clinical trial data.", openings: 2, location: "New Delhi", workArrangement: "Hybrid", duration: "6 Months", stipend: "₹15,000/month", deadline: "Oct 15, 2025", eligibility: { qualification: "BSc / MSc", courses: ["BSc", "MSc"], experience: "6 months relevant experience", otherCriteria: "" }, requiredSkills: [{ skill: "Python", required: "essential", minProficiency: 80 }, { skill: "Data Analysis", required: "essential", minProficiency: 75 }, { skill: "Statistical Analysis", required: "essential", minProficiency: 70 }], status: "active", totalApplicants: 8, shortlistedCount: 2, createdAt: "Aug 20, 2025", blindShortlisting: false },
   { id: 3, title: "AYUSH Public Health Intern", type: "Internship", description: "Support field research on AYUSH healthcare delivery.", openings: 3, location: "Jaipur", workArrangement: "On-site", duration: "2 Months", stipend: "₹8,000/month", deadline: "Sept 20, 2025", eligibility: { qualification: "BAMS / BPH", courses: ["BAMS"], experience: "No prior experience required", otherCriteria: "" }, requiredSkills: [{ skill: "Research", required: "essential", minProficiency: 50 }], status: "closing", totalApplicants: 5, shortlistedCount: 1, createdAt: "Jul 10, 2025", blindShortlisting: false },
   { id: 4, title: "Herbal Pharmacovigilance Intern", type: "Internship", description: "Monitor adverse drug reactions for AYUSH herbal formulations.", openings: 2, location: "New Delhi", workArrangement: "On-site", duration: "4 Months", stipend: "₹10,000/month", deadline: "Oct 5, 2025", eligibility: { qualification: "BAMS / BPharm", courses: ["BAMS", "BPharm"], experience: "1 year preferred", otherCriteria: "" }, requiredSkills: [{ skill: "Clinical Research", required: "essential", minProficiency: 60 }], status: "draft", totalApplicants: 0, shortlistedCount: 0, createdAt: "Sept 1, 2025", blindShortlisting: false },
 ];
 
-const applications: Application[] = [
+let applications: Application[] = [
   { id: 1, opportunityId: 1, opportunityTitle: "Clinical Research Intern", candidate: { id: 1, name: "Aarav Sharma", initials: "AS", course: "BAMS", year: "3rd Year", institution: "AIIA", skills: [{ name: "Python", confidence: 92, verified: true, source: "NPTEL Certificate" }, { name: "Research Methodology", confidence: 81, verified: true }, { name: "Data Analysis", confidence: 76, verified: true }, { name: "Scientific Writing", confidence: 64, verified: false }], verifiedSkills: 4, totalSkills: 7, certifications: 2, projects: 3, evidence: [{ type: "Certificate", title: "Python for Research", issuer: "NPTEL", date: "Jul 2025", verified: true }], roleReadiness: "Almost Ready", readinessScore: 82 }, matchScore: 92, matchedSkills: ["Python", "Research Methodology", "Data Analysis"], missingSkills: ["Scientific Writing"], stage: "shortlisted", appliedDate: "Sept 3, 2025", lastUpdated: "Sept 5, 2025", notes: "Strong technical background", interviewDate: "Sept 10, 2025" },
   { id: 2, opportunityId: 1, opportunityTitle: "Clinical Research Intern", candidate: { id: 2, name: "Meera Joshi", initials: "MJ", course: "BAMS", year: "Final Year", institution: "BHU", skills: [{ name: "Python", confidence: 85, verified: true }, { name: "Research Methodology", confidence: 88, verified: true }, { name: "Clinical Research", confidence: 78, verified: true }, { name: "Scientific Writing", confidence: 82, verified: true }], verifiedSkills: 6, totalSkills: 9, certifications: 4, projects: 5, evidence: [{ type: "Publication", title: "AYUSH Clinical Outcomes Review", issuer: "Journal of Ayurveda", date: "May 2025", verified: true }], roleReadiness: "Ready", readinessScore: 95 }, matchScore: 95, matchedSkills: ["Python", "Research Methodology", "Data Analysis", "Clinical Research"], missingSkills: [], stage: "interviewed", appliedDate: "Sept 1, 2025", lastUpdated: "Sept 6, 2025", notes: "Excellent interview", interviewDate: "Sept 6, 2025" },
   { id: 3, opportunityId: 1, opportunityTitle: "Clinical Research Intern", candidate: { id: 3, name: "Rohan Patel", initials: "RP", course: "BAMS", year: "4th Year", institution: "GAU", skills: [{ name: "Python", confidence: 70, verified: false }, { name: "Research Methodology", confidence: 75, verified: true }], verifiedSkills: 3, totalSkills: 5, certifications: 1, projects: 2, evidence: [{ type: "Project", title: "Herbal Drug Efficacy Study", issuer: "GAU", date: "Apr 2025", verified: true }], roleReadiness: "Almost Ready", readinessScore: 72 }, matchScore: 78, matchedSkills: ["Research Methodology"], missingSkills: ["Python", "Scientific Writing"], stage: "applied", appliedDate: "Sept 4, 2025", lastUpdated: "Sept 4, 2025", notes: "" },
   { id: 4, opportunityId: 2, opportunityTitle: "Research Data Assistant", candidate: { id: 4, name: "Neha Gupta", initials: "NG", course: "BSc CS", year: "3rd Year", institution: "DU", skills: [{ name: "Python", confidence: 88, verified: true }, { name: "Data Analysis", confidence: 82, verified: true }, { name: "Machine Learning", confidence: 75, verified: true }, { name: "Statistical Analysis", confidence: 80, verified: true }], verifiedSkills: 5, totalSkills: 6, certifications: 3, projects: 4, evidence: [{ type: "Portfolio", title: "Data Science Portfolio", issuer: "GitHub", date: "Aug 2025", verified: true }], roleReadiness: "Ready", readinessScore: 88 }, matchScore: 90, matchedSkills: ["Python", "Data Analysis", "Machine Learning", "Statistical Analysis"], missingSkills: [], stage: "offered", appliedDate: "Aug 25, 2025", lastUpdated: "Sept 2, 2025", notes: "Outstanding assessment" },
 ];
 
-const slaTrackers: SLATracker[] = [
+let slaTrackers: SLATracker[] = [
   { applicationId: 3, candidateName: "Rohan Patel", opportunityTitle: "Clinical Research Intern", appliedDate: "Sept 4, 2025", deadline: "Sept 11, 2025", timeRemaining: "6 days", slaStatus: "on-track", daysRemaining: 6 },
 ];
 
-const analytics: IndustryAnalytics = {
+let analytics: IndustryAnalytics = {
   totalOpportunities: 4, activeOpportunities: 2, totalApplicants: 25,
   shortlistingRate: 32, fillRate: 75, avgTimeToHire: 14,
   pipeline: [{ stage: "Applied", count: 25 }, { stage: "Shortlisted", count: 8 }, { stage: "Interviewed", count: 5 }, { stage: "Offered", count: 3 }, { stage: "Joined", count: 2 }],
@@ -54,10 +54,20 @@ const analytics: IndustryAnalytics = {
   opportunityPerformance: [{ title: "Clinical Research Intern", applicants: 12, fillRate: 75, avgMatch: 85 }, { title: "Research Data Assistant", applicants: 8, fillRate: 50, avgMatch: 82 }],
 };
 
-const ratings: Rating[] = [
+let ratings: Rating[] = [
   { id: 1, from: "Meera Joshi", fromType: "student", to: "AIIA Research Division", toType: "industry", score: 5, feedback: "Excellent mentorship and research exposure.", date: "Aug 2025", opportunity: "Clinical Research Intern" },
   { id: 2, from: "AIIA Research Division", fromType: "industry", to: "Meera Joshi", toType: "student", score: 5, feedback: "Outstanding performance. Strong research skills.", date: "Aug 2025", opportunity: "Clinical Research Intern" },
 ];
+
+/** Server data entry point (called by the route-level LiveDashboard wrapper). */
+export function hydrateIndustryDashboard(payload: IndustryDashboard) {
+  company = payload.company;
+  opportunities = payload.opportunities;
+  applications = payload.applications;
+  slaTrackers = payload.slaTrackers;
+  analytics = payload.analytics;
+  ratings = payload.ratings;
+}
 
 const navLinks = [
   { id: "overview", label: "Overview", icon: <LayoutDashboard size={18} /> },

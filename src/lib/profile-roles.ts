@@ -83,3 +83,19 @@ export function roleForPath(pathname: string): ProfileRoleId | null {
   const match = PROFILE_ROLES.find((r) => pathname === r.path || pathname.startsWith(`${r.path}/`));
   return match ? match.id : null;
 }
+
+/** Django User.role values → platform ProfileRoleId (null when unknown). */
+export function apiRoleToProfileRole(apiRole: string | null | undefined): ProfileRoleId | null {
+  switch (apiRole) {
+    case "student":
+      return "student";
+    case "industry":
+      return "industry";
+    case "academician":
+      return "academician";
+    case "institution_admin":
+      return "institutionAdmin";
+    default:
+      return null;
+  }
+}

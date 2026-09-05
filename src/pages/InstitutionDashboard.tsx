@@ -12,14 +12,14 @@ import {
 import type {
   Institution, PlacementRecord, DepartmentPlacement, PlacementTrend,
   SkillMetric, ReadinessDistribution, DepartmentComparison,
-  AnomalyFlag, InstitutionalReport, InstitutionAnalytics,
+  AnomalyFlag, InstitutionalReport, InstitutionAnalytics, InstitutionDashboard,
 } from "@/lib/institution-api";
 import { institutionApi } from "@/lib/institution-api";
 
 /* ─── Mock Data ─── */
-const institution: Institution = { name: "All India Institute of Ayurveda", initials: "AIIA", location: "New Delhi, India", type: "Government Institute", establishedYear: 2015, departments: ["Ayurveda", "Surgery", "Pharmacology", "Kayachikitsa", "Shalya Tantra", "Shaalakya Tantra"], totalStudents: 320, totalFaculty: 48, website: "https://aiia.gov.in", email: "admin@aiia.gov.in", phone: "+91 11 2659 3642", verified: true };
+let institution: Institution = { name: "All India Institute of Ayurveda", initials: "AIIA", location: "New Delhi, India", type: "Government Institute", establishedYear: 2015, departments: ["Ayurveda", "Surgery", "Pharmacology", "Kayachikitsa", "Shalya Tantra", "Shaalakya Tantra"], totalStudents: 320, totalFaculty: 48, website: "https://aiia.gov.in", email: "admin@aiia.gov.in", phone: "+91 11 2659 3642", verified: true };
 
-const placements: PlacementRecord[] = [
+let placements: PlacementRecord[] = [
   { id: "pl-1", studentName: "Aarav Sharma", studentInitials: "AS", department: "Ayurveda", course: "BAMS", company: "AIIA Research Division", role: "Clinical Research Intern", type: "Internship", startDate: "Sept 2025", duration: "3 Months", stipend: "₹12,000/mo", status: "active" },
   { id: "pl-2", studentName: "Meera Joshi", studentInitials: "MJ", department: "Ayurveda", course: "BAMS", company: "NIA Jaipur", role: "AYUSH Research Intern", type: "Internship", startDate: "Aug 2025", duration: "2 Months", stipend: "₹8,000/mo", status: "completed" },
   { id: "pl-3", studentName: "Neha Gupta", studentInitials: "NG", department: "Pharmacology", course: "BPharm", company: "CCRAS", role: "Research Data Assistant", type: "Placement", startDate: "Aug 2025", duration: "6 Months", stipend: "₹15,000/mo", status: "active" },
@@ -27,7 +27,7 @@ const placements: PlacementRecord[] = [
   { id: "pl-5", studentName: "Ananya Reddy", studentInitials: "AR", department: "Kayachikitsa", course: "BAMS", company: "AIIA", role: "Clinical Assistant", type: "Placement", startDate: "Sept 2025", duration: "12 Months", stipend: "₹18,000/mo", status: "offered" },
 ];
 
-const departmentPlacements: DepartmentPlacement[] = [
+let departmentPlacements: DepartmentPlacement[] = [
   { department: "Ayurveda", totalStudents: 85, placed: 52, placementRate: 61, avgStipend: "₹11,000/mo", topCompany: "AIIA" },
   { department: "Surgery", totalStudents: 45, placed: 28, placementRate: 62, avgStipend: "₹13,000/mo", topCompany: "AIIMS" },
   { department: "Pharmacology", totalStudents: 60, placed: 41, placementRate: 68, avgStipend: "₹14,000/mo", topCompany: "CCRAS" },
@@ -36,7 +36,7 @@ const departmentPlacements: DepartmentPlacement[] = [
   { department: "Shaalakya Tantra", totalStudents: 35, placed: 18, placementRate: 51, avgStipend: "₹9,500/mo", topCompany: "NIA" },
 ];
 
-const skillMetrics: SkillMetric[] = [
+let skillMetrics: SkillMetric[] = [
   { name: "Python", verifiedCount: 120, selfDeclaredCount: 85, totalCount: 205, avgConfidence: 72, trend: "up" },
   { name: "Research Methodology", verifiedCount: 140, selfDeclaredCount: 60, totalCount: 200, avgConfidence: 68, trend: "stable" },
   { name: "Data Analysis", verifiedCount: 100, selfDeclaredCount: 90, totalCount: 190, avgConfidence: 65, trend: "up" },
@@ -45,7 +45,7 @@ const skillMetrics: SkillMetric[] = [
   { name: "Machine Learning", verifiedCount: 35, selfDeclaredCount: 50, totalCount: 85, avgConfidence: 38, trend: "up" },
 ];
 
-const readinessDist: ReadinessDistribution[] = [
+let readinessDist: ReadinessDistribution[] = [
   { department: "Ayurveda", beginning: 20, developing: 42, jobReady: 23, total: 85 },
   { department: "Surgery", beginning: 12, developing: 22, jobReady: 11, total: 45 },
   { department: "Pharmacology", beginning: 10, developing: 28, jobReady: 22, total: 60 },
@@ -54,7 +54,7 @@ const readinessDist: ReadinessDistribution[] = [
   { department: "Shaalakya Tantra", beginning: 10, developing: 18, jobReady: 7, total: 35 },
 ];
 
-const deptComparison: DepartmentComparison[] = [
+let deptComparison: DepartmentComparison[] = [
   { name: "Ayurveda", students: 85, avgSkills: 7.2, avgMatch: 83, avgReadiness: 68, placementRate: 61, verifiedPct: 58, topGap: "Statistical Analysis", internshipParticipation: 72 },
   { name: "Surgery", students: 45, avgSkills: 6.8, avgMatch: 78, avgReadiness: 62, placementRate: 62, verifiedPct: 55, topGap: "Machine Learning", internshipParticipation: 65 },
   { name: "Pharmacology", students: 60, avgSkills: 8.1, avgMatch: 88, avgReadiness: 75, placementRate: 68, verifiedPct: 65, topGap: "Data Analysis", internshipParticipation: 78 },
@@ -63,7 +63,7 @@ const deptComparison: DepartmentComparison[] = [
   { name: "Shaalakya Tantra", students: 35, avgSkills: 5.5, avgMatch: 68, avgReadiness: 55, placementRate: 51, verifiedPct: 42, topGap: "Clinical Research", internshipParticipation: 48 },
 ];
 
-const anomalies: AnomalyFlag[] = [
+let anomalies: AnomalyFlag[] = [
   { id: "an-1", studentName: "Ravi Kumar", studentInitials: "RK", department: "Ayurveda", type: "Duplicate Record", description: "Two identical internship records detected for same company/period.", severity: "high", status: "flagged", flaggedDate: "Sept 3, 2025", evidence: "Duplicate entries: AIIA internship Sept 2025 submitted twice." },
   { id: "an-2", studentName: "Priya Desai", studentInitials: "PD", department: "Pharmacology", type: "Statistical Outlier", description: "12 verified skills when dept average is 6.8.", severity: "medium", status: "reviewing", flaggedDate: "Sept 2, 2025", evidence: "12 verified skills vs dept avg 6.8. All added within 48 hours." },
   { id: "an-3", studentName: "Amit Verma", studentInitials: "AV", department: "Surgery", type: "Inconsistent Data", description: "Placement record shows company that closed 6 months ago.", severity: "high", status: "flagged", flaggedDate: "Sept 1, 2025", evidence: "Company 'HealthTech Solutions' closed March 2025." },
@@ -71,7 +71,7 @@ const anomalies: AnomalyFlag[] = [
   { id: "an-5", studentName: "Deepak Joshi", studentInitials: "DJ", department: "Shalya Tantra", type: "Duplicate Record", description: "Same certificate uploaded with different metadata.", severity: "low", status: "escalated", flaggedDate: "Aug 25, 2025", evidence: "NPTEL certificate hash matches existing record." },
 ];
 
-const reports: InstitutionalReport[] = [
+let reports: InstitutionalReport[] = [
   { id: "rpt-1", title: "Q3 2025 Placement Report", type: "Placement", period: "Jul - Sep 2025", generatedDate: "Sept 5, 2025", departments: ["All"], summary: "Overall placement rate improved to 58% from 52% in Q2.", keyFindings: ["Pharmacology leads with 68% placement rate", "Avg stipend increased 12% to ₹11,500/mo", "3 new industry partnerships established"], status: "ready" },
   { id: "rpt-2", title: "Skill Development Analysis", type: "Skill Development", period: "Aug 2025", generatedDate: "Sept 1, 2025", departments: ["All"], summary: "Python remains top verified skill. Statistical Analysis gap persists.", keyFindings: ["Python verified: 120 students (+15 from July)", "Statistical Analysis: only 45 verified out of 320", "ML skills showing fastest growth (+28% MoM)"], status: "ready" },
   { id: "rpt-3", title: "Department Performance", type: "Readiness", period: "Q3 2025", generatedDate: "Sept 3, 2025", departments: ["All"], summary: "Pharmacology shows best readiness. Shalya Tantra needs intervention.", keyFindings: ["Pharmacology avg readiness: 75% (highest)", "Shalya Tantra avg readiness: 58% (lowest)", "4 departments below 60% job-ready rate"], status: "ready" },
@@ -79,7 +79,20 @@ const reports: InstitutionalReport[] = [
   { id: "rpt-5", title: "Anomaly Investigation", type: "Anomaly", period: "Aug 2025", generatedDate: "Sept 2, 2025", departments: ["Ayurveda", "Pharmacology"], summary: "5 anomalies flagged, 1 resolved, 1 escalated.", keyFindings: ["2 high-severity pending review", "1 resolved (concurrent internship violation)", "1 escalated (duplicate certificate)"], status: "ready" },
 ];
 
-const analytics: InstitutionAnalytics = { totalStudents: 320, totalPlaced: 189, placementRate: 59, internshipRate: 72, avgReadiness: 64, avgSkills: 6.8, industryPartners: 12, monthlyTrend: [{ month: "May", placements: 8, internships: 12, verified: 45 }, { month: "Jun", placements: 10, internships: 15, verified: 52 }, { month: "Jul", placements: 12, internships: 18, verified: 60 }, { month: "Aug", placements: 15, internships: 22, verified: 72 }, { month: "Sep", placements: 12, internships: 20, verified: 68 }], skillGaps: [{ skill: "Statistical Analysis", gapCount: 215, pct: 67 }, { skill: "Machine Learning", gapCount: 235, pct: 73 }, { skill: "Data Management", gapCount: 180, pct: 56 }, { skill: "Clinical Research", gapCount: 170, pct: 53 }], industryEngagement: [{ company: "AIIA", opportunities: 8, hired: 6 }, { company: "CCRAS", opportunities: 6, hired: 8 }, { company: "AIIMS", opportunities: 5, hired: 4 }, { company: "MoHFW", opportunities: 4, hired: 3 }, { company: "NIA", opportunities: 3, hired: 2 }] };
+let analytics: InstitutionAnalytics = { totalStudents: 320, totalPlaced: 189, placementRate: 59, internshipRate: 72, avgReadiness: 64, avgSkills: 6.8, industryPartners: 12, monthlyTrend: [{ month: "May", placements: 8, internships: 12, verified: 45 }, { month: "Jun", placements: 10, internships: 15, verified: 52 }, { month: "Jul", placements: 12, internships: 18, verified: 60 }, { month: "Aug", placements: 15, internships: 22, verified: 72 }, { month: "Sep", placements: 12, internships: 20, verified: 68 }], skillGaps: [{ skill: "Statistical Analysis", gapCount: 215, pct: 67 }, { skill: "Machine Learning", gapCount: 235, pct: 73 }, { skill: "Data Management", gapCount: 180, pct: 56 }, { skill: "Clinical Research", gapCount: 170, pct: 53 }], industryEngagement: [{ company: "AIIA", opportunities: 8, hired: 6 }, { company: "CCRAS", opportunities: 6, hired: 8 }, { company: "AIIMS", opportunities: 5, hired: 4 }, { company: "MoHFW", opportunities: 4, hired: 3 }, { company: "NIA", opportunities: 3, hired: 2 }] };
+
+/** Server data entry point (called by the route-level LiveDashboard wrapper). */
+export function hydrateInstitutionDashboard(payload: InstitutionDashboard) {
+  institution = payload.institution;
+  placements = payload.placements;
+  departmentPlacements = payload.departmentPlacements;
+  skillMetrics = payload.skillMetrics;
+  readinessDist = payload.readinessDistribution;
+  deptComparison = payload.departmentComparison;
+  anomalies = payload.anomalies;
+  reports = payload.reports;
+  analytics = payload.analytics;
+}
 
 const navLinks = [
   { id: "overview", label: "Overview", icon: <LayoutDashboard size={18} /> },

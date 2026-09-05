@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Loader2, LogOut } from "lucide-react";
 import { useNavigate } from "react-router";
 
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/lib/django-auth";
 import { cn } from "@/lib/utils";
 
 /**
- * Sidebar "Log out" button used by all four dashboards. Signs the Convex
- * session out and returns to /login.
+ * Sidebar "Log out" button used by all four dashboards. Clears the Django JWT
+ * session and returns to /login.
  */
 export function SignOutButton({ open }: { open: boolean }) {
   const { signOut } = useAuth();
@@ -20,7 +20,7 @@ export function SignOutButton({ open }: { open: boolean }) {
     try {
       await signOut();
       navigate("/login", { replace: true });
-    } catch {
+    } finally {
       setBusy(false);
     }
   };

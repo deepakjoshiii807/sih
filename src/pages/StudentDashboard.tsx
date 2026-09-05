@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { DashboardError, DashboardLoader } from "@/components/ui/dashboard-state"; // P1
+import { subscribeDataChanged } from "@/lib/data-events";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 import { Sidebar, SidebarBody, Logo, LogoIcon, useSidebar } from "@/components/ui/sidebar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,12 +19,13 @@ import type {
   SimulatorAction, RecommendedProject, Opportunity, Application,
   LearningRecommendation, PortfolioProject, EvidenceItem,
 } from "@/lib/student-api";
+import type { PortfolioSummary, SkillPassport, StudentDashboard } from "@/lib/student-api";
 import { studentApi } from "@/lib/student-api";
 
 /* ─── Mock Data ─── */
-const student: Student = { id: "st-1", name: "Aarav Sharma", initials: "AS", email: "aarav.sharma@aiia.ac.in", phone: "+91 98765 43210", bio: "Third-year BAMS student with a strong interest in clinical research and evidence-based medicine.", institution: "All India Institute of Ayurveda", course: "BAMS", department: "Ayurveda Medicine", year: "3rd Year", graduationYear: 2027, location: "New Delhi", targetRole: "Clinical Research Intern", profileCompletion: 82 };
+let student: Student = { id: "st-1", name: "Aarav Sharma", initials: "AS", email: "aarav.sharma@aiia.ac.in", phone: "+91 98765 43210", bio: "Third-year BAMS student with a strong interest in clinical research and evidence-based medicine.", institution: "All India Institute of Ayurveda", course: "BAMS", department: "Ayurveda Medicine", year: "3rd Year", graduationYear: 2027, location: "New Delhi", targetRole: "Clinical Research Intern", profileCompletion: 82 };
 
-const skillPassport = { verifiedCount: 5, selfDeclaredCount: 3, totalEvidence: 12, verifiedEvidence: 8, items: [
+let skillPassport: SkillPassport = { verifiedCount: 5, selfDeclaredCount: 3, totalEvidence: 12, verifiedEvidence: 8, items: [
   { id: "sp-1", name: "Python", taxonomyId: "TC-PY-01", origin: "evidence" as const, confidence: 92, category: "Technical", evidence: { id: "ev-1", title: "Python for Research Certificate", kind: "Certificate" as const, issuer: "NPTEL", date: "Jul 2025", status: "verified" as const } },
   { id: "sp-2", name: "Machine Learning", taxonomyId: "TC-ML-01", origin: "evidence" as const, confidence: 86, category: "Technical", evidence: { id: "ev-2", title: "CVD Risk Prediction Model", kind: "Project" as const, issuer: "AIIA", date: "Jun 2025", status: "verified" as const } },
   { id: "sp-3", name: "Research Methodology", taxonomyId: "TC-RM-04", origin: "evidence" as const, confidence: 81, category: "Research", evidence: { id: "ev-3", title: "Academic Transcript", kind: "Transcript" as const, issuer: "AIIA", date: "Aug 2025", status: "verified" as const } },
@@ -33,7 +36,7 @@ const skillPassport = { verifiedCount: 5, selfDeclaredCount: 3, totalEvidence: 1
   { id: "sp-8", name: "Statistical Analysis", taxonomyId: "TC-SA-01", origin: "self-declared" as const, confidence: 45, category: "Technical" },
 ] };
 
-const roleReadiness: RoleReadinessProfile = { targetRole: "Clinical Research Intern", readiness: "Developing", readinessScore: 74, matchedSkills: 5, totalRequired: 8, strongSkills: ["Python", "Machine Learning", "Research Methodology"], missingSkills: ["Statistical Analysis"], weakSkills: ["Scientific Writing", "Clinical Research"], explanation: "You are Developing toward this role. Your Python and research skills are strong, but Statistical Analysis is missing and Scientific Writing needs improvement.", factors: [
+let roleReadiness: RoleReadinessProfile = { targetRole: "Clinical Research Intern", readiness: "Developing", readinessScore: 74, matchedSkills: 5, totalRequired: 8, strongSkills: ["Python", "Machine Learning", "Research Methodology"], missingSkills: ["Statistical Analysis"], weakSkills: ["Scientific Writing", "Clinical Research"], explanation: "You are Developing toward this role. Your Python and research skills are strong, but Statistical Analysis is missing and Scientific Writing needs improvement.", factors: [
   { label: "Verified skills match", value: "5 of 8 required skills verified", positive: true },
   { label: "Strong technical foundation", value: "Python 92%, ML 86%", positive: true },
   { label: "Missing critical skill", value: "Statistical Analysis not demonstrated", positive: false },
@@ -41,46 +44,60 @@ const roleReadiness: RoleReadinessProfile = { targetRole: "Clinical Research Int
   { label: "Evidence-backed", value: "74% of skills have supporting evidence", positive: true },
 ] };
 
-const gaps: SkillGap[] = [
+let gaps: SkillGap[] = [
   { id: "gp-1", taxonomyId: "TC-SA-01", name: "Statistical Analysis", current: 45, required: 75, severity: "High", evidenceNeeded: true },
   { id: "gp-2", taxonomyId: "TC-SW-02", name: "Scientific Writing", current: 64, required: 80, severity: "Medium", evidenceNeeded: false },
   { id: "gp-3", taxonomyId: "TC-CT-05", name: "Clinical Trial Documentation", current: 55, required: 75, severity: "Medium", evidenceNeeded: true },
 ];
 
-const simulatorActions: SimulatorAction[] = [
+let simulatorActions: SimulatorAction[] = [
   { type: "course", name: "Statistics for Health Research", description: "Complete NPTEL course on statistical methods", skillsImproved: [{ skill: "Statistical Analysis", currentConfidence: 45, projectedConfidence: 72 }], readinessChange: { from: 74, to: 83, fromLabel: "Developing", toLabel: "Developing" } },
   { type: "project", name: "Clinical Data Analysis Project", description: "Analyze real clinical trial dataset using Python and statistical methods", skillsImproved: [{ skill: "Statistical Analysis", currentConfidence: 45, projectedConfidence: 78 }, { skill: "Data Analysis", currentConfidence: 76, projectedConfidence: 84 }], readinessChange: { from: 74, to: 88, fromLabel: "Developing", toLabel: "Job-Ready" } },
   { type: "certification", name: "GCP Certification", description: "Obtain Good Clinical Practice certification", skillsImproved: [{ skill: "Clinical Trial Documentation", currentConfidence: 55, projectedConfidence: 78 }], readinessChange: { from: 74, to: 81, fromLabel: "Developing", toLabel: "Developing" } },
 ];
 
-const recommendedProjects: RecommendedProject[] = [
+let recommendedProjects: RecommendedProject[] = [
   { id: "rp-1", title: "Clinical Data Statistical Analysis", description: "Analyze a provided clinical trial dataset. Apply appropriate statistical tests, create visualizations, and write a brief findings report.", targetSkill: "Statistical Analysis", skillGapId: "gp-1", difficulty: "Intermediate", estimatedDuration: "3 weeks", deliverables: ["Jupyter notebook", "Statistical test results", "Charts", "Findings report"], verificationCriteria: ["Correct methodology", "Reproducible code", "Clear visualizations"], submissionStatus: "not submitted" },
   { id: "rp-2", title: "Herbal Drug Efficacy Literature Review", description: "Conduct a systematic literature review on the efficacy of a chosen Ayurvedic formulation.", targetSkill: "Scientific Writing", skillGapId: "gp-2", difficulty: "Beginner", estimatedDuration: "2 weeks", deliverables: ["Literature review", "Reference list", "Summary tables"], verificationCriteria: ["Proper citations", "Structured methodology"], submissionStatus: "not submitted" },
 ];
 
-const opportunities: Opportunity[] = [
+let opportunities: Opportunity[] = [
   { id: "op-1", title: "Clinical Research Intern", type: "Internship", org: "AIIA / Research Division", location: "New Delhi", duration: "3 Months", stipend: "₹12,000/month", deadline: "Sept 30, 2025", match: 92, matchedSkills: ["Python", "Research Methodology", "Data Analysis"], missingSkills: ["Statistical Analysis"], requiredSkills: ["Python", "Research Methodology", "Data Analysis", "Statistical Analysis"], description: "Work on ongoing clinical trials in Ayurvedic pharmacology.", workArrangement: "On-site", openings: 4 },
   { id: "op-2", title: "Research Data Assistant", type: "Part-time", org: "CCRAS / New Delhi", location: "New Delhi", duration: "6 Months", stipend: "₹15,000/month", deadline: "Oct 15, 2025", match: 85, matchedSkills: ["Python", "Data Analysis", "Machine Learning"], missingSkills: [], requiredSkills: ["Python", "Data Analysis", "Statistical Analysis"], description: "Assist in cleaning and analyzing clinical trial data.", workArrangement: "Hybrid", openings: 2 },
   { id: "op-3", title: "AYUSH Research Internship", type: "Internship", org: "NIA / Jaipur", location: "Jaipur", duration: "2 Months", stipend: "₹8,000/month", deadline: "Sept 20, 2025", match: 78, matchedSkills: ["Research Methodology", "Clinical Research"], missingSkills: ["Statistical Analysis"], requiredSkills: ["Research", "Data Analysis", "Clinical Research"], description: "Support field research on AYUSH healthcare delivery.", workArrangement: "On-site", openings: 3 },
 ];
 
-const applications: Application[] = [
+let applications: Application[] = [
   { id: "ap-1", opportunityId: "op-1", role: "Clinical Research Intern", org: "AIIA Research Division", stage: "shortlisted", stageLabel: "Shortlisted", status: "Interview scheduled", nextStep: "Interview: Sept 10", match: 92, appliedDate: "Sept 3, 2025" },
   { id: "ap-2", opportunityId: "op-2", role: "Research Data Assistant", org: "CCRAS", stage: "interviewed", stageLabel: "Interviewed", status: "Awaiting decision", match: 88, appliedDate: "Aug 25, 2025" },
   { id: "ap-3", opportunityId: "op-3", role: "AYUSH Research Internship", org: "NIA Jaipur", stage: "applied", stageLabel: "Applied", status: "Submitted 2 days ago", match: 78, appliedDate: "Sept 4, 2025" },
 ];
 
-const recommendations: LearningRecommendation[] = [
+let recommendations: LearningRecommendation[] = [
   { id: "rc-1", closesGap: "Statistical Analysis", title: "Statistics for Health Research", type: "Course", provider: "NPTEL", duration: "8 weeks", rating: 4.6, why: "Directly addresses your Statistical Analysis gap.", projectedImprovement: 27 },
   { id: "rc-2", closesGap: "Scientific Writing", title: "Scientific Writing Fundamentals", type: "Course", provider: "Coursera", duration: "4 weeks", rating: 4.8, why: "Builds the writing skills your target role lists as required.", projectedImprovement: 18 },
   { id: "rc-3", closesGap: "Clinical Trial Documentation", title: "GCP & Clinical Trial Basics", type: "Workshop", provider: "AIIA", duration: "2 days", rating: 4.7, why: "Hands-on practice with trial documentation.", projectedImprovement: 23 },
 ];
 
-const portfolioData = { projects: 4, certificates: 6, verifiedSkills: 18, internshipHours: 240, achievements: 3, featured: [
+let portfolioData: PortfolioSummary = { projects: 4, certificates: 6, verifiedSkills: 18, internshipHours: 240, achievements: 3, featured: [
   { id: "pf-1", title: "Rural Health Data Survey", description: "Analyzed health data from 500+ rural households", skills: ["Python", "Data Analysis"], date: "May 2025" },
   { id: "pf-2", title: "CVD Risk Prediction Model", description: "ML model predicting cardiovascular risk from Ayurvedic markers", skills: ["Machine Learning", "Python"], date: "Jun 2025" },
   { id: "pf-3", title: "Herbal Safety Database", description: "Searchable database of 200+ herb-drug interactions", skills: ["Data Analysis", "Documentation"], date: "Apr 2025" },
 ] };
+
+/** Server data entry point (called by the route-level LiveDashboard wrapper). */
+export function hydrateStudentDashboard(payload: StudentDashboard) {
+  student = payload.student;
+  skillPassport = payload.skillPassport;
+  roleReadiness = payload.roleReadiness;
+  gaps = payload.gaps;
+  simulatorActions = payload.simulator.actions;
+  recommendedProjects = payload.recommendedProjects;
+  opportunities = payload.opportunities;
+  applications = payload.applications;
+  recommendations = payload.recommendations;
+  portfolioData = payload.portfolio;
+}
 
 const navLinks = [
   { id: "overview", label: "Overview", icon: <LayoutDashboard size={18} /> },
@@ -144,7 +161,7 @@ function OverviewSection() {
     { label: "Skill Gap", active: true }, { label: "Match" }, { label: "Opportunity" },
   ];
 
-  const bestMatch = opportunities[0];
+  const bestMatch = opportunities[0]; // P149
 
   return (
     <div className="flex flex-col gap-5">
@@ -344,7 +361,7 @@ function OverviewSection() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   PROFILE SECTION
+   PROFILE SECTION // P350
    ═══════════════════════════════════════════════════════ */
 function ProfileSection() {
   return (

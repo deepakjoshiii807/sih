@@ -1,9 +1,8 @@
 import '@vly-ai/integrations';
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/lib/django-auth";
 import { VlyToolbar } from '../vly-toolbar-readonly.tsx';
-import { ConvexAuthProvider } from "@convex-dev/auth/react";
-import { ConvexReactClient } from "convex/react";
-import React, { StrictMode } from "react";
+import { Component, StrictMode, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
 import "./index.css";
@@ -11,38 +10,35 @@ import "./index.css";
 import AuthPage from "./pages/Auth.tsx";
 import LoginPage from "./pages/Login.tsx";
 import RequireRole from "./components/RequireRole.tsx";
-import StudentDashboard from "./pages/StudentDashboard.tsx";
-import FacultyDashboard from "./pages/FacultyDashboard.tsx";
-import IndustryDashboard from "./pages/IndustryDashboard.tsx";
-import InstitutionDashboard from "./pages/InstitutionDashboard.tsx";
+import {
+  LiveStudentDashboard,
+  LiveFacultyDashboard,
+  LiveIndustryDashboard,
+  LiveInstitutionDashboard,
+} from "./components/live/role-dashboards.tsx";
 
-class ToolbarErrorBoundary extends React.Component<
-  { children: React.ReactNode }, { hasError: boolean }
+class ToolbarErrorBoundary extends Component<
+  { children: ReactNode }, { hasError: boolean }
 > {
   state = { hasError: false };
   static getDerivedStateFromError() { return { hasError: true }; }
   render() { return this.state.hasError ? null : this.props.children; }
 }
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ToolbarErrorBoundary>
-      <VlyToolbar />
-    </ToolbarErrorBoundary>
-    <ConvexAuthProvider client={convex}>
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
         <Route path="/" element={<AuthPage />} />
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Authenticated, role-scoped dashboards */}
+        {/* Authenticated, role-scoped dashboards (Django JWT) */}
         <Route
           path="/student"
           element={
             <RequireRole role="student">
-              <StudentDashboard />
+              <LiveStudentDashboard />
             </RequireRole>
           }
         />
@@ -50,7 +46,7 @@ createRoot(document.getElementById("root")!).render(
           path="/faculty"
           element={
             <RequireRole role="academician">
-              <FacultyDashboard />
+              <LiveFacultyDashboard />
             </RequireRole>
           }
         />
@@ -58,7 +54,7 @@ createRoot(document.getElementById("root")!).render(
           path="/academician"
           element={
             <RequireRole role="academician">
-              <FacultyDashboard />
+              <LiveFacultyDashboard />
             </RequireRole>
           }
         />
@@ -66,7 +62,7 @@ createRoot(document.getElementById("root")!).render(
           path="/industry"
           element={
             <RequireRole role="industry">
-              <IndustryDashboard />
+              <LiveIndustryDashboard />
             </RequireRole>
           }
         />
@@ -74,14 +70,17 @@ createRoot(document.getElementById("root")!).render(
           path="/institution-admin"
           element={
             <RequireRole role="institutionAdmin">
-              <InstitutionDashboard />
+              <LiveInstitutionDashboard />
             </RequireRole>
           }
         />
 
         </Routes>
       </BrowserRouter>
+      <ToolbarErrorBoundary>
+        <VlyToolbar />
+      </ToolbarErrorBoundary>
       <Toaster />
-    </ConvexAuthProvider>
+    </AuthProvider>
   </StrictMode>,
 );
