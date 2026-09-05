@@ -67,7 +67,6 @@ const navLinks = [
   { id: "analytics", label: "Analytics", icon: <BarChart3 size={18} /> },
   { id: "sla", label: "SLA Tracker", icon: <Clock size={18} /> },
   { id: "ratings", label: "Ratings", icon: <Star size={18} /> },
-  { id: "settings", label: "Settings", icon: <Settings size={18} /> },
 ];
 
 /* ─── Pixel Bar ─── */
