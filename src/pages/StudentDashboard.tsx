@@ -585,20 +585,53 @@ function SimulatorSection() {
    PROJECTS SECTION (Skill-to-Project Loop)
    ═══════════════════════════════════════════════════════ */
 function ProjectsSection() {
+  const [projectStatus, setProjectStatus] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState<string | null>(null);
+  const [description, setDescription] = useState("");
+
+  const handleStart = (id: string) => {
+    setProjectStatus(prev => ({ ...prev, [id]: "in-progress" }));
+  };
+
+  const handleSubmit = (id: string) => {
+    setSubmitting(id);
+    setTimeout(() => {
+      setProjectStatus(prev => ({ ...prev, [id]: "submitted" }));
+      setSubmitting(null);
+      setDescription("");
+    }, 1500);
+  };
+
+  const statusLabel = (id: string) => {
+    const s = projectStatus[id];
+    if (s === "submitted") return "Submitted";
+    if (s === "in-progress") return "In Progress";
+    return "Not started";
+  };
+
+  const statusCls = (id: string) => {
+    const s = projectStatus[id];
+    if (s === "submitted") return "verified";
+    if (s === "in-progress") return "medium";
+    return "applied";
+  };
+
   return (
     <div className="flex flex-col gap-5">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#E6E3D7", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
         <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #C98B5F, #E8D36B)" }} />
         <Eyebrow color="#C98B5F">Skill-to-Project Loop</Eyebrow>
-        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1">Recommended Projects</div>
-        <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Each project targets a specific skill gap. Complete it to earn verified evidence.</p>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-1" style={{ color: "#171A18" }}>Recommended Projects</div>
+        <p className="text-xs mb-5" style={{ color: "#6B6F68" }}>Each project targets a specific skill gap. Complete it to earn verified evidence for your Skill Passport.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {recommendedProjects.map((proj) => (
+          {recommendedProjects.map((proj) => {
+            const status = projectStatus[proj.id];
+            return (
             <div key={proj.id} className="rounded-xl border p-5 hover:shadow-md transition-shadow" style={{ borderColor: "#DED6EC", background: "linear-gradient(180deg, #FDFCFA 0%, #FAF8FD 100%)" }}>
               <div className="flex items-center justify-between mb-2">
                 <Tag cls="lavender">{proj.targetSkill}</Tag>
-                <Tag cls={proj.difficulty === "Beginner" ? "low" : "medium"}>{proj.difficulty}</Tag>
+                <div className="flex items-center gap-2"><Tag cls={proj.difficulty === "Beginner" ? "low" : "medium"}>{proj.difficulty}</Tag><Tag cls={statusCls(proj.id)}>{statusLabel(proj.id)}</Tag></div>
               </div>
               <div className="font-semibold text-[16px] mb-1" style={{ color: "#171A18" }}>{proj.title}</div>
               <p className="text-xs mb-3" style={{ color: "#6B6F68" }}>{proj.description}</p>
@@ -608,22 +641,41 @@ function ProjectsSection() {
               </div>
               <div className="mb-3">
                 <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: "#9A9D94" }}>Deliverables</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {proj.deliverables.map((d) => <span key={d} className="text-[10px] font-medium px-2 py-0.5 rounded-md" style={{ background: "#EDEBE0", color: "#6B6F68" }}>{d}</span>)}
-                </div>
+                <div className="flex flex-wrap gap-1.5">{proj.deliverables.map((d) => <span key={d} className="text-[10px] font-medium px-2 py-0.5 rounded-md" style={{ background: "#EDEBE0", color: "#6B6F68" }}>{d}</span>)}</div>
               </div>
               <div className="mb-3">
                 <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: "#9A9D94" }}>Verification Criteria</div>
-                <div className="flex flex-col gap-1">
-                  {proj.verificationCriteria.map((c) => <div key={c} className="flex items-center gap-1.5 text-xs" style={{ color: "#6B6F68" }}><Check size={11} style={{ color: "#244B35" }} /> {c}</div>)}
-                </div>
+                <div className="flex flex-col gap-1">{proj.verificationCriteria.map((c) => <div key={c} className="flex items-center gap-1.5 text-xs" style={{ color: "#6B6F68" }}><Check size={11} style={{ color: "#244B35" }} /> {c}</div>)}</div>
               </div>
-              <div className="flex items-center justify-between">
-                <Tag cls={proj.submissionStatus === "not submitted" ? "applied" : "verified"}>{proj.submissionStatus === "not submitted" ? "Not submitted" : proj.submissionStatus}</Tag>
-                <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white transition-all hover:shadow-md hover:scale-[1.02]" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)" }}>Start project</button>
+
+              {/* Submission Flow */}
+              {status === "in-progress" && (
+                <div className="mt-3 p-3 rounded-xl border" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+                  <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "#9A9D94" }}>Submit Evidence</div>
+                  <textarea className="w-full rounded-lg border px-3 py-2 text-sm outline-none mb-2" style={{ borderColor: "#E6E3D7", background: "#fff", color: "#171A18", minHeight: 60 }} placeholder="Describe your project and upload files..." value={description} onChange={e => setDescription(e.target.value)} />
+                  <div className="flex items-center gap-2 mb-2">
+                    <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-lg border transition-all hover:bg-[#F0F5EC]" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}><Upload size={12} /> Upload files</button>
+                    <span className="font-mono text-[10px]" style={{ color: "#9A9D94" }}>PDF, images, code files</span>
+                  </div>
+                  <button onClick={() => handleSubmit(proj.id)} disabled={!description.trim() || submitting === proj.id} className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white transition-all hover:shadow-md disabled:opacity-50" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)" }}>{submitting === proj.id ? "Submitting..." : "Submit for Review"}</button>
+                </div>
+              )}
+
+              {status === "submitted" && (
+                <div className="mt-3 p-3 rounded-xl" style={{ background: "#F0F5EC" }}>
+                  <div className="flex items-center gap-2"><Check size={14} style={{ color: "#244B35" }} /><span className="font-semibold text-sm" style={{ color: "#244B35" }}>Submitted for review</span></div>
+                  <p className="text-xs mt-1" style={{ color: "#6B6F68" }}>Awaiting academician verification. You will be notified when reviewed.</p>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mt-3 pt-3 border-t" style={{ borderColor: "#EDEBE0" }}>
+                <Tag cls={statusCls(proj.id)}>{statusLabel(proj.id)}</Tag>
+                {!status && <button onClick={() => handleStart(proj.id)} className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white transition-all hover:shadow-md hover:scale-[1.02]" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)" }}>Start project</button>}
+                {status === "in-progress" && <button onClick={() => handleSubmit(proj.id)} disabled={!description.trim() || submitting === proj.id} className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white transition-all hover:shadow-md disabled:opacity-50" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)" }}>{submitting === proj.id ? "Submitting..." : "Submit"}</button>}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </motion.div>
     </div>
@@ -666,7 +718,7 @@ function OpportunitiesSection() {
               </div>
               <div className="font-mono text-[10px] mb-3" style={{ color: "#6B6F68" }}>Deadline: {opp.deadline}</div>
               <div className="flex gap-3">
-                <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white transition-all hover:shadow-md hover:scale-[1.02]" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)" }}>Apply now</button>
+                <button onClick={() => { const el = document.createElement("div"); el.className = "fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-white font-semibold text-sm shadow-lg"; el.style.background = "#244B35"; el.textContent = "Application submitted!"; document.body.appendChild(el); setTimeout(() => el.remove(), 3000); }} className="font-mono text-xs font-bold px-4 py-2 rounded-lg text-white transition-all hover:shadow-md hover:scale-[1.02]" style={{ background: "linear-gradient(135deg, #244B35, #1C3D2B)" }}>Apply now</button>
                 <button className="font-mono text-xs font-bold px-4 py-2 rounded-lg border" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>Details</button>
               </div>
             </div>
@@ -920,11 +972,17 @@ export default function StudentDashboard() {
 
       <main className="flex-1 h-screen overflow-y-auto">
         <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-6 md:py-8">
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-            <h1 className="font-semibold text-[22px] md:text-[26px] tracking-tight" style={{ color: "#171A18" }}>
-              {activeNav === "overview" ? `${greeting}, ${student.name.split(" ")[0]}.` : titleMap[activeNav]}
-            </h1>
-            {activeNav === "overview" && <p className="text-sm mt-0.5" style={{ color: "#6B6F68" }}>Here is what your skill journey looks like today.</p>}
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex items-start justify-between">
+            <div>
+              <h1 className="font-semibold text-[22px] md:text-[26px] tracking-tight" style={{ color: "#171A18" }}>
+                {activeNav === "overview" ? `${greeting}, ${student.name.split(" ")[0]}.` : titleMap[activeNav]}
+              </h1>
+              {activeNav === "overview" && <p className="text-sm mt-0.5" style={{ color: "#6B6F68" }}>Here is what your skill journey looks like today.</p>}
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2 border rounded-xl px-3 py-2 bg-white" style={{ borderColor: "#E6E3D7" }}><Search size={14} style={{ color: "#9A9D94" }} /><input type="text" placeholder="Search skills, opportunities..." className="border-none outline-none bg-transparent text-[13px] w-48" style={{ color: "#171A18" }} /></div>
+              <button className="relative w-9 h-9 rounded-xl border bg-white flex items-center justify-center hover:bg-[#EFEDE3] transition-colors" style={{ borderColor: "#E6E3D7" }}><Bell size={16} /><span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style={{ background: "#C98B5F" }} /></button>
+            </div>
           </motion.div>
 
           <div className="mt-6">

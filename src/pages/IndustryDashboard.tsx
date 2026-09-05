@@ -67,6 +67,7 @@ const navLinks = [
   { id: "analytics", label: "Analytics", icon: <BarChart3 size={18} /> },
   { id: "sla", label: "SLA Tracker", icon: <Clock size={18} /> },
   { id: "ratings", label: "Ratings", icon: <Star size={18} /> },
+  { id: "completion", label: "Completion", icon: <Check size={18} /> },
 ];
 
 /* ─── Pixel Bar ─── */
@@ -558,6 +559,134 @@ function SettingsSection() {
   );
 }
 
+
+/* ═══════════════════════════════════════════════════════
+   INTERNETSHIP COMPLETION & RATING
+   ═══════════════════════════════════════════════════════ */
+function CompletionSection() {
+  const [rating, setRating] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const completions = [
+    { id: 1, student: "Meera Joshi", initials: "MJ", role: "Clinical Research Intern", duration: "3 Months", status: "completed", startDate: "Jun 2025", endDate: "Aug 2025" },
+    { id: 2, student: "Rohan Patel", initials: "RP", role: "AYUSH Research Intern", duration: "2 Months", status: "completed", startDate: "Jul 2025", endDate: "Aug 2025" },
+    { id: 3, student: "Aarav Sharma", initials: "AS", role: "Clinical Research Intern", duration: "3 Months", status: "active", startDate: "Sept 2025", endDate: "Dec 2025" },
+  ];
+
+  return (
+    <div className="flex flex-col gap-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-[18px] border p-6 bg-white relative overflow-hidden" style={{ borderColor: "#D6E3CE", boxShadow: "0 1px 3px rgba(0,0,0,.04)" }}>
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: "linear-gradient(90deg, #244B35, #DCE6D0)" }} />
+        <Eyebrow color="#244B35">Completion & Rating</Eyebrow>
+        <div className="font-semibold text-[22px] tracking-tight mt-2 mb-5" style={{ color: "#171A18" }}>Internship Completion</div>
+
+        <div className="flex flex-col gap-4">
+          {completions.map((c) => (
+            <div key={c.id} className="rounded-xl border p-5 hover:shadow-md transition-shadow" style={{ borderColor: c.status === "completed" ? "#DCE6D0" : "#E6E3D7", background: c.status === "completed" ? "linear-gradient(180deg, #FDFCFA 0%, #F0F5EC 100%)" : "linear-gradient(180deg, #FDFCFA 0%, #FAFCF7 100%)" }}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm" style={{ background: c.status === "completed" ? "#DCE6D0" : "#EDEBE0", color: c.status === "completed" ? "#244B35" : "#171A18" }}>{c.initials}</div>
+                  <div><div className="font-bold text-[15px]" style={{ color: "#171A18" }}>{c.student}</div><div className="font-mono text-[11px]" style={{ color: "#6B6F68" }}>{c.role} / {c.duration}</div></div>
+                </div>
+                <Tag cls={c.status}>{c.status}</Tag>
+              </div>
+              <div className="flex items-center gap-3 font-mono text-[11px] mb-3" style={{ color: "#6B6F68" }}>
+                <span>{c.startDate} - {c.endDate}</span>
+              </div>
+
+              {c.status === "completed" && !submitted && (
+                <div className="mt-3 p-4 rounded-xl border" style={{ borderColor: "#E6E3D7", background: "#FAFAF7" }}>
+                  <div className="font-semibold text-sm mb-3" style={{ color: "#171A18" }}>Rate this intern</div>
+                  <div className="flex items-center gap-1 mb-3">
+                    {[1,2,3,4,5].map((star) => (
+                      <button key={star} onClick={() => setRating(star)} className="transition-transform hover:scale-110">
+                        <Star size={24} style={{ color: star <= rating ? "#E8D36B" : "#E6E3D7", fill: star <= rating ? "#E8D36B" : "none" }} />
+                      </button>
+                    ))}
+                  </div>
+                  <textarea className="w-full rounded-lg border px-3 py-2 text-sm outline-none mb-3" style={{ borderColor: "#E6E3D7", background: "#fff", color: "#171A18", minHeight: 60 }} placeholder="Provide performance feedback..." value={feedback} onChange={e => setFeedback(e.target.value)} />
+                  <button onClick={() => { setSubmitted(true); }} disabled={!rating} className="font-semibold text-[12px] px-4 py-2 rounded-lg text-white transition-all hover:shadow-md disabled:opacity-50" style={{ background: "#244B35" }}>Submit Rating</button>
+                </div>
+              )}
+
+              {submitted && (
+                <div className="mt-3 p-3 rounded-xl" style={{ background: "#F0F5EC" }}>
+                  <div className="flex items-center gap-2"><Check size={14} style={{ color: "#244B35" }} /><span className="font-semibold text-sm" style={{ color: "#244B35" }}>Rating submitted</span></div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   OPPORTUNITY DETAIL MODAL
+   ═══════════════════════════════════════════════════════ */
+function OpportunityDetailModal({ opp, onClose }: { opp: typeof opportunities[0]; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.4)" }} onClick={onClose}>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-lg rounded-2xl p-6 bg-white shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <Tag cls={opp.status}>{opp.status}</Tag>
+          <button onClick={onClose} className="text-[#6B6F68] hover:text-[#171A18] text-xl">&times;</button>
+        </div>
+        <div className="font-bold text-xl mb-1" style={{ color: "#171A18" }}>{opp.title}</div>
+        <div className="text-sm mb-3" style={{ color: "#6B6F68" }}>{opp.type}</div>
+        <p className="text-sm mb-4" style={{ color: "#6B6F68" }}>{opp.description}</p>
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {[{ label: "Location", value: opp.location }, { label: "Duration", value: opp.duration }, { label: "Stipend", value: opp.stipend }, { label: "Openings", value: opp.openings }, { label: "Work", value: opp.workArrangement }, { label: "Deadline", value: opp.deadline }].map((f) => (
+            <div key={f.label} className="p-2 rounded-lg" style={{ background: "#FAFAF7" }}><div className="font-mono text-[9px] tracking-widest uppercase" style={{ color: "#9A9D94" }}>{f.label}</div><div className="font-semibold text-sm" style={{ color: "#171A18" }}>{f.value}</div></div>
+          ))}
+        </div>
+        <div className="mb-4">
+          <div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "#9A9D94" }}>Required Skills</div>
+          <div className="flex flex-wrap gap-1.5">{opp.requiredSkills.map(sk => <Tag key={sk.skill} cls={sk.required === "essential" ? "verified" : "applied"}>{sk.skill}</Tag>)}</div>
+        </div>
+        {opp.eligibility && <div className="mb-4"><div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "#9A9D94" }}>Eligibility</div><div className="text-sm" style={{ color: "#6B6F68" }}>{opp.eligibility.qualification} / {opp.eligibility.experience}</div></div>}
+        {opp.blindShortlisting && <div className="mb-4"><Tag cls="lavender">Blind Shortlisting Enabled</Tag><div className="text-xs mt-1" style={{ color: "#6B6F68" }}>Your institution identity will be hidden during initial screening.</div></div>}
+        <div className="flex gap-3"><button className="font-semibold text-[13px] px-5 py-2.5 rounded-xl text-white transition-all hover:shadow-md" style={{ background: "#244B35" }}>Apply Now</button><button onClick={onClose} className="font-semibold text-[13px] px-5 py-2.5 rounded-xl border transition-all hover:bg-[#FAFAF7]" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>Close</button></div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   CANDIDATE DETAIL MODAL
+   ═══════════════════════════════════════════════════════ */
+function CandidateDetailModal({ app, onClose }: { app: typeof applications[0]; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.4)" }} onClick={onClose}>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-lg rounded-2xl p-6 bg-white shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg" style={{ background: "#EDEBE0", color: "#171A18" }}>{app.candidate.initials}</div>
+            <div><div className="font-bold text-lg" style={{ color: "#171A18" }}>{app.candidate.name}</div><div className="font-mono text-[11px]" style={{ color: "#6B6F68" }}>{app.candidate.course} / {app.candidate.year} / {app.candidate.institution}</div></div>
+          </div>
+          <button onClick={onClose} className="text-[#6B6F68] hover:text-[#171A18] text-xl">&times;</button>
+        </div>
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="rounded-lg p-3 text-center" style={{ background: "#EAE3F4" }}><div className="font-bold text-xl" style={{ color: "#4A2D7A" }}>{app.candidate.verifiedSkills}</div><div className="font-mono text-[9px]" style={{ color: "#9A9D94" }}>Verified</div></div>
+          <div className="rounded-lg p-3 text-center" style={{ background: "#EDEBE0" }}><div className="font-bold text-xl" style={{ color: "#171A18" }}>{app.candidate.certifications}</div><div className="font-mono text-[9px]" style={{ color: "#9A9D94" }}>Certs</div></div>
+          <div className="rounded-lg p-3 text-center" style={{ background: "#DCE6D0" }}><div className="font-bold text-xl" style={{ color: "#244B35" }}>{app.candidate.readinessScore}%</div><div className="font-mono text-[9px]" style={{ color: "#9A9D94" }}>Readiness</div></div>
+        </div>
+        <div className="mb-4"><div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "#9A9D94" }}>Skills</div>{app.candidate.skills.map(sk => (
+          <div key={sk.name} className="flex items-center justify-between py-1.5"><span className="text-sm" style={{ color: "#171A18" }}>{sk.name}{sk.verified && <span className="ml-1 text-[10px]" style={{ color: "#244B35" }}>verified</span>}</span><span className="font-mono text-xs font-bold" style={{ color: "#6B6F68" }}>{sk.confidence}%</span></div>
+        ))}</div>
+        <div className="mb-4"><div className="font-mono text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: "#9A9D94" }}>Evidence</div>{app.candidate.evidence.map(ev => (
+          <div key={ev.title} className="flex items-center gap-2 py-1.5 text-sm" style={{ color: "#6B6F68" }}><Check size={12} style={{ color: ev.verified ? "#244B35" : "#9A9D94" }} />{ev.title} / {ev.issuer}</div>
+        ))}</div>
+        <div className="mb-4"><Tag cls={app.candidate.roleReadiness === "Ready" ? "verified" : "warning"}>{app.candidate.roleReadiness}</Tag><span className="ml-2 font-mono text-xs" style={{ color: "#6B6F68" }}>Match: {app.matchScore}%</span></div>
+        <button onClick={onClose} className="font-semibold text-[13px] px-5 py-2.5 rounded-xl border transition-all hover:bg-[#FAFAF7]" style={{ borderColor: "#E6E3D7", color: "#6B6F68" }}>Close</button>
+      </motion.div>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════
    MAIN DASHBOARD
    ═══════════════════════════════════════════════════════ */
@@ -575,6 +704,7 @@ export default function IndustryDashboard() {
       case "analytics": return <AnalyticsSection />;
       case "sla": return <SLASection />;
       case "ratings": return <RatingsSection />;
+      case "completion": return <CompletionSection />;
       case "settings": return <SettingsSection />;
       default: return <OverviewSection />;
     }
@@ -583,7 +713,7 @@ export default function IndustryDashboard() {
   const pageTitle: Record<string, string> = {
     overview: "Industry Dashboard", profile: "Company Profile", opportunities: "Opportunities",
     applications: "Applications", matching: "Candidate Matching", analytics: "Analytics",
-    sla: "SLA Tracker", ratings: "Ratings", settings: "Settings",
+    sla: "SLA Tracker", ratings: "Ratings", completion: "Completion & Rating", settings: "Settings",
   };
 
   return (

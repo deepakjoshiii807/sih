@@ -525,7 +525,7 @@ function ReportsSection() {
               </div>
               <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: "#EDEBE0" }}>
                 <div className="flex items-center gap-2">{r.departments.map(d => <Tag key={d} cls="active">{d}</Tag>)}</div>
-                <span className="font-mono text-[11px]" style={{ color: "#9A9D94" }}>Generated: {r.generatedDate}</span>
+                <div className="flex items-center gap-2"><span className="font-mono text-[11px]" style={{ color: "#9A9D94" }}>Generated: {r.generatedDate}</span><button onClick={() => { const el = document.createElement("div"); el.className = "fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-white font-semibold text-sm shadow-lg"; el.style.background = "#244B35"; el.textContent = "Report downloaded!"; document.body.appendChild(el); setTimeout(() => el.remove(), 3000); }} className="font-semibold text-[11px] px-3 py-1.5 rounded-lg transition-all hover:shadow-sm" style={{ background: "#DCE6D0", color: "#16301F" }}>Download PDF</button></div>
               </div>
             </div>
           ))}
@@ -742,11 +742,17 @@ export default function InstitutionDashboard() {
 
       <main className="flex-1 h-screen overflow-y-auto">
         <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-6 md:py-8">
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex items-start justify-between">
+            <div>
             <h1 className="font-semibold text-[22px] md:text-[26px] tracking-tight" style={{ color: "#171A18" }}>
               {activeNav === "overview" ? `${institution.name}` : titleMap[activeNav]}
             </h1>
             {activeNav === "overview" && <p className="text-sm mt-0.5" style={{ color: "#6B6F68" }}>Institution-wide monitoring and analytics.</p>}
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2 border rounded-xl px-3 py-2 bg-white" style={{ borderColor: "#E6E3D7" }}><Search size={14} style={{ color: "#9A9D94" }} /><input type="text" placeholder="Search departments, students..." className="border-none outline-none bg-transparent text-[13px] w-48" style={{ color: "#171A18" }} /></div>
+              <button className="relative w-9 h-9 rounded-xl border bg-white flex items-center justify-center hover:bg-[#EFEDE3] transition-colors" style={{ borderColor: "#E6E3D7" }}><Bell size={16} /><span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style={{ background: "#C98B5F" }} /></button>
+            </div>
           </motion.div>
           <div className="mt-6">
             <AnimatePresence mode="wait">

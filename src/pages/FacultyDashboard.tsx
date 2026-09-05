@@ -747,11 +747,17 @@ export default function FacultyDashboard() {
 
       <main className="flex-1 h-screen overflow-y-auto">
         <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-6 md:py-8">
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex items-start justify-between">
+            <div>
             <h1 className="font-semibold text-[22px] md:text-[26px] tracking-tight" style={{ color: "#171A18" }}>
               {activeNav === "overview" ? `${greeting}, ${academician.name.split(" ")[1]}.` : titleMap[activeNav]}
             </h1>
             {activeNav === "overview" && <p className="text-sm mt-0.5" style={{ color: "#6B6F68" }}>Bridge the gap between industry needs and student skills.</p>}
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2 border rounded-xl px-3 py-2 bg-white" style={{ borderColor: "#E6E3D7" }}><Search size={14} style={{ color: "#9A9D94" }} /><input type="text" placeholder="Search students, skills..." className="border-none outline-none bg-transparent text-[13px] w-48" style={{ color: "#171A18" }} /></div>
+              <button className="relative w-9 h-9 rounded-xl border bg-white flex items-center justify-center hover:bg-[#EFEDE3] transition-colors" style={{ borderColor: "#E6E3D7" }}><Bell size={16} /><span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style={{ background: "#C98B5F" }} /></button>
+            </div>
           </motion.div>
           <div className="mt-6">
             <AnimatePresence mode="wait">
